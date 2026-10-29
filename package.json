@@ -7,11 +7,22 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
     "postinstall": "nuxt prepare"
   },
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26"
+  },
   "dependencies": {
-    "nuxt": "^4.6.3",
+    "nuxt": "4.6.3",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "1.17.0",
+    "eslint": "10.13.0",
+    "typescript": "6.0.3",
+    "vue-tsc": "3.3.13"
   }
 }
