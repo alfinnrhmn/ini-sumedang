@@ -143,3 +143,22 @@ Terikat variabel [V]: `Brand Colors/Color - Secondary` `#FFFFFF` · `Gray Colors
 7. Menu hamburger (desktop + mobile) dan akordeon footer mobile tidak punya desain isi.
 8. Header Detail desktop berbeda geometri dari Beranda desktop.
 9. Teks berita, nama, dan waktu di Figma placeholder; label kategori kartu mobile ("Teknologi", "Jelajah") hanya contoh.
+
+### Status gap per keputusan pemilik 29 Okt 2026 (PRD v1.10)
+Tabel I di atas dibiarkan sebagai catatan bukti; status terbarunya:
+| Gap | Status |
+|---|---|
+| 1. Sumber font | **Diputuskan (G17):** Inter + Merriweather SemiBold; Outfit tidak dipakai; Merriweather Sans (hero) saat task hero |
+| 2. `#2866EB` dan warna footer | **Diputuskan (G18):** token resmi `#2866EB`, `#667085`, `#172033`, `#E5E7EB`, `#D5D5D5`, `#F3F7FF` |
+| 3. Skala ukuran teks | **Diputuskan:** skala frame (§A1, §A3) |
+| 5. Tujuan tautan footer | **Diputuskan sebagian (G16):** enam tautan (Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan) = teks biasa `to: null` sampai halaman Nuxt (STATIC-001 untuk lima; "Redaksi" tetap teks). Item kategori menjadi tautan saat PAGE-003 selesai; Terbaru/Terpopuler tetap teks sampai pemilik menentukan tujuan |
+| 7. Hamburger | **Diputuskan (G20):** laci 9 kategori, desktop = mobile; tampilan laci [?]. Akordeon footer mobile masih [?] |
+| Label kategori kartu (§G–H) | **Diputuskan (G19):** ikut desain per varian |
+Gap 4, 6, 8, 9 tidak berubah.
+
+### Pembaruan SET-002 (PM, 29 Okt 2026; baca saja, file asli, hanya frame final)
+- Node diperiksa: `130:2945` (variabel + metadata), `130:3352`, `57:516`, `60:486`.
+- §A1 `News/Headline/Mobile`: letter-spacing **−0,2 px** (variabel `-0.2`, kode `tracking-[-0.2px]`, `130:3352`).
+- §A4 tambahan: teks `#000000` (`text-black`) pada kartu `57:516` [V]. Judul Detail mobile `130:3352` berwarna **`#1A212E`** [V], bukan Grey 1 dan belum token (diputuskan di PAGE-002/CARD-001).
+- §A5 radius: 12 hanya pada panel berlangganan `87:464` (tidak dibangun); tombol `87:466` radius 16; avatar `rounded-[50px]` (20×20).
+- Footer `60:486` mengonfirmasi enam label di kolom Tentang + legal: Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan [V].

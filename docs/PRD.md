@@ -4,7 +4,7 @@
 
 | Metadata | Value |
 |---|---|
-| Dokumen | **PRD v1.9** — file Figma asli terbaca; temuan sidebar Detail ("Trending"); perbaikan ketidakkonsistenan antar dokumen |
+| Dokumen | **PRD v1.10** — keputusan pemilik 29 Okt 2026: font, token warna, label kartu, footer enam tautan, hamburger = laci 9 kategori, WordPress ditunda (data contoh) |
 | Tanggal | 29 Oktober 2026 |
 | Proyek | IniSumedang.com — redesign portal berita |
 | Frontend | **Nuxt 4.6.3** (rilis 27 Okt 2026, tag npm `latest`), Vue 3, TypeScript, SSR/Nitro |
@@ -12,10 +12,25 @@
 | Backend | WordPress Headless CMS, WordPress REST API v2 (read-only dari frontend) |
 | Desain | Figma — **file asli `tCjg6zC8qsZ4jhQpXvb0gK`** ("Ini Sumedang"; terbaca, 4 frame final diverifikasi 29 Okt 2026); salinan `ged4NOZtduLbw0gusMjAzn` hanya cadangan; **4 frame final** (§4.1) |
 | Workflow | Figma MCP → AI PM → Fullstack Engineer + QA → VS Code/Git → WordPress → QA/PM sign-off |
-| Status | Draft v1.9. DISC-001 sebagian (metadata 4 frame terbaca); isi tiap section (teks, aset, state) dan audit WordPress **belum dilakukan** |
+| Status | Draft v1.10. SET-001 `DONE` (bukti CI T14 tertunda), SET-002 `READY`; tugas bergantung WordPress `DITUNDA`. DISC-001 sebagian (metadata 4 frame terbaca); isi tiap section (teks, aset, state) dan audit WordPress **belum dilakukan** |
 
 ### Label bukti
 **[V]** terverifikasi dari sumber (Figma MCP, npm, release notes, pernyataan pemilik) · **[I]** inferensi dari yang terverifikasi · **[?]** belum diketahui / butuh keputusan. Isi bertanda [?] tidak boleh dianggap fakta oleh agent.
+
+### Perubahan dari v1.9 (keputusan pemilik, 29 Okt 2026; final)
+1. **Font = Inter + Merriweather SemiBold sesuai frame.** Outfit tidak dipakai. Merriweather Sans (judul hero) diputuskan saat task hero (§4.5). Menutup D-FONT dan D-SKALA (skala ukuran = skala frame).
+2. **Token warna resmi:** `#2866EB` dan warna footer `#667085`, `#172033`, `#E5E7EB`, `#D5D5D5`, `#F3F7FF` (§4.5). Menutup D-WARNA.
+3. **Label kategori pada kartu mengikuti desain per varian:** tampil di kartu mobile, tidak di desktop (§4.6, FR-02).
+4. **Footer tetap dibuat sesuai desain dengan ENAM tautan:** Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan. (Koreksi: tautan di kolom Tentang IniSumedang pada desain bernama "Redaksi"; versi awal v1.10 salah menyebutnya dan menghapusnya dari scope. Keputusan pemilik: **"Redaksi" dipertahankan sebagai teks biasa**.) Keenam label dirender sebagai **teks biasa** (bukan `<a>`, tanpa `href` kosong atau `#`), tampilan sama dengan desain, dari satu daftar konfigurasi dengan `to: null`; begitu halaman tujuan ada, `to` diisi dan otomatis menjadi tautan. Halaman tujuan dibuat di Nuxt (bukan WordPress Pages), nanti: STATIC-001 (lima halaman: Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan; "Redaksi" belum punya halaman, tujuannya ditentukan pemilik nanti) (§3.1, §7, G16).
+4a. **Aturan `to: null` bersifat sementara.** Item kategori di footer menjadi tautan ke `/kategori/[slug]` saat PAGE-003 selesai. "Terbaru" dan "Terpopuler" di footer **tetap teks biasa** sampai pemilik menentukan tujuan.
+4b. **Font: opsi A** — berkas `woff2` Inter dan Merriweather SemiBold di `public/fonts`, tanpa dependensi; wajib menyertakan berkas lisensi tiap font (diperiksa dari lisensi resmi, bukan ditebak), subset Latin, `font-display: swap` (§4.5, §5.1).
+4c. **Vitest ditunda** sampai ada logika nyata pertama; pemicunya: komposisi Rekomendasi, penyanitasi HTML, atau peringkat Berita Terkait (mana yang lebih dulu). MOCK-001 diverifikasi dengan typecheck dan cek manual lewat HTTP.
+4d. **Warna turunan** `#F8F8F8`, `rgba(8,8,8,0.05)`, `rgba(8,8,8,0.1)`, `#000000` diterima sebagai token. `#F3F7FF` tetap token resmi (G18) tetapi **dikeluarkan dari SET-002** sampai ada pemakainya.
+4e. **Laci hamburger:** sebelum LAY-001 `READY`, PM menyiapkan usulan visual sederhana (panel, daftar 9 kategori bergaya teks menu yang ada, tombol tutup, perilaku fokus dan Esc) untuk disetujui pemilik. Tidak dibangun sebelum disetujui.
+4f. **SANITIZE-001** (penyanitasi HTML sisi server) dibuat, `DITUNDA` ("WordPress ditunda"); dependensi PAGE-002.
+5. **Hamburger desktop dan mobile = laci berisi 9 kategori resmi**, fungsi sama (FR-01, G20).
+6. **WordPress ditunda: UI dikerjakan dengan data contoh** (prinsip 9, G21). Tugas yang bergantung WordPress berstatus `DITUNDA`; **gerbang "titik cek WordPress"** wajib sebelum PAGE-002, PAGE-003, PAGE-004 dan bagian PAGE-001 yang bergantung data WordPress (§13).
+7. Backlog (§15): SET-002 `READY`; task baru MOCK-001 dan STATIC-001 (`BACKLOG`). Rute halaman statis footer dicatat sebagai rencana di §7.
 
 ### Perubahan dari v1.8 (pembacaan file asli + review dokumen)
 **Sumber desain.** File asli `tCjg6zC8qsZ4jhQpXvb0gK` kini terbaca (login Figma dengan akun lain di VS Code). Keempat frame final cocok dengan §4.1 (nama dan ukuran). Isi file asli belum dibandingkan menyeluruh dengan salinan; AGENTS.md dan skill PM memakai file asli.
@@ -114,6 +129,7 @@ IniSumedang adalah portal berita berbasis Nuxt (SSR) yang mengambil konten dari 
 6. **SSR/SEO-first:** konten dan metadata ada di HTML server-rendered.
 7. **CMS-independent UI:** komponen memakai tipe domain internal, bukan struktur mentah REST WordPress.
 8. **Human approval** untuk tulis ke CMS, kredensial, dependensi baru, commit/push, deployment, perubahan scope.
+9. **Data contoh di balik fungsi layanan yang sama dengan WordPress nanti.** Selama WordPress ditunda, UI membaca data contoh (fixture) lewat fungsi layanan bertipe domain di `server/`; saat WordPress siap, hanya isi fungsi itu yang diganti, bukan komponen atau halaman. Fixture **sengaja memuat kasus buruk**: judul panjang, artikel tanpa gambar, entitas HTML seperti `&amp;` dan `&#8211;`, kategori/tag kosong, dan isi HTML yang berbeda-beda. Fixture adalah contoh, bukan fakta tentang WordPress: bentuk respons asli dibuktikan di titik cek WordPress (§13).
 
 ## 2. Tujuan dan Indikator Keberhasilan
 
@@ -144,7 +160,7 @@ IniSumedang adalah portal berita berbasis Nuxt (SSR) yang mengambil konten dari 
 ### 3.1 In scope (MVP) — mengikuti 4 frame final
 - **Beranda** desktop dan mobile: header, navigasi/tab kategori, area `Switch`, grid News Card, kolom samping, footer. [V struktur; isi per section belum dibaca]
 - **Detail Berita** desktop dan mobile: header, navigasi kategori, breadcrumb, artikel (judul, kategori, tanggal, identitas redaksi + waktu baca, foto + kredit foto, isi), bagikan artikel, berita terkait (sidebar desktop + blok kartu), footer.
-- **Footer**: tagline, tautan navigasi/kategori/tentang, ikon sosial (Facebook, X, WordPress, Instagram, YouTube, TikTok), teks legal. Tanpa berlangganan. [V nama node; teks asli belum dibaca]
+- **Footer** (sesuai desain `60:486` / `101:2600`; diputuskan pemilik 29 Okt 2026, G16): logo, tagline, ikon sosial (Facebook, X, WordPress, Instagram, YouTube, TikTok), kolom Navigasi / Kategori / Tentang, teks legal. Tanpa berlangganan. **Enam tautan:** Redaksi, Pedoman Siber, Iklan, Kontak (kolom Tentang IniSumedang), Kebijakan Privasi, Ketentuan Penggunaan (baris legal) [V, FIGMA-INVENTORY §D]. Keenam label dirender sebagai **teks biasa** (bukan `<a>`, tanpa `href` kosong atau `#`) dengan tampilan sama seperti desain, dari **satu daftar konfigurasi** `{ label, to }` dengan `to: null`; begitu halaman tujuan ada, `to` diisi dan otomatis menjadi tautan. "Redaksi" **dipertahankan sebagai teks biasa** (keputusan pemilik); tujuannya ditentukan pemilik nanti [?]. Halaman tujuan lima lainnya = halaman Nuxt (bukan WordPress Pages), task STATIC-001, isi dari pemilik. **Aturan `to: null` bersifat sementara:** item kategori di footer menjadi tautan ke `/kategori/[slug]` saat PAGE-003 selesai; "Terbaru" dan "Terpopuler" tetap teks sampai pemilik menentukan tujuan. Beranda → `/`. Tidak ada tautan mati.
 - **Halaman kategori** (`/kategori/[slug]`): daftar berita kategori tersebut, pola kartu dan grid sama dengan beranda **tanpa bagian hero/gambar besar**, berhalaman. [Diturunkan; keputusan pemilik]
 - **Pencarian** (`/cari?q=`): daftar berita yang judulnya cocok atau terkait dengan kata kunci. [Diturunkan; keputusan pemilik]
 - **Tablet**: layout dibuat dan konsisten dengan desktop dan mobile (§3.4).
@@ -171,6 +187,12 @@ IniSumedang adalah portal berita berbasis Nuxt (SSR) yang mengambil konten dari 
 | G13 | Tombol bagikan | Facebook, X, Instagram, Salin tautan | **Diputuskan**; perlakuan Instagram [?] |
 | G14 | Judul sidebar Detail desktop | Desain berjudul "Trending" + "Lainnya"; keputusan pemilik: isi = Berita Terkait | **[?]** usulan: judul "Berita Terkait"; tautan "Lainnya" tidak dibangun |
 | G15 | File Figma sumber | File asli `tCjg6zC8qsZ4jhQpXvb0gK` | **Diputuskan** (terbaca 29 Okt 2026) |
+| G16 | Footer | **Dibuat sesuai desain, enam tautan** (Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan); keenamnya teks biasa dari daftar konfigurasi `to: null`; lima di antaranya menjadi tautan saat halaman Nuxt ada (STATIC-001); "Redaksi" tetap teks sampai pemilik menentukan tujuan; item kategori menjadi tautan saat PAGE-003 selesai; Terbaru/Terpopuler tetap teks | **Diputuskan** (29 Okt 2026); tujuan Redaksi, Terbaru, Terpopuler [?] |
+| G17 | Font | Inter + Merriweather SemiBold sesuai frame; Outfit tidak dipakai; Merriweather Sans (hero) diputuskan saat task hero | **Diputuskan** (29 Okt 2026) |
+| G18 | Token warna | `#2866EB` dan `#667085`, `#172033`, `#E5E7EB`, `#D5D5D5`, `#F3F7FF` menjadi token resmi | **Diputuskan** (29 Okt 2026) |
+| G19 | Label kategori pada kartu | Mengikuti desain per varian: tampil di kartu mobile, tidak di desktop | **Diputuskan** (29 Okt 2026) |
+| G20 | Hamburger | Desktop dan mobile = laci berisi 9 kategori resmi, fungsi sama | **Diputuskan** (29 Okt 2026); tampilan laci tanpa frame: usulan visual PM disiapkan sebelum LAY-001 `READY`, disetujui pemilik dulu [?] |
+| G21 | WordPress | Ditunda; UI memakai data contoh (prinsip 9); gerbang titik cek WordPress (§13) | **Diputuskan** (29 Okt 2026) |
 
 Halaman kategori, pencarian, tablet, dan state 404/error/kosong **tidak punya frame Figma**. Karena itu mereka memakai komponen dan token dari 4 frame final; PM tidak boleh menambah elemen visual baru di luar itu tanpa persetujuan pemilik.
 
@@ -298,7 +320,7 @@ File terbaca [V]: **file asli `tCjg6zC8qsZ4jhQpXvb0gK`** ("Ini Sumedang") — 4 
 ### 4.2 Referensi saja — bukan requirement
 Library dan eksplorasi berikut ada di file tetapi **tidak boleh** menjadi task:
 - Halaman **Component** `12:809`: tombol, input, kontrol, kartu, topic/author card, komentar, bottom nav, notifikasi, OTP. Sumber tampilan komponen, bukan daftar fitur. Sebuah komponen baru masuk scope **hanya bila di-instance di salah satu frame final**.
-- Halaman **Guidline for Dekstop** `13:4033`: sumber token (warna, tipografi, grid, spacing) — dipakai.
+- Halaman **Guidline for Dekstop** `13:4033`: sumber token warna, grid, spacing — dipakai. **Tipografi guideline (Outfit) tidak dipakai**; tipografi diambil dari frame final (§4.5, G17).
 - Frame mobile lama: `Homepage` `12:2500`/`12:2547`, `notification` `12:2590`, `Trending` `12:2625`, `Frame 291` `100:2489`, `News Blog Website 2` di halaman mobile `90:1613` (versi desktop), `Frame 310` `116:1646`.
 - Semua frame `Preview` (`44:845`, `130:4313`, `116:1663`, `130:3710`), `Container` dan instance lepas di kanvas.
 - Halaman `Branding for Mobile` `12:69`, `Beranda — Redesign` `10:2`, `Assets` `74:1154`: tidak diaudit [?]; `Assets` boleh dipakai sebagai sumber ikon/gambar bila PM mengonfirmasi.
@@ -337,12 +359,21 @@ Lebar konten: desktop 1120 pada kanvas 1440 (margin ±160 [I]); mobile 354 pada 
 | Success | `#27AE60` | **2,87** | gagal |
 | Warning | `#E2B93B` | **1,87** | gagal |
 | Error | `#EB5757` | **3,48** | gagal |
+| Biru merek | `#2866EB` | ≈ 5,0 [I, FIGMA-INVENTORY §A4] | **token resmi (G18)**; latar menu kategori, judul kolom footer. Putih di atasnya ≈ 5,0 |
+| Footer / teks sekunder | `#667085` | ≈ 4,97 [I] | **token resmi**; tagline dan legal footer; lolos AA teks normal (tipis) |
+| Footer / tautan | `#172033` | tinggi [I] | **token resmi**; teks tautan footer |
+| Footer / garis | `#E5E7EB`, `#D5D5D5` | border | **token resmi**; hanya border/divider |
+| Footer / latar panel | `#F3F7FF` | latar | **token resmi** meski pemakaian asalnya panel berlangganan (tidak dibangun, G3); belum ada pemakai → **tidak dimasukkan ke SET-002** sampai ada pemakainya |
+| Latar kontrol | `#F8F8F8` | latar | **token** (diterima pemilik 29 Okt 2026); latar kolom pencarian dan tombol |
+| Border kontrol | `rgba(8,8,8,0.05)`, `rgba(8,8,8,0.1)` | border | **token** (diterima pemilik); border pencarian/tombol, garis |
+| Teks kartu | `#000000` | 21 : 1 [I] | **token** (diterima pemilik); teks kartu berita |
 
 Kontras dihitung dengan rumus WCAG. **Aturan:** token yang gagal tidak dipakai sebagai warna teks ukuran normal di atas putih; PM meminta pengganti dari desainer atau membatasinya untuk ikon/border/teks besar (≥ 24px, atau ≥ 18,66px bold; ambang 3:1). Warna **yang benar-benar dipakai** di 4 frame final belum diaudit [?] — periksa dulu sebelum menganggap ini masalah.
 
-**Tipografi (Google Fonts) [V]:** **Outfit** untuk judul — 64/54/42/24/18 px, line-height 120%. **Inter** untuk isi — 24/20/18/16/14 px, line-height 150%. Bobot dan pemetaan gaya→ukuran [?] (ambil dari `get_design_context`). Font di-*self-host*.
-
-**Temuan v1.8 [V, kode Beranda desktop `21:4950`]:** font yang benar-benar dipakai di frame = **Inter** (Light/Regular/Medium/SemiBold/Bold) dan **Merriweather SemiBold** (judul section 23,04 px, nama "IniSumedang"), plus **Merriweather Sans Regular** (judul hero 32 px). **Outfit tidak muncul** di kode frame itu. Guideline (Outfit) dan frame berbeda → **sumber kebenaran font [?] diputuskan pemilik**; Detail dan mobile belum dicek. Sampai dijawab, PM/Fullstack tidak memilih sendiri.
+**Tipografi — diputuskan pemilik 29 Okt 2026 (G17):** **Inter** (isi, kartu, meta, menu, footer) + **Merriweather SemiBold 600** (judul section, nama/judul berita) **sesuai frame**. **Outfit tidak dipakai.** Skala ukuran, bobot, line-height, dan letter-spacing = gaya di frame final: tabel `docs/FIGMA-INVENTORY.md` §A1 (terikat variabel, [V] `get_variable_defs` pada 4 frame) dan §A3 (di-hardcode, [V] kode node), mis. 11,111 / 13,333 / 16 / 19,2 / 23,04 / 27,648 px. Bobot Inter yang dipakai: Light 300 (timestamp kartu mobile), Regular 400, Medium 500, SemiBold 600 (+ Bold bila ditemukan di frame [?]). Font di-*self-host* dengan `font-display`; tanpa permintaan ke Google Fonts saat runtime.
+- **Merriweather Sans** (judul hero 32 px, [V] kode `21:4950` v1.8) **tidak ditetapkan sekarang**; diputuskan saat task hero (FR-03). Tidak termasuk SET-002.
+- Skala guideline (Outfit 64/54/42/24/18; Inter 24/20/18/16/14) **tidak dipakai**.
+- **Self-host = opsi A (diputuskan pemilik 29 Okt 2026):** berkas `woff2` di `public/fonts`, tanpa dependensi. Wajib: berkas lisensi tiap font (lisensi resmi diperiksa, tidak ditebak), subset Latin, `font-display: swap`. Detail di SET-002.
 
 **Grid referensi [V]:** Desktop 1440: 12 kolom, kolom 65, gutter 30 · Desktop 1024: 12/50/30 · Tablet 768: 6/88/30 · Mobile 320: 2/130/30. Frame final memakai 1440 dan 402; ukuran lain hanya sampel uji.
 **Spacing [V]:** 8, 16, 24, 32, 40, 56, 72, 80, 96, 120 px.
@@ -351,6 +382,8 @@ Kontras dihitung dengan rumus WCAG. **Aturan:** token yang gagal tidak dipakai s
 
 ### 4.6 Komponen kartu yang ada di frame final [V nama]
 `News Card 01–18` (desktop, 358×350/348/321/323 dan 255 lebar) · `Card recomendasion desktop` (243×260) · `Card news Mobile` (354×318) · `Card News Mobile` (354×104, bentuk horizontal). Varian yang tepat dipetakan PM per section.
+
+**Label kategori pada kartu (G19, diputuskan 29 Okt 2026):** mengikuti desain **per varian** — tampil di kartu mobile (`159:2933`), **tidak** tampil di kartu desktop (`57:516`) [V, FIGMA-INVENTORY §G–H]. Tidak diseragamkan. Varian lain yang belum dibaca mengikuti gambarnya masing-masing saat dibaca.
 
 ### 4.7 Kriteria handoff per section
 Node ID + screenshot desktop/mobile · token terpakai · aset dan rasio gambar · state (hover/focus/empty/loading/error) atau gap yang dicatat · field data CMS · keputusan tablet. Hasil di `docs/FIGMA-INVENTORY.md`; pisahkan *actual* vs *proposed*.
@@ -379,9 +412,9 @@ DEV ONLY: Figma MCP ─> agent skills ─> VS Code/Git     WordPress MCP ─> in
 | Style | CSS dengan custom properties dari token Figma. Tailwind/Nuxt UI tidak dipasang kecuali PM menunjukkan kebutuhan konkret |
 | Auth | **Tidak ada** |
 | Bagikan | Tautan share biasa / Web Share API; **tanpa SDK pihak ketiga** (privasi, ukuran JS) |
-| Font | Self-host (`@nuxt/fonts` atau manual) — putuskan di SET-002 |
+| Font | Inter + Merriweather SemiBold (G17), self-host opsi A: `woff2` di `public/fonts`, tanpa dependensi, berkas lisensi disertakan, subset Latin, `font-display: swap` |
 | Data | WordPress REST API v2 |
-| Unit/komponen | Vitest + `@nuxt/test-utils` |
+| Unit/komponen | Vitest + `@nuxt/test-utils` — **ditunda** sampai ada logika nyata pertama (komposisi Rekomendasi, penyanitasi HTML, atau peringkat Berita Terkait, mana yang lebih dulu); persetujuan dependensi diminta saat itu |
 | E2E/visual | Playwright |
 | Lint | ESLint (`@nuxt/eslint`) |
 
@@ -397,7 +430,7 @@ Gunakan core `posts`, `categories`, `tags`, `media`. Tanpa CPT kecuali kebutuhan
 | Category | id, slug, name, parent? | label menu dari sini |
 | MediaAsset | src, alt, width?, height?, caption?, **credit** | **Kredit Foto**: sumber field [?] (caption bawaan WP atau meta kustom) |
 | HomeEditorial | tag `terpopuler` (editor), jendela hari; kategori induk `ruang-visual` + kategori anak = topik | tanpa plugin; konvensi editorial |
-| SiteSettings | tagline, tautan footer, URL sosial, teks legal | [?] dari WP options / konfigurasi kode |
+| SiteSettings | tagline, tautan footer, URL sosial, teks legal | Tautan footer = **konfigurasi kode** `{ label, to }` (G16), bukan WordPress. URL sosial dan teks legal [?] (WP options atau konfigurasi kode) |
 
 - `readingMinutes` dihitung server dari jumlah kata (rumus, mis. 200 kata/menit, disepakati PM) [?].
 - `authorLabel`: "Redaksi IniSumedang" atau nama penulis [?].
@@ -417,14 +450,21 @@ Gunakan core `posts`, `categories`, `tags`, `media`. Tanpa CPT kecuali kebutuhan
 | Detail berita | `/berita/[slug]` | MVP — cocokkan dengan URL live |
 | Kategori | `/kategori/[slug]` | MVP (G1) — berhalaman, tanpa hero |
 | Pencarian | `/cari?q=` | MVP (G2) — `noindex` |
+| Pedoman Siber | `/pedoman-siber` | **Rencana, belum dibangun** — STATIC-001, isi dari pemilik; slug usulan [I] |
+| Iklan (info pemasangan iklan) | `/iklan` | **Rencana, belum dibangun** — STATIC-001 |
+| Kontak | `/kontak` | **Rencana, belum dibangun** — STATIC-001; teks saja, tanpa formulir |
+| Kebijakan Privasi | `/kebijakan-privasi` | **Rencana, belum dibangun** — STATIC-001 |
+| Ketentuan Penggunaan | `/ketentuan-penggunaan` | **Rencana, belum dibangun** — STATIC-001 |
+
+Lima halaman statis footer (G16) adalah halaman Vue biasa di Nuxt, bukan WordPress Pages. Sebelum halamannya ada, labelnya di footer berupa teks biasa (`to: null`). Slug final ditetapkan di STATIC-001. "Redaksi" (label keenam) belum punya halaman dan tetap teks biasa.
 
 Wajib: matriks `URL lama → URL baru` (301) sebelum rute final.
 
 ## 8. Functional Requirements
 
-**FR-01 Header & navigasi (P0).** Header beranda dan detail sesuai frame final; hamburger/menu mobile; menu kategori (tautan biasa ke `/kategori/[slug]`, bukan tab) dari kategori WordPress (bukan teks Figma); state aktif; fokus keyboard; label aksesibel; tanpa overflow. Tombol 36×36 = toggle tema (§3.7), tidak dirender di MVP; kolom pencarian desktop dan ikon cari mobile ada di header (§3.5).
+**FR-01 Header & navigasi (P0).** Header beranda dan detail sesuai frame final; **hamburger (desktop dan mobile) = laci berisi 9 kategori resmi, fungsi sama** (G20; tautan biasa ke `/kategori/[slug]`, label dari kategori WordPress/data contoh; buka/tutup dengan `aria-expanded`, Esc menutup, fokus kembali ke tombol; tampilan laci tanpa frame, diturunkan dari token dan disetujui pemilik sebelum dibangun); menu kategori (tautan biasa ke `/kategori/[slug]`, bukan tab) dari kategori WordPress (bukan teks Figma); state aktif; fokus keyboard; label aksesibel; tanpa overflow. Tombol 36×36 = toggle tema (§3.7), tidak dirender di MVP; kolom pencarian desktop dan ikon cari mobile ada di header (§3.5).
 
-**FR-02 News card (P0).** Varian dari §4.6; props bertipe; gambar hilang, judul panjang, rasio, hover/fokus/touch diuji; satu tautan per kartu.
+**FR-02 News card (P0).** Varian dari §4.6; label kategori mengikuti desain per varian (mobile tampil, desktop tidak; G19); props bertipe; gambar hilang, judul panjang, rasio, hover/fokus/touch diuji; satu tautan per kartu.
 
 **FR-03 Area `Switch` beranda (P0).** Perilaku [?] harus dibaca dari `get_design_context` dulu (ukuran 739×531 desktop, 354×238 mobile; mungkin hero/slider). Bila slider/tab: dapat dikontrol keyboard, tidak berputar otomatis tanpa kontrol jeda.
 
@@ -438,7 +478,7 @@ Wajib: matriks `URL lama → URL baru` (301) sebelum rute final.
 
 **FR-07 Berita terkait (P0).** Sesuai §3.8, untuk sidebar dan blok 3 berita di bawah artikel: tag → kategori → terbaru; lintas kategori boleh; tanpa duplikat antar dua blok; bukan artikel yang sedang dibuka; kosong → blok disembunyikan.
 
-**FR-08 Footer (P0).** Tagline, tautan, ikon sosial dengan URL dari pemilik, teks legal. Tanpa berlangganan.
+**FR-08 Footer (P0).** Sesuai desain (§3.1, G16): tagline, kolom, ikon sosial dengan URL dari pemilik, teks legal. Tanpa berlangganan. Enam tautan (Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan) dari satu daftar konfigurasi `{ label, to }`: `to: null` → **teks biasa** (bukan `<a>`, tanpa `href` kosong atau `#`, tampilan sama dengan desain); `to` terisi → tautan. "Redaksi" tetap teks biasa sampai pemilik menentukan tujuan; item kategori menjadi tautan saat PAGE-003 selesai; "Terbaru" dan "Terpopuler" tetap teks. Tidak ada tautan mati.
 
 **FR-09 Freshness (P0).** Publish di WordPress tampil sesuai kebijakan cache (TTL/webhook); draft/delete tidak terpapar.
 
@@ -504,11 +544,12 @@ ini-sumedang/
 │   ├── components/                # base/, layout/, news/
 │   ├── composables/
 │   ├── layouts/
-│   ├── pages/                     # index.vue, berita/[slug].vue, kategori/[slug].vue, cari.vue
+│   ├── pages/                     # index.vue, berita/[slug].vue, kategori/[slug].vue, cari.vue (+ halaman statis footer, STATIC-001)
 │   └── types/
 ├── server/
 │   ├── api/                       # handler tipis
-│   ├── services/                  # wp-client.ts, mappers
+│   ├── fixtures/                  # data contoh sementara (MOCK-001; prinsip 9); dihapus/diganti saat WordPress siap
+│   ├── services/                  # fungsi layanan (fixture dulu, lalu wp-client.ts), mappers
 │   └── utils/                     # sanitize, validate
 ├── public/                        # aset statis (tanpa robots.txt; lihat catatan)
 ├── tests/{unit,e2e}/
@@ -540,7 +581,16 @@ Tidak membuat folder/berkas yang belum dibutuhkan; `shared/` hanya bila tipe/uti
 ## 13. Workflow & Gate
 
 Discovery (read-only) → task breakdown → QA test plan → implementasi → verifikasi → gate (FAIL kembali ke engineer) → DONE oleh PM.
-Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE` (+ `BLOCKED`, `QA_FAILED`).
+Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE` (+ `BLOCKED`, `QA_FAILED`, `DITUNDA`). `DITUNDA` = ditunda atas keputusan pemilik dengan alasan tertulis; tidak dihapus; dibuka kembali oleh PM saat alasannya hilang.
+
+**Gerbang "titik cek WordPress" (G-WP, ditetapkan 29 Okt 2026).** Tugas maksimum **1 jam**, read-only (REST publik / MCP read-only; tanpa menulis ke WordPress), hasil dicatat di `docs/decisions/`. Isi:
+1. REST API aktif dan publik (URL dari pemilik).
+2. Bentuk respons `posts` dengan `_embed` (field yang benar-benar ada, bukan tebakan fixture).
+3. Sembilan kategori resmi ada (nama + slug) dan tag `terpopuler` ada.
+4. Sumber field kredit foto (caption media bawaan atau meta kustom).
+5. Hasil pencarian "peraturan pemerintah terbaru" (perilaku semua-kata vs longgar, §3.5).
+6. Versi Node hosting memenuhi `engines` Nuxt.
+**Wajib lulus (atau hasilnya dicatat dan PM menyesuaikan task) sebelum:** PAGE-002, PAGE-003, PAGE-004, dan bagian PAGE-001 yang bergantung data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial). **Bagian PAGE-001 yang hanya UI** (tata letak, kartu, judul section, Rekomendasi/kategori dari fixture) **boleh memakai fixture** tanpa gerbang. Titik cek adalah himpunan bagian DISC-002; DISC-002 penuh (plugin SEO, bentuk plugin iklan/ACF, URL lama) tetap `DITUNDA`.
 
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 **Definition of Done:** fidelity dibandingkan dengan screenshot; build, lint, typecheck, tes relevan lulus dengan output nyata; keyboard/a11y/kontras diperiksa; tidak ada defect Critical/High; QA_PASSED; PM sign-off.
@@ -556,7 +606,10 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | SEO | konten SSR, canonical, sitemap, 404, JSON-LD (`NewsArticle`, `BreadcrumbList`), robots staging |
 | A11y | keyboard, fokus terlihat, landmark, kontras (§4.5), alt text, `Switch` terkontrol |
 | Keamanan | XSS via konten WP, parameter berbahaya, header keamanan, tidak ada secret di bundel klien, **tidak ada `Set-Cookie` / elemen login** |
-| Konten | label menu = 9 kategori resmi dari WordPress (bukan "Otomatif/Jalajah"); tidak ada elemen berlangganan |
+| Konten | label menu = 9 kategori resmi dari WordPress/data contoh (bukan "Otomatif/Jalajah"); tidak ada elemen berlangganan |
+| Footer & hamburger | enam label footer terlihat (Redaksi, Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan); **"Redaksi" berupa teks biasa, bukan `<a>`**; **tidak ada `<a>` dengan `href` kosong atau `#`** di seluruh situs; label dengan `to: null` = teks biasa (bukan `<a>`, tidak bisa difokus) dan label dengan `to` terisi = `<a>` yang valid (200); hamburger desktop dan mobile membuka laci berisi 9 kategori resmi, fungsi sama; tidak ada tautan mati |
+| Kartu | label kategori tampil di kartu mobile, tidak di kartu desktop (G19) |
+| Data contoh | fixture memuat kasus buruk (judul panjang, tanpa gambar, entitas `&amp;`/`&#8211;`, kategori/tag kosong, HTML isi bervariasi) dan UI tetap rapi; entitas tampil sebagai karakter, bukan teks `&amp;`; UI hanya melewati fungsi layanan (tidak membaca fixture langsung) |
 | Beranda | judul section bukan tautan dan bukan tombol (tidak fokus, tidak klik); jumlah kartu per section = tabel §3.6 di desktop dan mobile; Rekomendasi tanpa duplikat; Ruang Visual 4 blok (judul topik + 1 kartu besar + 3 berthumbnail), topik tanpa artikel dilewati; tab Terbaru/Terpopuler: garis pindah, panah kiri/kanan, `aria-selected`, reduced-motion tanpa animasi, tidak ada layout shift, kedua daftar di HTML SSR; Terpopuler hanya bertag `terpopuler` ≤ 14 hari, kosong → tab disembunyikan; tidak ada toggle tema |
 | Iklan | slot sesuai ukuran desain; slot tanpa iklan tidak dirender; iklan jadwal lewat tidak tampil; tautan `https` + `rel="sponsored noopener noreferrer"`; tautan `javascript:` ditolak; tidak ada layout shift (CLS) saat iklan dimuat; ubah ukuran/penempatan di WordPress → tampil setelah TTL; tidak ada skrip pihak ketiga; ukuran tidak cocok dengan slot ditolak WordPress |
 | Kategori | hanya berita kategori itu, tanpa hero, paginasi, 404, empty state |
@@ -572,7 +625,9 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | DISC-003 | Konfirmasi sisa: angka final per section kategori (usulan 4); fungsi tautan "Lihat Lainnya"; sumber font (Inter + Merriweather di frame vs Outfit di guideline); perlakuan Instagram di bagikan; judul sidebar Detail ("Trending" vs "Berita Terkait"); sumber angka widget sosial + URL akun; teks placeholder pencarian dan keadaan terbuka mobile; teks label slot iklan; bentuk WordPress (plugin kecil atau ACF); salinan Figma = file asli | P0 | Pemilik |
 | POP-001 | Terpopuler = tag editor + jendela 14 hari: tag di WordPress, `getPopularArticles()`, panduan editor (upgrade ke tayangan = change request) | P0 | QA+PM |
 | SET-001 | Nuxt sudah terpasang (`^4.6.3`): pin ke `4.6.3` persis (perlu persetujuan), lockfile, `.nvmrc`, `engines`, skrip `lint`/`test`, ESLint, CI dasar | P0 | FE+QA |
-| SET-002 | Token CSS, font self-host, base components; kontras warna disepakati | P0 | QA+PM |
+| SET-002 | Token CSS (warna, tipografi frame, spacing, radius), font self-host Inter + Merriweather SemiBold, CSS dasar; **bukan komponen**. Keputusan font dan warna sudah ada (G17, G18) | P0 | QA+PM |
+| MOCK-001 | Fixture + fungsi layanan bertipe domain (§6) termasuk kasus buruk (prinsip 9) | P0 | QA+PM |
+| STATIC-001 | Lima halaman statis footer di Nuxt (Pedoman Siber, Iklan, Kontak, Kebijakan Privasi, Ketentuan Penggunaan); isi dari pemilik | P1 | QA+PM |
 | API-001 | WP client, tipe domain, mapper, validasi, sanitasi, error handling | P0 | QA+PM |
 | LAY-001 | Header, navigasi kategori, footer (desktop+mobile) | P0 | QA+PM |
 | CARD-001 | Sistem News Card (varian final) | P0 | QA+PM |
@@ -587,6 +642,25 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | SOC-001 | Widget sosial (`Frame 283`): opsi WordPress untuk angka + URL akun, endpoint baca-saja, komponen Nuxt | P0 | QA+PM |
 | RESP-001 | Aturan dan implementasi tablet (§3.4) | P0 | QA+PM |
 | REL-001 | Staging, E2E, rollback, release checklist | P0 | Pemilik |
+
+### 15.1 Status backlog (v1.10, 29 Okt 2026)
+| ID | Status | Catatan |
+|---|---|---|
+| SET-001 | `DONE` | Bukti CI (T14) dan versi Node lain (T13) tertunda; lihat `docs/tasks/SET-001.md` |
+| SET-002 | `READY` | `docs/tasks/SET-002.md` |
+| MOCK-001 | `BACKLOG` | Dependensi: SET-001. Menggantikan sumber data API-001 sementara |
+| STATIC-001 | `BACKLOG` | Menunggu konten dari pemilik; dependensi LAY-001 (daftar footer). Lima halaman; "Redaksi" tetap teks |
+| SANITIZE-001 | `DITUNDA` | Alasan: WordPress ditunda. Penyanitasi HTML sisi server; dependensi PAGE-002; pemicu Vitest bila lebih dulu |
+| LAY-001, CARD-001 | `BACKLOG` | Dependensi data berpindah dari API-001 ke MOCK-001 |
+| PAGE-001 | `BACKLOG` | Bagian UI-only boleh fixture; bagian data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial) menunggu gerbang G-WP (§13) |
+| PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13). PAGE-002 juga bergantung SANITIZE-001 |
+| API-001 | `DITUNDA` | Alasan: WordPress ditunda |
+| DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |
+| POP-001 | `DITUNDA` | Alasan: WordPress ditunda |
+| ADS-001 | `DITUNDA` | Alasan: WordPress ditunda |
+| ADS-002 | `DITUNDA` | Alasan: WordPress ditunda |
+| SOC-001 | `DITUNDA` | Alasan: WordPress ditunda |
+| Lainnya (DISC-001, DISC-003, SEC-001, SEO-001, RESP-001, REL-001) | tidak berubah | SEO-001 (redirect map URL lama) dan SEC-001 (uji XSS konten) bergantung data WordPress pada bagian tertentu [I]; PM menilai saat task dibuka |
 
 ## 16. Fase & Estimasi (baseline)
 
@@ -610,12 +684,16 @@ Phase 0 Discovery 1–2 hari · Phase 1 Foundation 2–3 hari · Phase 2 Beranda
 | HTML berbahaya dari CMS | Sanitasi + allowlist embed + tes |
 | Prompt injection lewat konten | Konten = data; izin agent minimal |
 | Scope creep dari library komponen Figma | Hanya node di 4 frame final; sisanya referensi |
-| Font di frame ≠ guideline (Merriweather vs Outfit) | Pemilik memutuskan; cek Detail + mobile; font self-host |
+| ~~Font di frame ≠ guideline (Merriweather vs Outfit)~~ | **Diputuskan** G17: Inter + Merriweather SemiBold; Merriweather Sans (hero) diputuskan saat task hero |
+| Fixture tidak cocok dengan bentuk respons WordPress asli | Fixture berbentuk respons REST inti dan lewat mapper; dibuktikan di gerbang G-WP (§13); layanan satu pintu (prinsip 9) |
+| Halaman statis footer belum ada konten/isi dari pemilik | Label footer teks biasa (`to: null`) sampai STATIC-001 selesai; tidak ada tautan mati |
+| Tampilan laci hamburger tanpa frame | Usulan visual sederhana PM disiapkan **sebelum LAY-001 `READY`** dan disetujui pemilik; tidak dibangun sebelum disetujui |
+| Rendering `body` HTML artikel (fixture maupun WordPress) tanpa penyanitasi | Penyanitasi (SANITIZE-001, `DITUNDA`; dependensi, butuh persetujuan) wajib ada sebelum `body` dirender dengan `v-html` (AGENTS.md aturan 6); dijaga di PAGE-002. `v-html` untuk data mentah tetap dilarang |
 | "Lihat Lainnya" ada di desain tetapi tidak diputuskan | Tidak dibangun sampai dijawab; judul section tetap non-interaktif |
 | Instagram tidak punya URL share web | Pemilik memilih: Web Share API (mobile), ganti ke tautan akun, atau hapus tombol |
 | Keadaan terbuka pencarian mobile tidak ada di frame | Usulan §3.5, disetujui pemilik sebelum dibangun |
 
-**Open decisions:** URL WordPress dan hosting, versi Node hosting, autentikasi MCP, plugin SEO, URL lama dan migrasi, angka final per section kategori, fungsi "Lihat Lainnya", sumber font, perlakuan Instagram di bagikan, judul sidebar Detail (G14), sumber angka dan URL akun widget sosial, teks placeholder pencarian + keadaan terbuka mobile, teks label slot iklan, bentuk WordPress untuk iklan dan widget (plugin kecil atau ACF), apakah pencarian butuh plugin (setelah uji nyata), kebijakan cache, platform deploy, lokasi aset, salinan Figma = file asli. (Keputusan yang sudah dijawab: lihat changelog v1.8.)
+**Open decisions:** URL WordPress dan hosting, versi Node hosting, autentikasi MCP, plugin SEO, URL lama dan migrasi, angka final per section kategori, fungsi "Lihat Lainnya", perlakuan Instagram di bagikan, judul sidebar Detail (G14), sumber angka dan URL akun widget sosial, teks placeholder pencarian + keadaan terbuka mobile, teks label slot iklan, bentuk WordPress untuk iklan dan widget (plugin kecil atau ACF), apakah pencarian butuh plugin (setelah uji nyata), kebijakan cache, platform deploy, lokasi aset, salinan Figma = file asli. Terbuka tambahan v1.10: tujuan footer Redaksi, Terbaru, dan Terpopuler serta perilaku baris footer mobile, tampilan laci hamburger, isi lima halaman statis, URL WordPress untuk gerbang G-WP. (Keputusan yang sudah dijawab: lihat changelog v1.8–v1.10.)
 
 ## 18. Release Acceptance
 
@@ -634,4 +712,4 @@ Kode Nuxt 4.6.3 · dokumentasi kontrak API · inventaris Figma + pemetaan token 
 - Google Article structured data: https://developers.google.com/search/docs/appearance/structured-data/article
 - WCAG 2.2 kontras: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
 
-*PRD v1.9. Hasil DISC-001–003 harus diisi dari pembacaan nyata, bukan spekulasi.*
+*PRD v1.10. Hasil DISC-001–003 harus diisi dari pembacaan nyata, bukan spekulasi.*

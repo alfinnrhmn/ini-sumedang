@@ -6,7 +6,7 @@
 | **Status** | `BACKLOG` |
 | **Owner** | QA (rencana tes) → FE → QA → PM |
 | **Prioritas** | P0 |
-| **Dependensi** | SET-001 `DONE`; SET-002 `DONE`; API-001 `DONE` (tipe `Article`, `MediaAsset`) |
+| **Dependensi** | SET-001 `DONE`; SET-002 `DONE`; MOCK-001 `DONE` (tipe `Article`, `MediaAsset`; sebelumnya API-001, yang `DITUNDA`) |
 | **Rujukan PRD** | §4.6, FR-02, §15 (CARD-001); `docs/FIGMA-INVENTORY.md` §G–H |
 | **Dibuat** | 29 Okt 2026 (PM, Sprint 0) |
 
@@ -43,7 +43,7 @@ Disusun saat READY. Minimal: perbandingan dengan screenshot Figma pada 1440 dan 
 | – | – | – | – | – |
 
 ## Catatan — keputusan sebelum READY
-- Label kategori: tampil di mobile (`159:2933`) tetapi tidak di desktop (`57:516`). Pemilik/PM: ikuti desain per varian atau samakan?
+- **Diputuskan pemilik (29 Okt 2026, G19):** label kategori mengikuti desain per varian — tampil di kartu mobile (`159:2933`), tidak di kartu desktop (`57:516`). Tidak diseragamkan. Tambahan kriteria penerimaan (butir 2): label ada di varian mobile, tidak ada di varian desktop; QA menguji keduanya.
 - Label penerbit: "IniSumedang" tetap atau nama penulis (PRD §6 `authorLabel` [?]).
 - Aturan waktu relatif ("2 jam lalu"): kapan beralih ke tanggal; zona WIB.
 - State hover/fokus/gambar hilang tidak digambar; usulan PM turunan dari token.

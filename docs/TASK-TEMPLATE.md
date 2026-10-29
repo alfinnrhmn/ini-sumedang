@@ -9,7 +9,7 @@ Salin ke `docs/tasks/<ID>.md`. Satu file per task. Isi tiap bagian; tulis `n/a` 
 | Field | Isi |
 |---|---|
 | **ID** | mis. `SET-001` (sama dengan PRD §15) |
-| **Status** | `BACKLOG` / `READY` / `IN_PROGRESS` / `IN_REVIEW` / `QA_FAILED` / `QA_PASSED` / `DONE` / `BLOCKED` |
+| **Status** | `BACKLOG` / `READY` / `IN_PROGRESS` / `IN_REVIEW` / `QA_FAILED` / `QA_PASSED` / `DONE` / `BLOCKED` / `DITUNDA` (alasan tertulis) |
 | **Owner** | `PM` / `FE` / `QA` (satu owner aktif pada satu waktu) |
 | **Prioritas** | P0 / P1 |
 | **Dependensi** | ID task lain yang harus `DONE`, dan keputusan pemilik yang dibutuhkan |
