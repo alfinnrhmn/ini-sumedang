@@ -3,10 +3,10 @@
 | Field | Isi |
 |---|---|
 | **ID** | HOME-04 |
-| **Status** | `BACKLOG` — dibuka PM (→ `READY`) setelah HOME-01 `DONE` dan gerbang G-WP |
+| **Status** | `BACKLOG` — dibuka PM (→ `READY`) setelah HOME-01 `DONE`; gerbang G-WP **tidak** menghalangi UI dan layanan fixture (pengecualian pemilik 30 Okt 2026) |
 | **Owner** | FE → QA (konteks baru) → PM |
 | **Prioritas** | P0 |
-| **Dependensi** | HOME-01 `DONE`. **Gerbang G-WP** (PRD §13 menyebut Ruang Visual sebagai bagian yang bergantung data WordPress: struktur kategori induk `ruang-visual` dan anak belum terverifikasi). UI dengan fixture boleh dikerjakan hanya bila PM mencatat pengecualian tertulis di sini |
+| **Dependensi** | HOME-01 `DONE`. **Pengecualian pemilik (30 Okt 2026):** boleh dikerjakan dengan fixture di balik fungsi layanan; integrasi WordPress (struktur kategori induk `ruang-visual`) menjadi task terpisah setelah gerbang titik cek G-WP (PRD §13). G-WP tetap wajib sebelum PAGE-002/003/004 dan sebelum situs tayang |
 | **Rujukan PRD** | v1.10 §3.6 (Ruang Visual), §4.4, §4.6 |
 | **Dibuat** | 30 Okt 2026 (PM) |
 | **Menggantikan** | sebagian PAGE-001, sebagian CARD-001 (kartu besar dan kartu berthumbnail) |
@@ -70,4 +70,4 @@ Iklan `63:595` (1118×159, di bawah section), "Lihat Lainnya" `68:1129`, arsip t
 
 ## Catatan
 - Alternatif bila pemilik/editor memilih tag + penanda "topik unggulan" (PRD §3.6) diputuskan di gerbang G-WP; layanan satu pintu membatasi dampaknya.
-- Riwayat: 30 Okt 2026 → BACKLOG → PM.
+- Riwayat: 30 Okt 2026 → BACKLOG → PM · 30 Okt 2026 → BACKLOG (pengecualian gerbang dicatat) → PM.

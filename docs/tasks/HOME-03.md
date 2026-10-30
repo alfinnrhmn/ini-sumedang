@@ -3,10 +3,10 @@
 | Field | Isi |
 |---|---|
 | **ID** | HOME-03 |
-| **Status** | `BACKLOG` — dibuka PM (→ `READY`) setelah HOME-01 `DONE` dan gerbang G-WP untuk bagian Terpopuler |
+| **Status** | `BACKLOG` — dibuka PM (→ `READY`) setelah HOME-01 `DONE`; gerbang G-WP **tidak** menghalangi UI dan layanan fixture (pengecualian pemilik 30 Okt 2026) |
 | **Owner** | FE → QA (konteks baru) → PM |
 | **Prioritas** | P0 |
-| **Dependensi** | HOME-01 `DONE`. **Gerbang G-WP** (PRD §13) untuk bagian Terpopuler (tag `terpopuler` dan jendela 14 hari adalah konvensi WordPress yang belum terverifikasi); tab dan daftar Terbaru boleh fixture. Jika pemilik meminta jalan terus sebelum gerbang, PM mencatat pengecualian tertulis di sini |
+| **Dependensi** | HOME-01 `DONE`. **Pengecualian pemilik (30 Okt 2026):** boleh dikerjakan dengan fixture di balik fungsi layanan, termasuk Terpopuler; integrasi WordPress menjadi task terpisah setelah gerbang titik cek G-WP (PRD §13). G-WP tetap wajib sebelum PAGE-002/003/004 dan sebelum situs tayang |
 | **Rujukan PRD** | v1.10 §3.6 (Kolom samping, Terpopuler), FR-02; AGENTS.md aturan 1 |
 | **Dibuat** | 30 Okt 2026 (PM) |
 | **Menggantikan** | sebagian PAGE-001, sebagian CARD-001 (varian daftar samping), sebagian POP-001 (hanya sisi UI/layanan fixture; sisi WordPress tetap `DITUNDA`) |
@@ -71,4 +71,4 @@ Hero, iklan di kolom samping (`57:589`, `63:600`), widget sosial (`101:2601`), "
 ## Catatan
 - Setelah task ini, komposisi Rekomendasi "campuran terbaru + terpopuler" (PRD §3.6) dapat dibuat sebagai task lanjutan; itu pemicu Vitest dan butuh persetujuan pemilik.
 - Label "Terpopuler" dipilih editor, bukan tayangan (PRD §3.6, catatan label); label desain tetap.
-- Riwayat: 30 Okt 2026 → BACKLOG → PM.
+- Riwayat: 30 Okt 2026 → BACKLOG → PM · 30 Okt 2026 → BACKLOG (pengecualian gerbang dicatat) → PM.

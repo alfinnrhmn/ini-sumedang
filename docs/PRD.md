@@ -12,7 +12,7 @@
 | Backend | WordPress Headless CMS, WordPress REST API v2 (read-only dari frontend) |
 | Desain | Figma — **file asli `tCjg6zC8qsZ4jhQpXvb0gK`** ("Ini Sumedang"; terbaca, 4 frame final diverifikasi 29 Okt 2026); salinan `ged4NOZtduLbw0gusMjAzn` hanya cadangan; **4 frame final** (§4.1) |
 | Workflow | Figma MCP → AI PM → Fullstack Engineer + QA → VS Code/Git → WordPress → QA/PM sign-off |
-| Status | Draft v1.10. SET-001 `DONE` (bukti CI T14 tertunda), SET-002 `READY`; tugas bergantung WordPress `DITUNDA`. DISC-001 sebagian (metadata 4 frame terbaca); isi tiap section (teks, aset, state) dan audit WordPress **belum dilakukan** |
+| Status | Draft v1.10. SET-001 `DONE` (T14 ditutup 30 Okt 2026; T13 tertunda), SET-002 `DONE`; tugas bergantung WordPress `DITUNDA`. DISC-001 sebagian (metadata 4 frame terbaca); isi tiap section (teks, aset, state) dan audit WordPress **belum dilakukan** |
 
 ### Label bukti
 **[V]** terverifikasi dari sumber (Figma MCP, npm, release notes, pernyataan pemilik) · **[I]** inferensi dari yang terverifikasi · **[?]** belum diketahui / butuh keputusan. Isi bertanda [?] tidak boleh dianggap fakta oleh agent.
@@ -592,6 +592,8 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 6. Versi Node hosting memenuhi `engines` Nuxt.
 **Wajib lulus (atau hasilnya dicatat dan PM menyesuaikan task) sebelum:** PAGE-002, PAGE-003, PAGE-004, dan bagian PAGE-001 yang bergantung data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial). **Bagian PAGE-001 yang hanya UI** (tata letak, kartu, judul section, Rekomendasi/kategori dari fixture) **boleh memakai fixture** tanpa gerbang. Titik cek adalah himpunan bagian DISC-002; DISC-002 penuh (plugin SEO, bentuk plugin iklan/ACF, URL lama) tetap `DITUNDA`.
 
+**Pengecualian gerbang (keputusan pemilik 30 Okt 2026).** HOME-03 (kolom samping, termasuk Terpopuler) dan HOME-04 (Ruang Visual) boleh dikerjakan dengan fixture di balik fungsi layanan: bagian UI dan layanan memakai data contoh; integrasi WordPress menjadi task terpisah setelah gerbang titik cek. Gerbang G-WP **tetap wajib** sebelum PAGE-002, PAGE-003, PAGE-004, sebelum integrasi WordPress untuk HOME-03/04, dan sebelum situs tayang.
+
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 **Definition of Done:** fidelity dibandingkan dengan screenshot; build, lint, typecheck, tes relevan lulus dengan output nyata; keyboard/a11y/kontras diperiksa; tidak ada defect Critical/High; QA_PASSED; PM sign-off.
 
@@ -656,12 +658,12 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | PAGE-001 | `DITUNDA` | Digantikan oleh HOME-01..07 (tidak punya berkas task). Iklan dan widget sosial tetap di ADS-002/SOC-001 (`DITUNDA`) |
 | HOME-01 | `READY` | Rekomendasi (8 kartu) + `NewsCard` + `SectionTitle`; `docs/tasks/HOME-01.md` |
 | HOME-02 | `BACKLOG` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif; setelah HOME-01 |
-| HOME-03 | `BACKLOG` | Kolom samping Terbaru | Terpopuler; setelah HOME-01 dan gerbang G-WP (bagian Terpopuler) |
-| HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01 dan gerbang G-WP |
+| HOME-03 | `BACKLOG` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
+| HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-05 | `BACKLOG` | Footer; menunggu persetujuan pemilik atas perilaku mobile |
 | HOME-06 | `BACKLOG` | Header, menu, laci; prasyarat: usulan visual laci disetujui pemilik |
 | HOME-07 | `BACKLOG` | Hero `Switch`; prasyarat: node dibaca PM dan keputusan Merriweather Sans |
-| PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13). PAGE-002 juga bergantung SANITIZE-001 |
+| PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13), tidak ada pengecualian. PAGE-002 juga bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |
 | POP-001 | `DITUNDA` | Alasan: WordPress ditunda |

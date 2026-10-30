@@ -17,7 +17,7 @@ Tandai setiap klaim: **[V]** terverifikasi (Figma MCP / repo / API), **[I]** inf
 4. Halaman yang **tidak punya frame** tetapi sudah diputuskan pemilik (PRD §3.2): **kategori** (daftar berita tanpa hero), **pencarian** (pembaca mengetik, hasil sesuai teks), **tablet** (turunan desktop+mobile, §3.4), 404/error/kosong. Buat task dari komponen dan token 4 frame final; jangan menambah elemen visual baru tanpa persetujuan pemilik. Yang masih terbuka: angka final per section kategori, fungsi "Lihat Lainnya", perlakuan Instagram di bagikan, sumber angka widget sosial, teks placeholder pencarian + keadaan terbuka mobile, teks label iklan.
 5. WordPress: hanya baca (REST publik / MCP read-only) bila endpoint ada. Jangan membuat/mengubah/menerbitkan konten.
 6. Kumpulkan keputusan yang masih terbuka (PRD §3.2 G6, §17); ajukan ke pemilik sebagai pertanyaan pendek berpilihan.
-7. Buat backlog berurutan dependensi. Untuk section pertama buat **dua** task di `docs/tasks/` memakai `docs/TASK-TEMPLATE.md`: (a) QA test plan, (b) Fullstack implementasi. QA lebih dulu.
+7. Buat backlog berurutan dependensi, dipotong per slice vertikal: satu task per slice (satu diff yang bisa ditinjau) di `docs/tasks/` memakai `docs/TASK-TEMPLATE.md`. Slice UI rutin membawa kriteria penerimaan dan daftar pemeriksaan QA (maks. 15 kasus) langsung di file task; tidak ada task QA terpisah. Rencana tes QA sebelum implementasi (Fase 1) hanya untuk task berisiko tinggi.
 8. Kirim laporan ringkas dan minta persetujuan sebelum implementasi.
 
 ## Per section
