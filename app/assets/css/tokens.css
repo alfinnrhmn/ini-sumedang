@@ -1,0 +1,131 @@
+/*
+ * Token desain IniSumedang (SET-002). Satu sumber nilai; komponen memakai var(--…).
+ * Sumber: docs/FIGMA-INVENTORY.md §A, PRD v1.10 §4.5, keputusan pemilik 29 Okt 2026.
+ * Penanda [usulan] = bukan nilai frame; disetujui PM di docs/tasks/SET-002.md.
+ */
+
+:root {
+  /* ---- Warna ---- */
+  --color-white: #FFFFFF; /* Brand Colors/Color - Secondary [variabel] */
+  --color-black: #000000; /* teks kartu, node 57:516 text-black */
+  --color-black-1: #080808; /* PRD §4.5 Primary/Black 1; dasar rgba(8,8,8,…) */
+  --color-black-2: #1D1D1D; /* PRD §4.5 Black 2 */
+  --color-black-3: #282828; /* PRD §4.5 Black 3 */
+  --color-gray-1: #333333; /* variabel Gray Colors/Color - Grey 1 */
+  --color-gray-2: #4F4F4F; /* variabel Gray Colors/Color - Grey 2 */
+  --color-gray-3: #828282; /* PRD §4.5 Gray 3; bukan warna teks (3,84:1) */
+  --color-gray-4: #BDBDBD; /* PRD §4.5 Gray 4; bukan warna teks (1,88:1) */
+  --color-gray-5: #E0E0E0; /* PRD §4.5 Gray 5; bukan warna teks (1,32:1) */
+  --color-info: #2F80ED; /* PRD §4.5 Info; bukan warna teks (3,87:1) */
+  --color-success: #27AE60; /* PRD §4.5 Success; bukan warna teks (2,87:1) */
+  --color-warning: #E2B93B; /* PRD §4.5 Warning; bukan warna teks (1,87:1) */
+  --color-error: #EB5757; /* PRD §4.5 Error; bukan warna teks (3,48:1) */
+  --color-brand: #2866EB; /* G18 biru merek: menu kategori, judul kolom footer */
+  --color-footer-muted: #667085; /* G18 tagline dan legal footer */
+  --color-footer-link: #172033; /* G18 tautan footer */
+  --color-footer-divider: #E5E7EB; /* G18 garis footer desktop */
+  --color-footer-divider-mobile: #D5D5D5; /* G18 garis atas footer mobile */
+  --color-surface: #F8F8F8; /* diterima pemilik: latar pencarian/tombol */
+  --color-border-subtle: rgba(8, 8, 8, 0.05); /* diterima pemilik: border kontrol */
+  --color-border: rgba(8, 8, 8, 0.1); /* diterima pemilik: border kontrol, garis */
+  --color-text: var(--color-gray-1); /* [usulan] warna teks dasar, 12,63:1 vs putih */
+  --color-background: var(--color-white); /* [usulan] latar body */
+  --color-focus: var(--color-black-1); /* [usulan] cincin fokus, 20,03:1 vs putih, 4,00:1 vs biru merek */
+
+  /* ---- Tipografi: famili ---- */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* [usulan] fallback */
+  --font-serif: "Merriweather", Georgia, "Times New Roman", serif; /* [usulan] fallback */
+
+  /* ---- Tipografi: gaya = font singkat (bobot ukuran/line-height famili) ---- */
+  --type-text-l-regular: 400 18px/27px var(--font-sans); /* A1 Text/L/Regular; + --tracking-text-l */
+  --type-text-l-medium: 500 18px/27px var(--font-sans); /* A1 Text/L/Medium; + --tracking-text-l */
+  --type-heading-desktop: 600 23.04px/29.95px var(--font-serif); /* A1 News/Heading/Desktop */
+  --type-heading-mobile: 600 19.2px/24.96px var(--font-serif); /* A1 News/Heading/Mobile */
+  --type-headline-mobile: 600 27.648px/33.178px var(--font-serif); /* A1 News/Headline/Mobile; + --tracking-headline */
+  --type-card-headline-desktop: 600 19.2px/26.88px var(--font-sans); /* A1 News/Card/Headline/Desktop */
+  --type-card-headline-mobile: 600 16px/22.4px var(--font-sans); /* A1 News/Card/Headline/Mobile */
+  --type-body: 400 16px/25.6px var(--font-sans); /* A1 News/Body; judul kolom footer desktop (A3) */
+  --type-caption: 400 13.333px/18.666px var(--font-sans); /* A1 News/Caption; tautan footer (A3) */
+  --type-metadata: 500 11.111px/15.555px var(--font-sans); /* A1 News/Metadata; legal/Ikuti kami footer (A3) */
+  --type-card-author-desktop: 500 13.333px/18.666px var(--font-sans); /* A1 News/Card/Author/Desktop */
+  --type-card-author-mobile: 500 11.111px/16.667px var(--font-sans); /* A1 News/Card/Author/Mobile */
+  --type-card-timestamp: 400 11.111px/16.667px var(--font-sans); /* A1 News/Card/Timestamp Desktop = Mobile */
+  --type-card-label-mobile: 600 11.111px/16.667px var(--font-sans); /* A1 News/Card/Label/Mobile */
+  --type-card-mobile-headline: 600 13.333px/18.666px var(--font-sans); /* A3 judul kartu mobile 159:2933 */
+  --type-card-mobile-category: 400 11.111px/15.555px var(--font-sans); /* A3 label kategori kartu mobile */
+  --type-card-mobile-timestamp: 300 11.111px/15.555px var(--font-sans); /* A3 timestamp kartu mobile (Light) */
+  --type-footer-heading-mobile: 600 16px/25.6px var(--font-sans); /* A3 judul kolom footer mobile */
+
+  /* ---- Tipografi: letter-spacing ---- */
+  --tracking-text-l: -0.72px; /* A1 Text/L "-4" = -4% x 18px [turunan] */
+  --tracking-headline: -0.2px; /* 130:3352 tracking-[-0.2px]; variabel -0.2 */
+
+  /* ---- Spacing (skala PRD §4.5) ---- */
+  --space-8: 8px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-56: 56px;
+  --space-72: 72px;
+  --space-80: 80px;
+  --space-96: 96px;
+  --space-120: 120px;
+
+  /* ---- Radius ---- */
+  --radius-6: 6px; /* A5 tombol bulan */
+  --radius-8: 8px; /* A5 gambar kartu desktop */
+  --radius-10: 10px; /* A5 thumbnail kartu mobile */
+  --radius-16: 16px; /* A5 kolom pencarian */
+  --radius-full: 9999px; /* [usulan] avatar 20x20, 57:516 rounded-[50px] */
+
+  /* ---- Kontainer ---- */
+  /* Ambang responsif (komentar saja; custom property tidak dapat dipakai di @media): 768 dan 1024. */
+  --container-desktop: 1120px; /* frame 1440, margin 160 per sisi */
+  --container-mobile: 354px; /* frame 402, margin 24 per sisi */
+}
+
+/*
+ * Font self-host (opsi A). Berkas woff2 = turunan subset Latin dari Fontsource 5.3.0
+ * (paket inter dan merriweather); bukan distribusi resmi pencipta.
+ * Lisensi: public/fonts/LICENSE-*.txt. Nama keluarga harus sama dengan --font-sans / --font-serif.
+ */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/inter-latin-300-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/inter-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/inter-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Merriweather";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/merriweather-latin-600-normal.woff2") format("woff2");
+}
