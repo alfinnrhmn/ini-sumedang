@@ -44,8 +44,8 @@ function mapPost(post: WpPost): Article {
   }
 }
 
-/** 8 artikel terbit terbaru, tanpa duplikat. Hanya status `publish`. */
-export function getRecommendedArticles(now: Date = new Date()): Article[] {
+/** Semua artikel terbit (hanya status `publish`), terbaru dulu, tanpa duplikat id. */
+function getPublishedArticles(now: Date): Article[] {
   const seen = new Set<number>()
   // `process` tidak bertipe di proyek ini (tanpa @types/node); baca env lewat globalThis.
   const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
@@ -59,5 +59,16 @@ export function getRecommendedArticles(now: Date = new Date()): Article[] {
       seen.add(article.id)
       return true
     })
-    .slice(0, RECOMMENDED_COUNT)
+}
+
+/** 8 artikel terbit terbaru, tanpa duplikat. Hanya status `publish`. */
+export function getRecommendedArticles(now: Date = new Date()): Article[] {
+  return getPublishedArticles(now).slice(0, RECOMMENDED_COUNT)
+}
+
+/** `limit` artikel terbit terbaru di kategori `slug` (kategori kosong atau tak dikenal: array kosong). */
+export function getArticlesByCategory(slug: string, limit: number, now: Date = new Date()): Article[] {
+  return getPublishedArticles(now)
+    .filter(article => article.categories.some(category => category.slug === slug))
+    .slice(0, limit)
 }

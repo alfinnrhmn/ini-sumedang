@@ -660,7 +660,7 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | PAGE-001 | `DITUNDA` | Digantikan oleh HOME-01..07 (tidak punya berkas task). Iklan dan widget sosial tetap di ADS-002/SOC-001 (`DITUNDA`) |
 | HOME-01 | `READY` | Rekomendasi (8 kartu) + `NewsCard` + `SectionTitle`; `docs/tasks/HOME-01.md` |
 | FIX-001 | `DONE` | Fixture default meniru Figma, kasus buruk jadi set `edge` (`FIXTURE_SET=edge`); `docs/tasks/FIX-001.md` |
-| HOME-02 | `BACKLOG` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif; setelah HOME-01 |
+| HOME-02 | `DONE` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif (`HOME_SECTION_COUNTS`, `/api/articles/by-category`); dimensi gambar fixture 716×400; `docs/tasks/HOME-02.md` |
 | HOME-03 | `BACKLOG` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-05 | `BACKLOG` | Footer; menunggu persetujuan pemilik atas perilaku mobile |

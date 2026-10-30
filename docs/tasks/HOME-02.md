@@ -3,7 +3,7 @@
 | Field | Isi |
 |---|---|
 | **ID** | HOME-02 |
-| **Status** | `BACKLOG` — dibuka PM (→ `READY`) setelah HOME-01 `DONE` |
+| **Status** | `DONE` (PM 30 Okt 2026, setelah `QA_PASSED` putaran 2; putaran 1 `QA_FAILED` karena lebar kartu section desktop 232 px, diperbaiki; tidak ada `npm ci` di QA) |
 | **Owner** | FE → QA (konteks baru) → PM |
 | **Prioritas** | P0 |
 | **Dependensi** | HOME-01 `DONE` (komponen `NewsCard`, `SectionTitle`, tipe `Article`, fixture dan mapper). Tidak menunggu gerbang G-WP (PRD §13: kategori dari fixture boleh). Angka final per section [?] — default 4 |
@@ -41,6 +41,8 @@ Ruang Visual, iklan (`63:595`, `63:627`), "Lihat Lainnya", halaman kategori `/ka
 4. Fixture diperluas (bukan diganti): ≥ 6 artikel terbit per kategori section, 1 kategori dengan tepat 1 artikel, 1 kategori kosong, ≥ 2 artikel `draft`/`private` yang tidak boleh muncul.
 5. Validasi parameter butir 2 berfungsi; respons error terkontrol.
 6. Tidak ada token baru, tidak ada dependensi baru, `nuxt.config.ts` tidak berubah; `lint`, `typecheck`, `build` kode 0.
+7. *(catatan pemilik; temuan Low FIX-001)* Dimensi gambar yang dideklarasikan di `server/fixtures/posts.ts` (`media_details.width/height`) disamakan menjadi **716×400** untuk semua gambar fixture, sesuai ukuran berkas nyata di `public/fixtures/` (set `figma` dan `edge`); tidak ada lagi nilai 1354×756. Dimensi berkas diverifikasi (bukan ditebak).
+8. *(catatan pemilik)* Fixture section baru mengikuti pola FIX-001: set **default (`figma`)** meniru Figma (judul dan penerbit dari kartu section di node tercantum, kategori dari 9 kategori resmi, tanpa artikel `draft`/`private`), sedangkan **kasus buruk** (judul ≥ 150 dan ≤ 15 karakter, tanpa gambar, gambar tanpa `alt`, entitas HTML, kategori 1 artikel, kategori kosong, `draft`/`private`) hanya ada di set **`edge`** (`FIXTURE_SET=edge`). Kriteria 4 berlaku per set sesuai pola ini: set `figma` ≥ 6 terbit per kategori section; set `edge` memuat kategori 1 artikel, kategori kosong, dan ≥ 2 `draft`/`private`. Gambar baru, bila perlu, hanya dari node Figma di atas, diperkecil (716 px, JPEG ~75, maks. 120 KB); gambar `figma-1..8.jpg` boleh dipakai ulang.
 
 ## Daftar pemeriksaan QA (inline; tanpa Fase 1)
 | ID | Langkah | Hasil diharapkan | P |
@@ -67,9 +69,16 @@ Ruang Visual, iklan (`63:595`, `63:627`), "Lihat Lainnya", halaman kategori `/ka
 ## Bukti
 | Tahap | Perintah / langkah | Output / jalur bukti | Oleh | Tanggal |
 |---|---|---|---|---|
-| – | – | – | – | – |
+| FE | `npm run lint`, `npx nuxt typecheck`, `npm run build` (putaran 1 dan 2) | Semua kode keluar 0; `Build complete in 14.6s` (putaran 2); rute `api/articles/by-category.get.mjs` terbangun | FE | 30 Okt 2026 |
+| QA r1 | Ukur 1440, tablet, overflow, SSR, handler, fixture | `QA_FAILED`: D1 (High) lebar 739/1120 diterapkan dua kali, kartu section 232,3 px vs Figma 358 px; Medium/Low lain tidak menghalangi | QA | 30 Okt 2026 |
+| FE r2 | Tambah `.category-section .list { width: 100% }` pada ≥ 1024 px; perbaiki komentar `section-query.ts` | Kartu section 358 × 349,6 di 1440/1280, 305,5 di 1024, sama dengan Rekomendasi; mobile/tablet tidak berubah; lint/typecheck/build kode 0 | FE | 30 Okt 2026 |
+| QA r2 | Verifikasi penuh pada build produksi (salinan di luar repo; port 3121–3124, semua ditutup) | `QA_PASSED`: K1–K9, K11, C1–C4, kriteria 1–8 LULUS; kartu 358 × 349,63, kolom 2 di x 381, garis 739, aksen biru dan jarak sesuai catatan; K10 `npm ci` TIDAK TERUJI; lint/typecheck/build/audit kode 0 | QA | 30 Okt 2026 |
+| QA r2 | Handler `/api/articles/by-category` | 400 terkontrol tanpa stack untuk `../x`, URL penuh, 300 karakter, `limit` 0/999/abc/13/-1/4.5, karakter kontrol; 200 untuk 1/4/12 | QA | 30 Okt 2026 |
+| QA r2 | Kriteria 7 | Ukuran nyata `figma-1..8.jpg` semuanya 716×400; deklarasi `IMG_WIDTH/IMG_HEIGHT` satu sumber; `1354`/`756` tidak tersisa di `app/` dan `server/` | QA | 30 Okt 2026 |
 
 ## Catatan
 - Pertanyaan terbuka bagi pemilik (tidak menghalangi): angka final per section (4 atau 6).
 - Otomotif di Figma hanya 1 kartu (desain belum rapi); angka dari konfigurasi, bukan dari Figma.
-- Riwayat: 30 Okt 2026 → BACKLOG → PM.
+- Keputusan PM: kartu yang sama boleh muncul di Rekomendasi dan Nasional (Rekomendasi = campuran; tanpa dedupe, ids 3 dan 4 pada set default). Lebar aksen judul dan jarak garis-ke-kartu 28 px mengikuti pola HOME-01 (Figma tidak seragam: 40/28/21/36). Gambar section memakai ulang `figma-1..8.jpg`; judul selain kartu Figma bertanda [I] di fixture. Set `edge` memindah id 6, 11, 12 ke Berita agar Sepak Bola tepat 1 artikel dan Otomotif kosong.
+- Temuan Low/Info tidak menghalangi: judul fixture terpotong 3 baris pada 1024 (clamp `NewsCard` HOME-01); respons 400 bawaan Nitro memantulkan `url` permintaan; `alt` gambar kartu = judul (pola HOME-01); aksen judul mobile Nasional 81,69 vs 86.
+- Riwayat: 30 Okt 2026 → BACKLOG → PM; 30 Okt 2026 → READY → PM (kriteria 7–8 ditambah atas catatan pemilik); QA_FAILED (r1) → QA_PASSED (r2) → DONE → PM.

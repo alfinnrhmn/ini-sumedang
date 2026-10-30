@@ -1,8 +1,9 @@
 /**
  * Fixture berbentuk respons REST WordPress v2 (posts?_embed). Tanggal relatif terhadap `now`.
- * Dua set: `figma` (default; meniru kartu Rekomendasi di Figma 21:4950) dan `edge` (kasus buruk:
+ * Dua set: `figma` (default; meniru kartu Rekomendasi dan section kategori Sepak Bola, Nasional,
+ * Bisnis dan Teknologi, Otomotif di Figma 21:4950, tanpa draft/private) dan `edge` (kasus buruk:
  * judul panjang/pendek, tanpa gambar, gambar tanpa alt, entitas HTML, kategori ber-entitas,
- * kategori kosong, dan artikel draft/private yang tidak boleh tampil).
+ * kategori 1 artikel, kategori kosong, dan artikel draft/private yang tidak boleh tampil).
  * Gambar di public/fixtures/ berasal dari Figma, hanya untuk pengembangan, WAJIB dihapus
  * sebelum situs tayang (PRD §13).
  */
@@ -29,9 +30,12 @@ const BISNIS: WpTerm = { id: 7, slug: 'bisnis-teknologi', name: 'Bisnis &amp; Te
 const OTOMOTIF: WpTerm = { id: 9, slug: 'otomotif', name: 'Otomotif' }
 const SEPAK_BOLA: WpTerm = { id: 5, slug: 'sepak-bola', name: 'Sepak Bola' }
 
-// Dimensi nyata berkas Figma (JPEG 1354x756).
+// Dimensi nyata semua berkas public/fixtures/figma-*.jpg (JPEG 716x400, diukur dengan System.Drawing).
+const IMG_WIDTH = 716
+const IMG_HEIGHT = 400
+
 function img(n: number, alt: string): WpMedia {
-  return { source_url: `/fixtures/figma-${n}.jpg`, alt_text: alt, media_details: { width: 1354, height: 756 } }
+  return { source_url: `/fixtures/figma-${n}.jpg`, alt_text: alt, media_details: { width: IMG_WIDTH, height: IMG_HEIGHT } }
 }
 
 function makePost(
@@ -51,10 +55,18 @@ function makePost(
   }
 }
 
-/** Set default: 8 kartu Rekomendasi dari Figma 21:4950 (teks aktual; kategori dari 9 kategori resmi). */
+/**
+ * Set default: 8 kartu Rekomendasi dari Figma 21:4950 (teks aktual; kategori dari 9 kategori resmi)
+ * ditambah artikel section kategori (id 21 ke atas). Semua artikel section lebih lama dari kartu
+ * Rekomendasi (> 360 menit) agar 8 kartu Rekomendasi tidak berubah. Semua berstatus `publish`.
+ * Judul bertanda [F] diambil dari kartu Figma; bertanda [I] dikarang untuk mengisi >= 6 per
+ * kategori (bukan dari Figma). Gambar memakai ulang figma-1..8.jpg (bukan gambar kartu Figma asli).
+ */
 export function buildFigmaPosts(now: Date): WpPost[] {
   const p = (id: number, minutes: number, title: string, term: WpTerm, image: number) =>
     makePost(now, id, 'publish', minutes, title, [term], img(image, title))
+  const HOUR = 60
+  const DAY = 24 * 60
   return [
     p(1, 12, 'Pemkab Sumedang Dorong Transformasi Digital untuk Tingkatkan Pelayanan Publik', BERITA, 1),
     p(2, 35, 'Aktivitas Warga di Pusat Kota Sumedang Meningkat Menjelang Akhir Pekan', BERITA, 2),
@@ -63,11 +75,47 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(5, 180, 'Pemkab Sumedang Perluas Layanan Administrasi Berbasis Digital hingga Kecamatan', PEMERINTAHAN, 5),
     p(6, 240, 'Program Peningkatan Infrastruktur Daerah Jadi Fokus Pembahasan Pemerintah', PEMERINTAHAN, 6),
     p(7, 300, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah dalam Rapat Kerja', POLITIK, 7),
-    p(8, 360, 'Pengamat Soroti Peran Generasi Muda dalam Meningkatkan Partisipasi Politik', POLITIK, 8)
+    p(8, 360, 'Pengamat Soroti Peran Generasi Muda dalam Meningkatkan Partisipasi Politik', POLITIK, 8),
+
+    // Sepak Bola (84:1437): [F] 48:385, 48:400; sisanya [I]
+    p(21, 9 * HOUR, 'Persib Bandung Fokus Tingkatkan Performa Tim Menjelang Pertandingan Berikutnya', SEPAK_BOLA, 1),
+    p(22, 10 * HOUR, 'Talenta Muda Jawa Barat Didorong Berkembang Lewat Kompetisi Sepak Bola Daerah', SEPAK_BOLA, 2),
+    p(23, 1 * DAY + 3 * HOUR, 'Tim Sepak Bola Sumedang Matangkan Strategi Jelang Laga Uji Coba', SEPAK_BOLA, 3),
+    p(24, 2 * DAY + 5 * HOUR, 'Pelatih Lokal Gelar Latihan Intensif untuk Persiapan Kompetisi Antar-Kecamatan', SEPAK_BOLA, 4),
+    p(25, 3 * DAY + 2 * HOUR, 'Lapangan Sepak Bola Desa Direnovasi untuk Mendukung Pembinaan Pemain Muda', SEPAK_BOLA, 5),
+    p(26, 4 * DAY + 6 * HOUR, 'Suporter Sumedang Ajak Penonton Menjaga Ketertiban Selama Pertandingan', SEPAK_BOLA, 6),
+
+    // Nasional (57:496): [F] 48:355, 48:370; sisanya [I]
+    p(31, 7 * HOUR, 'Aparat Kepolisian Tingkatkan Edukasi Kesadaran Hukum kepada Masyarakat', NASIONAL, 7),
+    p(32, 8 * HOUR, 'Pakar Hukum Tekankan Pentingnya Perlindungan Data Pribadi di Era Digital', NASIONAL, 8),
+    p(33, 1 * DAY + 6 * HOUR, 'Pemerintah Pusat Percepat Penyaluran Bantuan Sosial ke Daerah', NASIONAL, 1),
+    p(34, 2 * DAY + 2 * HOUR, 'Kementerian Dorong Peningkatan Mutu Pendidikan Vokasi di Seluruh Indonesia', NASIONAL, 2),
+    p(35, 3 * DAY + 7 * HOUR, 'Program Ketahanan Pangan Nasional Libatkan Petani Muda', NASIONAL, 3),
+    p(36, 4 * DAY + 1 * HOUR, 'Otoritas Perkuat Pengawasan Layanan Keuangan Digital bagi Masyarakat', NASIONAL, 4),
+
+    // Bisnis dan Teknologi (57:501): [F] 48:460, 48:475; sisanya [I]
+    p(41, 1 * DAY, 'Pesona Kuliner Tradisional Sumedang yang Tetap Digemari Berbagai Generasi', BISNIS, 5),
+    p(42, 2 * DAY, 'Pelaku UMKM Sumedang Mulai Manfaatkan AI untuk Mengembangkan Bisnis Digital', BISNIS, 6),
+    p(43, 3 * DAY + 4 * HOUR, 'Pelaku Usaha Kecil Sumedang Mulai Beralih ke Pembayaran Nontunai', BISNIS, 7),
+    p(44, 4 * DAY + 3 * HOUR, 'Startup Lokal Kenalkan Aplikasi Pemasaran Produk Pertanian', BISNIS, 8),
+    p(45, 5 * DAY + 5 * HOUR, 'Pelatihan Literasi Digital Bantu Pedagang Pasar Berjualan Daring', BISNIS, 1),
+    p(46, 6 * DAY + 2 * HOUR, 'Jaringan Internet Cepat Menjangkau Lebih Banyak Desa di Sumedang', BISNIS, 2),
+
+    // Otomotif (57:505): [F] 48:430; sisanya [I]
+    p(51, 12 * HOUR, 'Tips Merawat Kendaraan agar Tetap Prima Saat Memasuki Musim Hujan', OTOMOTIF, 3),
+    p(52, 1 * DAY + 8 * HOUR, 'Penjualan Kendaraan Listrik Meningkat di Kalangan Warga Perkotaan', OTOMOTIF, 4),
+    p(53, 2 * DAY + 7 * HOUR, 'Bengkel Lokal Siapkan Layanan Servis Berkala Menjelang Musim Mudik', OTOMOTIF, 5),
+    p(54, 3 * DAY + 9 * HOUR, 'Pengendara Diimbau Periksa Kondisi Ban dan Rem Sebelum Perjalanan Jauh', OTOMOTIF, 6),
+    p(55, 4 * DAY + 4 * HOUR, 'Komunitas Otomotif Sumedang Gelar Bakti Sosial dan Kopdar Bulanan', OTOMOTIF, 7),
+    p(56, 5 * DAY + 8 * HOUR, 'Dealer Resmi Hadirkan Pilihan Kendaraan Irit Bahan Bakar', OTOMOTIF, 8)
   ]
 }
 
-/** Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. */
+/**
+ * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Per kategori section:
+ * Sepak Bola = tepat 1 artikel terbit (id 5); Otomotif = kosong (hanya 1 artikel `private`, id 103);
+ * Nasional = banyak (+ draft/private id 101, 102); Bisnis dan Teknologi = 2 (ber-entitas).
+ */
 export function buildEdgePosts(now: Date): WpPost[] {
   const post = (id: number, status: string, minutes: number, title: string, term: WpTerm | null, media: WpMedia | null) =>
     makePost(now, id, status, minutes, title, term ? [term] : [], media)
@@ -76,18 +124,19 @@ export function buildEdgePosts(now: Date): WpPost[] {
   return [
     post(101, 'draft', 1, 'Draft yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Draft')),
     post(102, 'private', 2, 'Artikel privat yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Privat')),
+    post(103, 'private', 3, 'Artikel privat Otomotif yang tidak boleh tampil di section', OTOMOTIF, img(1, 'Privat Otomotif')),
     post(1, 'publish', 0.5, 'Pemerintah Kabupaten Sumedang Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, dan Komunitas Pemuda untuk Meningkatkan Kenyamanan Ruang Publik', NASIONAL, img(1, 'Suasana pusat kota Sumedang')),
     post(2, 'publish', 35, 'Banjir surut', NASIONAL, img(2, 'Genangan air surut')),
     post(3, 'publish', 180, 'Bisnis &amp; Teknologi Sumedang Tumbuh &#8211; UMKM &#8217;Digital&#8217; Capai Target &#8230;', BISNIS, img(3, 'Pelaku UMKM menggunakan ponsel')),
     post(4, 'publish', DAY + 120, 'Harga Kebutuhan Pokok di Pasar Tradisional Relatif Stabil', NASIONAL, null),
     post(5, 'publish', 3 * DAY, 'Tim Sepak Bola Lokal Siap Hadapi Turnamen Antar-Kecamatan', SEPAK_BOLA, img(4, '')),
     post(13, 'publish', 4 * DAY, 'Artikel Tanpa Kategori Tetap Tampil Tanpa Label', null, img(5, 'Contoh tanpa kategori')),
-    post(6, 'publish', 5 * DAY, 'Uji Coba Angkutan Wisata Listrik Dimulai Pekan Ini', OTOMOTIF, null),
+    post(6, 'publish', 5 * DAY, 'Uji Coba Angkutan Wisata Listrik Dimulai Pekan Ini', BERITA, null),
     post(7, 'publish', 6 * DAY + 600, 'Festival Budaya Sunda Kembali Digelar di Alun-Alun', NASIONAL, img(2, 'Panggung festival')),
     post(8, 'publish', 9 * DAY, 'Layanan Administrasi Kependudukan Kini Dapat Diakses Lebih Cepat', NASIONAL, img(3, 'Loket layanan')),
     post(9, 'publish', 10 * DAY, 'Pelatihan Wirausaha Muda Diikuti Ratusan Peserta', BISNIS, img(1, 'Peserta pelatihan')),
     post(10, 'publish', 12 * DAY, 'Perbaikan Jalan Penghubung Antar-Desa Rampung Lebih Awal', NASIONAL, img(4, 'Jalan desa')),
-    post(11, 'publish', 15 * DAY, 'Komunitas Pesepeda Gelar Perjalanan Akhir Pekan', SEPAK_BOLA, img(2, 'Pesepeda')),
-    post(12, 'publish', 20 * DAY, 'Bengkel Otomotif Lokal Tawarkan Servis Gratis untuk Ojek', OTOMOTIF, img(3, 'Bengkel'))
+    post(11, 'publish', 15 * DAY, 'Komunitas Pesepeda Gelar Perjalanan Akhir Pekan', BERITA, img(2, 'Pesepeda')),
+    post(12, 'publish', 20 * DAY, 'Bengkel Otomotif Lokal Tawarkan Servis Gratis untuk Ojek', BERITA, img(3, 'Bengkel'))
   ]
 }

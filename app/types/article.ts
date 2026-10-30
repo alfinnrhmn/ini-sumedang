@@ -28,3 +28,6 @@ export interface RecommendedResponse {
   /** Waktu server (ISO) untuk menghitung waktu relatif sama di SSR dan hidrasi. */
   now: string
 }
+
+/** Respons daftar artikel satu kategori section (bentuk sama dengan Rekomendasi). */
+export type CategoryArticlesResponse = RecommendedResponse
