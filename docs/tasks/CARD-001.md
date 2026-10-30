@@ -3,7 +3,8 @@
 | Field | Isi |
 |---|---|
 | **ID** | CARD-001 |
-| **Status** | `BACKLOG` |
+| **Status** | `DITUNDA` — alasan: digantikan oleh slice vertikal (keputusan pemilik 30 Okt 2026); sebelumnya `BACKLOG` |
+| **Digantikan oleh** | HOME-01 (kartu desktop `57:516` dan mobile `159:2933`), HOME-03 (daftar samping), HOME-04 (kartu besar dan berthumbnail) |
 | **Owner** | QA (rencana tes) → FE → QA → PM |
 | **Prioritas** | P0 |
 | **Dependensi** | SET-001 `DONE`; SET-002 `DONE`; MOCK-001 `DONE` (tipe `Article`, `MediaAsset`; sebelumnya API-001, yang `DITUNDA`) |
@@ -49,3 +50,5 @@ Disusun saat READY. Minimal: perbandingan dengan screenshot Figma pada 1440 dan 
 - State hover/fokus/gambar hilang tidak digambar; usulan PM turunan dari token.
 - Judul kartu mobile di-hardcode 13,333 px (bukan variabel 16 px): ikuti frame.
 - Riwayat: 29 Okt 2026 → BACKLOG → PM.
+- **Penundaan (30 Okt 2026, PM):** Keputusan pemilik 30 Okt 2026: backlog per slice vertikal. Slice pertama yang membutuhkan kartu (HOME-01) memilikinya; slice berikutnya wajib memakai ulang. Keputusan G19 (label kategori per varian) berlaku di HOME-01.
+- Riwayat: 30 Okt 2026 → BACKLOG → DITUNDA → PM.

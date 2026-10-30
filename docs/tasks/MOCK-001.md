@@ -3,7 +3,8 @@
 | Field | Isi |
 |---|---|
 | **ID** | MOCK-001 |
-| **Status** | `BACKLOG` |
+| **Status** | `DITUNDA` — alasan: digantikan oleh slice vertikal (keputusan pemilik 30 Okt 2026); sebelumnya `BACKLOG` |
+| **Digantikan oleh** | HOME-01 sampai HOME-05 (data tipis per slice) |
 | **Owner** | QA (rencana tes) → FE → QA → PM |
 | **Prioritas** | P0 |
 | **Dependensi** | SET-001 `DONE`. Tidak butuh SET-002 (tanpa CSS). Keputusan pemilik 29 Okt 2026: WordPress ditunda (G21, PRD prinsip 9) |
@@ -87,3 +88,5 @@ Konsekuensi: `getRecommendedArticles` dan `getRelatedArticles` yang memuat logik
 - Risiko: fixture dapat berbeda dari WordPress asli; gerbang G-WP (PRD §13) membandingkan. Layanan satu pintu membatasi dampaknya pada isi fungsi/mapper.
 - `PAGE-002` tidak boleh merender `body` dengan `v-html` sebelum penyanitasi ada (AGENTS.md aturan 6), walau datanya fixture.
 - Riwayat: 29 Okt 2026 → BACKLOG → PM.
+- **Penundaan (30 Okt 2026, PM):** Keputusan pemilik 30 Okt 2026: backlog dipotong per slice vertikal. Tipe, fixture, mapper, dan fungsi layanan dibuat seperlunya oleh tiap slice HOME dan **diperluas, tidak diganti**. Fungsi yang tidak dipakai slice HOME (`getArticleBySlug`, pencarian, `getRelatedArticles`, validasi `slug`/`page`/`q`, fixture isi `body`) dikerjakan bersama PAGE-002/003/004 setelah gerbang G-WP. Kasus buruk dan kriteria di bawah tetap menjadi acuan.
+- Riwayat: 30 Okt 2026 → BACKLOG → DITUNDA → PM.

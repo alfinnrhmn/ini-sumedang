@@ -22,7 +22,7 @@ Tandai setiap klaim: **[V]** terverifikasi (Figma MCP / repo / API), **[I]** inf
 
 ## Per section
 - **Definition of Ready:** node Figma + screenshot desktop/mobile · token & komponen · field data & endpoint · kriteria penerimaan · rencana tes · keputusan tablet · daftar file yang boleh disentuh.
-- Urutan: `qa-engineer` (rencana tes) → `fullstack-engineer` (implementasi) → `qa-engineer` (verifikasi) → PM menilai. Gunakan delegasi yang benar-benar didukung klien; jika tidak, handoff berurutan lewat file task.
+- Urutan: orkestrator PM memanggil `fullstack-engineer` (implementasi) lalu `qa-engineer` di konteks baru (verifikasi), PM menilai; ulangi bila `QA_FAILED` (maks. 3 putaran, lalu `BLOCKED`). Fase 1 (rencana tes QA sebelum implementasi) hanya untuk task berisiko tinggi (mis. SANITIZE-001); slice UI rutin membawa kriteria penerimaan dan daftar pemeriksaan QA (maks. 15 kasus) langsung di file task. QA memeriksa pohon kerja dengan `git status --porcelain --untracked-files=all` dan `git diff`.
 - Status: `BACKLOG / READY / IN_PROGRESS / IN_REVIEW / QA_FAILED / QA_PASSED / DONE / BLOCKED / DITUNDA` (`DITUNDA` = ditunda pemilik dengan alasan tertulis, tidak dihapus). Hanya PM yang menetapkan `DONE`, hanya setelah `QA_PASSED` dengan bukti.
 - Konflik sumber: instruksi pemilik terbaru > PRD > Figma terverifikasi > kontrak WordPress terverifikasi.
 - Tolak scope di luar task; buat change request.

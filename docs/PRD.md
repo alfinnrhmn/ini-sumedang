@@ -643,16 +643,24 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | RESP-001 | Aturan dan implementasi tablet (§3.4) | P0 | QA+PM |
 | REL-001 | Staging, E2E, rollback, release checklist | P0 | Pemilik |
 
-### 15.1 Status backlog (v1.10, 29 Okt 2026)
+### 15.1 Status backlog (v1.10, 29 Okt 2026; diperbarui 30 Okt 2026: backlog Beranda dipotong per slice vertikal)
 | ID | Status | Catatan |
 |---|---|---|
-| SET-001 | `DONE` | Bukti CI (T14) dan versi Node lain (T13) tertunda; lihat `docs/tasks/SET-001.md` |
-| SET-002 | `READY` | `docs/tasks/SET-002.md` |
-| MOCK-001 | `BACKLOG` | Dependensi: SET-001. Menggantikan sumber data API-001 sementara |
+| SET-001 | `DONE` | T14 ditutup: CI GitHub hijau 30 Okt 2026. T13 (Node lain) tertunda; lihat `docs/tasks/SET-001.md` |
+| SET-002 | `DONE` | `docs/tasks/SET-002.md`; keputusan font/RFN: `docs/decisions/0004-merriweather-rfn.md` |
+| MOCK-001 | `DITUNDA` | Digantikan oleh HOME-01..05 (data tipis per slice); sisa fungsi layanan dikerjakan bersama PAGE-002/003/004 |
 | STATIC-001 | `BACKLOG` | Menunggu konten dari pemilik; dependensi LAY-001 (daftar footer). Lima halaman; "Redaksi" tetap teks |
 | SANITIZE-001 | `DITUNDA` | Alasan: WordPress ditunda. Penyanitasi HTML sisi server; dependensi PAGE-002; pemicu Vitest bila lebih dulu |
-| LAY-001, CARD-001 | `BACKLOG` | Dependensi data berpindah dari API-001 ke MOCK-001 |
-| PAGE-001 | `BACKLOG` | Bagian UI-only boleh fixture; bagian data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial) menunggu gerbang G-WP (§13) |
+| LAY-001 | `DITUNDA` | Digantikan oleh HOME-05 (footer) dan HOME-06 (header, menu, laci) |
+| CARD-001 | `DITUNDA` | Digantikan oleh HOME-01 (kartu), HOME-03, HOME-04 |
+| PAGE-001 | `DITUNDA` | Digantikan oleh HOME-01..07 (tidak punya berkas task). Iklan dan widget sosial tetap di ADS-002/SOC-001 (`DITUNDA`) |
+| HOME-01 | `READY` | Rekomendasi (8 kartu) + `NewsCard` + `SectionTitle`; `docs/tasks/HOME-01.md` |
+| HOME-02 | `BACKLOG` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif; setelah HOME-01 |
+| HOME-03 | `BACKLOG` | Kolom samping Terbaru | Terpopuler; setelah HOME-01 dan gerbang G-WP (bagian Terpopuler) |
+| HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01 dan gerbang G-WP |
+| HOME-05 | `BACKLOG` | Footer; menunggu persetujuan pemilik atas perilaku mobile |
+| HOME-06 | `BACKLOG` | Header, menu, laci; prasyarat: usulan visual laci disetujui pemilik |
+| HOME-07 | `BACKLOG` | Hero `Switch`; prasyarat: node dibaca PM dan keputusan Merriweather Sans |
 | PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13). PAGE-002 juga bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |
