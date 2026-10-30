@@ -1,5 +1,5 @@
 import type { Article } from '../../app/types/article'
-import { buildFixturePosts } from '../fixtures/posts'
+import { buildEdgePosts, buildFigmaPosts } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
 
 const RECOMMENDED_COUNT = 8
@@ -47,7 +47,10 @@ function mapPost(post: WpPost): Article {
 /** 8 artikel terbit terbaru, tanpa duplikat. Hanya status `publish`. */
 export function getRecommendedArticles(now: Date = new Date()): Article[] {
   const seen = new Set<number>()
-  return buildFixturePosts(now)
+  // `process` tidak bertipe di proyek ini (tanpa @types/node); baca env lewat globalThis.
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  const posts = env?.FIXTURE_SET === 'edge' ? buildEdgePosts(now) : buildFigmaPosts(now)
+  return posts
     .filter(post => post.status === 'publish')
     .map(mapPost)
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))

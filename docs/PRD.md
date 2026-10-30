@@ -595,6 +595,8 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 **Pengecualian gerbang (keputusan pemilik 30 Okt 2026).** HOME-03 (kolom samping, termasuk Terpopuler) dan HOME-04 (Ruang Visual) boleh dikerjakan dengan fixture di balik fungsi layanan: bagian UI dan layanan memakai data contoh; integrasi WordPress menjadi task terpisah setelah gerbang titik cek. Gerbang G-WP **tetap wajib** sebelum PAGE-002, PAGE-003, PAGE-004, sebelum integrasi WordPress untuk HOME-03/04, dan sebelum situs tayang.
 
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
+**Item wajib pra-tayang (ditetapkan 30 Okt 2026, FIX-001):** gambar di `public/fixtures/` berasal dari Figma dan hanya untuk pengembangan (hak pakai tidak diperiksa). **WAJIB dihapus sebelum situs tayang** dan digantikan konten WordPress; fixture dan variabel `FIXTURE_SET` tidak boleh ada di build produksi.
+
 **Definition of Done:** fidelity dibandingkan dengan screenshot; build, lint, typecheck, tes relevan lulus dengan output nyata; keyboard/a11y/kontras diperiksa; tidak ada defect Critical/High; QA_PASSED; PM sign-off.
 
 ## 14. Matriks QA
@@ -657,6 +659,7 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | CARD-001 | `DITUNDA` | Digantikan oleh HOME-01 (kartu), HOME-03, HOME-04 |
 | PAGE-001 | `DITUNDA` | Digantikan oleh HOME-01..07 (tidak punya berkas task). Iklan dan widget sosial tetap di ADS-002/SOC-001 (`DITUNDA`) |
 | HOME-01 | `READY` | Rekomendasi (8 kartu) + `NewsCard` + `SectionTitle`; `docs/tasks/HOME-01.md` |
+| FIX-001 | `DONE` | Fixture default meniru Figma, kasus buruk jadi set `edge` (`FIXTURE_SET=edge`); `docs/tasks/FIX-001.md` |
 | HOME-02 | `BACKLOG` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif; setelah HOME-01 |
 | HOME-03 | `BACKLOG` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
