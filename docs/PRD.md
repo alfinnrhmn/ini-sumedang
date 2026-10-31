@@ -370,6 +370,8 @@ Lebar konten: desktop 1120 pada kanvas 1440 (margin ±160 [I]); mobile 354 pada 
 
 Kontras dihitung dengan rumus WCAG. **Aturan:** token yang gagal tidak dipakai sebagai warna teks ukuran normal di atas putih; PM meminta pengganti dari desainer atau membatasinya untuk ikon/border/teks besar (≥ 24px, atau ≥ 18,66px bold; ambang 3:1). Warna **yang benar-benar dipakai** di 4 frame final belum diaudit [?] — periksa dulu sebelum menganggap ini masalah.
 
+**Aturan pemetaan warna hampir-sama (keputusan pemilik 31 Okt 2026).** Warna di Figma yang selisihnya **paling banyak 4 level per kanal RGB** (|ΔR|, |ΔG|, |ΔB| ≤ 4, skala 0–255) dari sebuah token yang sudah ada **dipetakan ke token terdekat tanpa persetujuan per kasus**, selama kontras teks tetap lolos AA (≥ 4,5:1 untuk teks normal; angka dihitung dan dicatat). Pemetaan dicatat PM di `docs/tasks/POLISH-01.md` sebagai **"dipetakan"** (node, warna Figma, token, selisih per kanal, kontras). Selisih **lebih besar dari 4 level pada kanal mana pun** diajukan ke pemilik (token baru atau terima token terdekat) dan dicatat sebagai deviasi menunggu keputusan. Aturan ini tidak membuat token baru dan tidak mengubah daftar token di atas.
+
 **Tipografi — diputuskan pemilik 29 Okt 2026 (G17):** **Inter** (isi, kartu, meta, menu, footer) + **Merriweather SemiBold 600** (judul section, nama/judul berita) **sesuai frame**. **Outfit tidak dipakai.** Skala ukuran, bobot, line-height, dan letter-spacing = gaya di frame final: tabel `docs/FIGMA-INVENTORY.md` §A1 (terikat variabel, [V] `get_variable_defs` pada 4 frame) dan §A3 (di-hardcode, [V] kode node), mis. 11,111 / 13,333 / 16 / 19,2 / 23,04 / 27,648 px. Bobot Inter yang dipakai: Light 300 (timestamp kartu mobile), Regular 400, Medium 500, SemiBold 600 (+ Bold bila ditemukan di frame [?]). Font di-*self-host* dengan `font-display`; tanpa permintaan ke Google Fonts saat runtime.
 - **Merriweather Sans** (judul hero 32 px, [V] kode `21:4950` v1.8) **tidak ditetapkan sekarang**; diputuskan saat task hero (FR-03). Tidak termasuk SET-002.
 - Skala guideline (Outfit 64/54/42/24/18; Inter 24/20/18/16/14) **tidak dipakai**.
@@ -594,6 +596,8 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 
 **Pengecualian gerbang (keputusan pemilik 30 Okt 2026).** HOME-03 (kolom samping, termasuk Terpopuler) dan HOME-04 (Ruang Visual) boleh dikerjakan dengan fixture di balik fungsi layanan: bagian UI dan layanan memakai data contoh; integrasi WordPress menjadi task terpisah setelah gerbang titik cek. Gerbang G-WP **tetap wajib** sebelum PAGE-002, PAGE-003, PAGE-004, sebelum integrasi WordPress untuk HOME-03/04, dan sebelum situs tayang.
 
+**Catatan uji data nyata (keputusan pemilik 31 Okt 2026, dari HOME-04).** Saat WordPress terhubung (task integrasi WordPress untuk HOME-04 dan hasil gerbang G-WP), kasus **"kategori induk `ruang-visual` tidak ada atau semua topiknya kosong"** wajib diuji dengan **data nyata**: Beranda harus tetap tampil tanpa section Ruang Visual (tanpa judul tanpa isi, tanpa galat, tanpa layout shift, section lain tidak bergeser dari urutan). Di fixture kasus ini belum diuji (hanya ditinjau dari kode `getVisualTopics()` yang mengembalikan `[]`); penerimaan integrasi tidak boleh `DONE` tanpa bukti uji dengan data WordPress nyata.
+
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 **Item wajib pra-tayang (ditetapkan 30 Okt 2026, FIX-001):** gambar di `public/fixtures/` berasal dari Figma dan hanya untuk pengembangan (hak pakai tidak diperiksa). **WAJIB dihapus sebelum situs tayang** dan digantikan konten WordPress; fixture dan variabel `FIXTURE_SET` tidak boleh ada di build produksi.
 
@@ -663,10 +667,10 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | HOME-02 | `DONE` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif (`HOME_SECTION_COUNTS`, `/api/articles/by-category`); dimensi gambar fixture 716×400; `docs/tasks/HOME-02.md` |
 | HOME-03 | `DONE` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-04 | `DONE` | Ruang Visual (`/api/articles/visual-topics`, `HomeVisualTopic`); setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
-| HOME-05 | `BACKLOG` | Footer; perilaku mobile (akordeon, node `101:2600`, semua item teks biasa) diputuskan pemilik 31 Okt 2026, dicatat di `docs/tasks/HOME-05.md`; siap dibuka `READY` |
+| HOME-05 | `DONE` | Footer desktop + mobile (`SiteFooter`, `layouts/default.vue`; accordion mobile; "Beranda" satu-satunya tautan; keputusan pemilik 31 Okt 2026); `docs/tasks/HOME-05.md` |
 | HOME-06 | `BACKLOG` | Header, menu, laci; usulan visual laci tertulis di `docs/tasks/HOME-06.md`, menunggu persetujuan pemilik (prasyarat `READY`) |
 | HOME-07 | `BACKLOG` | Hero `Switch`; prasyarat: node dibaca PM; Merriweather Sans di-host sendiri, unduhan Fontsource via jsDelivr disetujui di muka (31 Okt 2026), RFN diperiksa (`docs/tasks/HOME-07.md`) |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D3 dari HOME-03; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D11 dari HOME-03, HOME-04, HOME-05; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
 | PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13), tidak ada pengecualian. PAGE-002 juga bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |

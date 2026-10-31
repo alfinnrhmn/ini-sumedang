@@ -8,6 +8,8 @@ useHead({ htmlAttrs: { lang: 'id' } })
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <NuxtPage />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>

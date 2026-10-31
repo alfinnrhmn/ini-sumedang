@@ -72,7 +72,7 @@ Toggle tema (tidak dirender, PRD §3.7); kolom dan logika pencarian (PAGE-004); 
   1. Header mobile (node `116:1662`) = **hamburger + logo di kiri, ikon cari di kanan**.
   2. **Tombol bulan (ubah mode) TIDAK dirender** karena dark mode ditunda (keputusan tetap berlaku; tombol bulan `116:1636` di frame diabaikan).
   3. **Hamburger membuka laci berisi 9 kategori** (G20; sama di desktop dan mobile).
-  4. Ikon cari di header mobile: keputusan PM 4 di atas (slot pencarian tidak dirender sampai PAGE-004) tetap berlaku kecuali pemilik menyatakan lain; ruang tata letaknya dijaga agar header mobile tidak bergeser. Pertanyaan ke pemilik: apakah ikon cari mobile dirender sebagai ikon non-interaktif sampai PAGE-004, atau tidak dirender.
+  4. **Keputusan pemilik (31 Okt 2026, dicatat PM saat menjalankan HOME-05): ikon cari di header ditunda — TIDAK dirender sampai PAGE-004**, baik ikon cari di header mobile (`116:1647`) maupun kolom/input pencarian di header desktop (`21:5270`). Tidak ada versi non-interaktif/dekoratif. Ini mengonfirmasi keputusan PM 4 di atas (kontrol tanpa fungsi = tautan mati). Header mobile sementara = hamburger + logo di kiri, kanan kosong (tombol bulan juga tidak dirender, butir 2); ruang tata letak dijaga agar PAGE-004 menyisipkan ikon/input tanpa menggeser header. Pertanyaan terbuka sebelumnya (ikon non-interaktif atau tidak dirender) **ditutup**: tidak dirender.
   5. Deviasi Figma yang kelak diterima di slice ini ditambahkan PM ke `docs/tasks/POLISH-01.md`.
 
 ## Usulan visual (menunggu persetujuan pemilik)
