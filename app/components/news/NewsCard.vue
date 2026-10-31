@@ -7,6 +7,12 @@ const props = defineProps<{
   now: string
   /** Gambar di atas lipatan: loading eager. */
   eager?: boolean
+  /**
+   * `compact`: kartu daftar kolom samping Beranda, horizontal pada semua lebar
+   * (< 1024: Card Popular News 100:2461, thumbnail 104x80; >= 1024: 34:354, thumbnail 104x104).
+   * Bawaan (tanpa prop) mengikuti lebar layar seperti sebelumnya.
+   */
+  layout?: 'compact'
 }>()
 
 const href = computed(() => articlePath(props.article))
@@ -15,7 +21,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 </script>
 
 <template>
-  <article class="card">
+  <article class="card" :class="{ 'card--compact': layout === 'compact' }">
     <div class="media">
       <img
         v-if="article.heroImage"
@@ -139,52 +145,91 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   white-space: nowrap;
 }
 
-/* Varian vertikal (desktop, 57:514): 358 x <=350 */
+/* layout="compact" mobile (Card Popular News 159:2832): item 358x82 [V metadata 100:2461], thumbnail 104x80, gaya teks = varian horizontal di atas.
+   Judul dibatasi 2 baris di semua lebar (Figma 2 baris): isi teks maks. 80,9 < 82, jadi tinggi item selalu 82 dan kedua tab setinggi sama (tanpa layout shift). */
+.card--compact {
+  min-height: 82px;
+}
+
+.card--compact .media {
+  height: 80px;
+}
+
+.card--compact .title {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* layout="compact" desktop (34:354): thumbnail 104x104, jarak label-judul-meta 6, judul Regular 400 (News/Caption), label Medium 500 (News/Metadata).
+   Tidak dibuat (tanpa token/aset, deviasi dicatat di task): penerbit Bold 700 dan ikon jam 16 px. */
 @media (min-width: 1024px) {
-  .card {
+  .card--compact {
+    min-height: 0;
+  }
+
+  .card--compact .media {
+    height: 104px;
+  }
+
+  .card--compact .body {
+    gap: 6px;
+  }
+
+  .card--compact .category {
+    font: var(--type-metadata);
+  }
+
+  .card--compact .title {
+    font: var(--type-caption);
+  }
+}
+
+/* Varian vertikal (desktop, 57:514): 358 x <=350. Tidak berlaku untuk layout="compact" (kolom samping). */
+@media (min-width: 1024px) {
+  .card:not(.card--compact) {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--space-8);
     align-items: start;
   }
 
-  .media {
+  .card:not(.card--compact) .media {
     width: 100%;
     height: auto;
     aspect-ratio: 358 / 225;
     border-radius: var(--radius-8);
   }
 
-  .media img {
+  .card:not(.card--compact) .media img {
     border-radius: var(--radius-8);
   }
 
-  .body {
+  .card:not(.card--compact) .body {
     gap: 0;
   }
 
   /* G19: label kategori tidak tampil di desktop (display:none juga menyembunyikannya dari pembaca layar) */
-  .category {
+  .card:not(.card--compact) .category {
     display: none;
   }
 
-  .title {
+  .card:not(.card--compact) .title {
     font: var(--type-card-headline-desktop);
     margin-bottom: var(--space-16);
   }
 
-  .link:focus-visible::after {
+  .card:not(.card--compact) .link:focus-visible::after {
     border-radius: var(--radius-8);
   }
 
-  .meta {
+  .card:not(.card--compact) .meta {
     gap: var(--space-8);
   }
 
-  .author {
+  .card:not(.card--compact) .author {
     font: var(--type-card-author-desktop);
   }
 
-  .time {
+  .card:not(.card--compact) .time {
     margin-left: var(--space-8); /* 8 + 8 = gap 16 penerbit-waktu (57:514) */
     font: var(--type-card-timestamp);
   }

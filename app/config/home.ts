@@ -23,3 +23,14 @@ export const HOME_SECTION_COUNTS: Record<HomeSectionSlug, number> = {
 /** Batas `limit` yang diterima API section (bilangan bulat). */
 export const SECTION_LIMIT_MIN = 1
 export const SECTION_LIMIT_MAX = 12
+
+/** Kolom samping Beranda (HOME-03): jumlah item per tab [V 34:354 dan 4 `Card Popular News` di 90:1611]. */
+export const SIDEBAR_COUNT = 4
+
+/**
+ * Terpopuler = pilihan editor (PRD §3.6): artikel terbit bertag `POPULAR_TAG_SLUG` yang terbit dalam
+ * `POPULAR_WINDOW_DAYS` hari terakhir (umur tepat 14 hari masuk, lebih tua tidak). Satu konstanta jendela.
+ * Skenario "tidak ada populer" untuk QA di salinan sementara: ubah POPULAR_TAG_SLUG menjadi slug yang tak ada.
+ */
+export const POPULAR_WINDOW_DAYS = 14
+export const POPULAR_TAG_SLUG = 'terpopuler'

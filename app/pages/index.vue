@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import type { CategoryArticlesResponse, RecommendedResponse } from '~/types/article'
+import type { CategoryArticlesResponse, RecommendedResponse, SidebarResponse } from '~/types/article'
 import { HOME_SECTIONS, HOME_SECTION_COUNTS } from '~/config/home'
 
 useSeoMeta({ title: 'IniSumedang' })
 
 const { data } = await useFetch<RecommendedResponse>('/api/articles/recommended', {
   key: 'articles-recommended'
+})
+
+// Kolom samping (HOME-03): tab Terbaru | Terpopuler; `popular` kosong = tab Terpopuler tidak ditampilkan.
+const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar', {
+  key: 'articles-sidebar'
 })
 
 // Section kategori: satu permintaan per section, jumlah dari HOME_SECTION_COUNTS (satu konfigurasi).
@@ -33,6 +38,12 @@ const sections = computed(() =>
     <h1 class="visually-hidden">
       IniSumedang
     </h1>
+    <aside v-if="sidebar && sidebar.latest.length" class="sidebar" aria-labelledby="sidebar-title">
+      <h2 id="sidebar-title" class="visually-hidden">
+        {{ sidebar.popular.length ? 'Terbaru dan Terpopuler' : 'Terbaru' }}
+      </h2>
+      <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
+    </aside>
     <section class="recommended">
       <HomeSectionTitle title="Rekomendasi" />
       <ul v-if="data && data.articles.length" class="list">
@@ -87,6 +98,11 @@ const sections = computed(() =>
   margin-top: var(--space-24);
 }
 
+/* Mobile 90:1611: kolom samping 100:2461 (y 353, tinggi 460) di atas Rekomendasi; jarak ke judul Rekomendasi 165:1727 34 (813 ke 847) */
+.sidebar + .recommended {
+  margin-top: 34px;
+}
+
 /* Jarak antar section: mobile 30 (165:1735 y 1733 ke akhir kartu y 1703), desktop 50 (kartu 48:475 berakhir y 6334, judul 57:505 y 6384) */
 .category-section {
   margin-top: 30px;
@@ -98,7 +114,18 @@ const sections = computed(() =>
     margin-top: 50px;
   }
 
-  /* Kolom kiri 739 dari 1120; kolom kanan (kolom samping, HOME-03) dikosongkan di slice ini */
+  /* Kolom samping di kolom kanan: x 923 (130:2202) = 160 + 739 + 24, lebar 357; kolom kiri (hero) kosong sampai task hero */
+  .sidebar {
+    width: calc(100% * 357 / 1120);
+    margin-left: auto;
+  }
+
+  /* Dasar kolom samping 34:354 (daftar 482 @ y 227, berakhir y 709) ke judul Rekomendasi 42:376 (y 782): 73 [I, hero 531 berakhir y 692] */
+  .sidebar + .recommended {
+    margin-top: 73px;
+  }
+
+  /* Kolom kiri 739 dari 1120 */
   .list {
     width: calc(100% * 739 / 1120);
     grid-template-columns: repeat(2, minmax(0, 1fr));

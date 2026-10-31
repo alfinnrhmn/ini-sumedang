@@ -6,6 +6,7 @@
  * kategori 1 artikel, kategori kosong, dan artikel draft/private yang tidak boleh tampil).
  * Gambar di public/fixtures/ berasal dari Figma, hanya untuk pengembangan, WAJIB dihapus
  * sebelum situs tayang (PRD §13).
+ * Bentuk `_embedded['wp:term']` meniru WordPress: grup 0 = kategori, grup 1 = tag (HOME-03).
  */
 export interface WpTerm { id: number, slug: string, name: string }
 export interface WpMedia { source_url: string, alt_text: string, media_details: { width: number, height: number } }
@@ -29,6 +30,14 @@ const POLITIK: WpTerm = { id: 6, slug: 'politik', name: 'Politik' }
 const BISNIS: WpTerm = { id: 7, slug: 'bisnis-teknologi', name: 'Bisnis &amp; Teknologi' }
 const OTOMOTIF: WpTerm = { id: 9, slug: 'otomotif', name: 'Otomotif' }
 const SEPAK_BOLA: WpTerm = { id: 5, slug: 'sepak-bola', name: 'Sepak Bola' }
+// Kategori label item kolom samping Figma 34:354 (bukan section Beranda; slug [I], final di gerbang WordPress).
+const TEKNOLOGI: WpTerm = { id: 10, slug: 'teknologi', name: 'Teknologi' }
+const EKONOMI: WpTerm = { id: 11, slug: 'ekonomi', name: 'Ekonomi' }
+const SELEBRITI: WpTerm = { id: 12, slug: 'selebriti', name: 'Selebriti' }
+
+// Tag editor (PRD §3.6): `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
+const TERPOPULER: WpTerm = { id: 31, slug: 'terpopuler', name: 'Terpopuler' }
+const HEADLINE: WpTerm = { id: 32, slug: 'headline', name: 'Headline' }
 
 // Dimensi nyata semua berkas public/fixtures/figma-*.jpg (JPEG 716x400, diukur dengan System.Drawing).
 const IMG_WIDTH = 716
@@ -39,7 +48,8 @@ function img(n: number, alt: string): WpMedia {
 }
 
 function makePost(
-  now: Date, id: number, status: string, minutes: number, title: string, terms: WpTerm[], media: WpMedia | null
+  now: Date, id: number, status: string, minutes: number, title: string, terms: WpTerm[], media: WpMedia | null,
+  tags: WpTerm[] = []
 ): WpPost {
   return {
     id,
@@ -48,7 +58,7 @@ function makePost(
     date_gmt: new Date(now.getTime() - minutes * 60000).toISOString(),
     title: { rendered: title },
     _embedded: {
-      'wp:term': [terms],
+      'wp:term': [terms, tags],
       ...(media ? { 'wp:featuredmedia': [media] } : {}),
       'author': [{ name: 'IniSumedang' }]
     }
@@ -65,6 +75,9 @@ function makePost(
 export function buildFigmaPosts(now: Date): WpPost[] {
   const p = (id: number, minutes: number, title: string, term: WpTerm, image: number) =>
     makePost(now, id, 'publish', minutes, title, [term], img(image, title))
+  // Artikel bertag `terpopuler` (kolom samping, tab Terpopuler)
+  const pop = (id: number, minutes: number, title: string, term: WpTerm, image: number) =>
+    makePost(now, id, 'publish', minutes, title, [term], img(image, title), [TERPOPULER])
   const HOUR = 60
   const DAY = 24 * 60
   return [
@@ -107,7 +120,25 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(53, 2 * DAY + 7 * HOUR, 'Bengkel Lokal Siapkan Layanan Servis Berkala Menjelang Musim Mudik', OTOMOTIF, 5),
     p(54, 3 * DAY + 9 * HOUR, 'Pengendara Diimbau Periksa Kondisi Ban dan Rem Sebelum Perjalanan Jauh', OTOMOTIF, 6),
     p(55, 4 * DAY + 4 * HOUR, 'Komunitas Otomotif Sumedang Gelar Bakti Sosial dan Kopdar Bulanan', OTOMOTIF, 7),
-    p(56, 5 * DAY + 8 * HOUR, 'Dealer Resmi Hadirkan Pilihan Kendaraan Irit Bahan Bakar', OTOMOTIF, 8)
+    p(56, 5 * DAY + 8 * HOUR, 'Dealer Resmi Hadirkan Pilihan Kendaraan Irit Bahan Bakar', OTOMOTIF, 8),
+
+    // Terpopuler (tag `terpopuler`; HOME-03). Semua lebih lama dari 8 kartu Rekomendasi (> 360 menit) dan
+    // bukan kategori section, sehingga Rekomendasi dan section HOME-02 tidak berubah.
+    // 61-64: judul item daftar Figma 34:354 [F] (item 2 dan 4 sama di Figma); label kategori dari Figma.
+    pop(61, 13 * HOUR, 'Russian warship: Moskva sinks in Black Sea', TEKNOLOGI, 1),
+    pop(62, 20 * HOUR, 'Ukraine\'s President Zelensky to BBC: Blood money being paid...', EKONOMI, 2),
+    pop(63, 1 * DAY + 4 * HOUR, 'Her train broke down. Her phone died. And then she met her..', SELEBRITI, 3),
+    pop(64, 1 * DAY + 10 * HOUR, 'Ukraine\'s President Zelensky to BBC: Blood money being paid...', EKONOMI, 4),
+    // 65-68 [I]: melengkapi >= 8 artikel populer dalam 14 hari.
+    pop(65, 3 * DAY + 1 * HOUR, 'Warga Sumedang Antusias Ikuti Pelatihan Keamanan Digital', BERITA, 5),
+    pop(66, 5 * DAY + 3 * HOUR, 'Harga Komoditas Pangan Stabil Menjelang Akhir Pekan', EKONOMI, 6),
+    pop(67, 8 * DAY + 2 * HOUR, 'Festival Musik Daerah Hadirkan Penampil dari Berbagai Kota', SELEBRITI, 7),
+    pop(68, 11 * DAY + 5 * HOUR, 'Aplikasi Layanan Publik Baru Diperkenalkan kepada Warga', TEKNOLOGI, 8),
+    // Batas jendela [I]: umur 14 hari (tepat dan 1 jam lebih muda) masuk; umur 15 hari (tepat dan 1 jam lebih tua) tidak.
+    pop(69, 14 * DAY, 'Pasar Rakyat Kembali Ramai Dikunjungi Pembeli dari Luar Kota', BERITA, 1),
+    pop(70, 14 * DAY - 1 * HOUR, 'Pemuda Desa Rintis Usaha Kerajinan Bambu Bernilai Ekspor', EKONOMI, 2),
+    pop(71, 15 * DAY, 'Kajian Ketahanan Pangan Daerah Dipaparkan di Balai Kabupaten', BERITA, 3),
+    pop(72, 15 * DAY + 1 * HOUR, 'Peringatan Hari Jadi Kota Digelar Sederhana di Alun-Alun', BERITA, 4)
   ]
 }
 
@@ -115,28 +146,38 @@ export function buildFigmaPosts(now: Date): WpPost[] {
  * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Per kategori section:
  * Sepak Bola = tepat 1 artikel terbit (id 5); Otomotif = kosong (hanya 1 artikel `private`, id 103);
  * Nasional = banyak (+ draft/private id 101, 102); Bisnis dan Teknologi = 2 (ber-entitas).
+ * Kolom samping (HOME-03): Terbaru = id 1-4 (judul sangat panjang, judul pendek, entitas, tanpa gambar).
+ * Terpopuler (tag `terpopuler`) tepat 4 yang valid: id 2 (judul pendek), 4 (tanpa gambar), 5 (gambar tanpa alt)
+ * dan id 114 (umur tepat 14 hari, urutan terakhir). Tidak tampil: draft/private bertag (111, 112),
+ * umur 15 hari (11, 115) dan 20 hari (12); id 1 dan 3 hanya bertag `headline` (bukan populer).
  */
 export function buildEdgePosts(now: Date): WpPost[] {
-  const post = (id: number, status: string, minutes: number, title: string, term: WpTerm | null, media: WpMedia | null) =>
-    makePost(now, id, status, minutes, title, term ? [term] : [], media)
+  const post = (
+    id: number, status: string, minutes: number, title: string, term: WpTerm | null, media: WpMedia | null, tags: WpTerm[] = []
+  ) => makePost(now, id, status, minutes, title, term ? [term] : [], media, tags)
 
   const DAY = 24 * 60
   return [
     post(101, 'draft', 1, 'Draft yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Draft')),
     post(102, 'private', 2, 'Artikel privat yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Privat')),
     post(103, 'private', 3, 'Artikel privat Otomotif yang tidak boleh tampil di section', OTOMOTIF, img(1, 'Privat Otomotif')),
-    post(1, 'publish', 0.5, 'Pemerintah Kabupaten Sumedang Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, dan Komunitas Pemuda untuk Meningkatkan Kenyamanan Ruang Publik', NASIONAL, img(1, 'Suasana pusat kota Sumedang')),
-    post(2, 'publish', 35, 'Banjir surut', NASIONAL, img(2, 'Genangan air surut')),
-    post(3, 'publish', 180, 'Bisnis &amp; Teknologi Sumedang Tumbuh &#8211; UMKM &#8217;Digital&#8217; Capai Target &#8230;', BISNIS, img(3, 'Pelaku UMKM menggunakan ponsel')),
-    post(4, 'publish', DAY + 120, 'Harga Kebutuhan Pokok di Pasar Tradisional Relatif Stabil', NASIONAL, null),
-    post(5, 'publish', 3 * DAY, 'Tim Sepak Bola Lokal Siap Hadapi Turnamen Antar-Kecamatan', SEPAK_BOLA, img(4, '')),
+    post(1, 'publish', 0.5, 'Pemerintah Kabupaten Sumedang Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, dan Komunitas Pemuda untuk Meningkatkan Kenyamanan Ruang Publik', NASIONAL, img(1, 'Suasana pusat kota Sumedang'), [HEADLINE]),
+    post(2, 'publish', 35, 'Banjir surut', NASIONAL, img(2, 'Genangan air surut'), [TERPOPULER]),
+    post(3, 'publish', 180, 'Bisnis &amp; Teknologi Sumedang Tumbuh &#8211; UMKM &#8217;Digital&#8217; Capai Target &#8230;', BISNIS, img(3, 'Pelaku UMKM menggunakan ponsel'), [HEADLINE]),
+    post(4, 'publish', DAY + 120, 'Harga Kebutuhan Pokok di Pasar Tradisional Relatif Stabil', NASIONAL, null, [TERPOPULER]),
+    post(5, 'publish', 3 * DAY, 'Tim Sepak Bola Lokal Siap Hadapi Turnamen Antar-Kecamatan', SEPAK_BOLA, img(4, ''), [TERPOPULER]),
     post(13, 'publish', 4 * DAY, 'Artikel Tanpa Kategori Tetap Tampil Tanpa Label', null, img(5, 'Contoh tanpa kategori')),
     post(6, 'publish', 5 * DAY, 'Uji Coba Angkutan Wisata Listrik Dimulai Pekan Ini', BERITA, null),
     post(7, 'publish', 6 * DAY + 600, 'Festival Budaya Sunda Kembali Digelar di Alun-Alun', NASIONAL, img(2, 'Panggung festival')),
     post(8, 'publish', 9 * DAY, 'Layanan Administrasi Kependudukan Kini Dapat Diakses Lebih Cepat', NASIONAL, img(3, 'Loket layanan')),
     post(9, 'publish', 10 * DAY, 'Pelatihan Wirausaha Muda Diikuti Ratusan Peserta', BISNIS, img(1, 'Peserta pelatihan')),
     post(10, 'publish', 12 * DAY, 'Perbaikan Jalan Penghubung Antar-Desa Rampung Lebih Awal', NASIONAL, img(4, 'Jalan desa')),
-    post(11, 'publish', 15 * DAY, 'Komunitas Pesepeda Gelar Perjalanan Akhir Pekan', BERITA, img(2, 'Pesepeda')),
-    post(12, 'publish', 20 * DAY, 'Bengkel Otomotif Lokal Tawarkan Servis Gratis untuk Ojek', BERITA, img(3, 'Bengkel'))
+    post(11, 'publish', 15 * DAY, 'Komunitas Pesepeda Gelar Perjalanan Akhir Pekan', BERITA, img(2, 'Pesepeda'), [TERPOPULER]),
+    post(12, 'publish', 20 * DAY, 'Bengkel Otomotif Lokal Tawarkan Servis Gratis untuk Ojek', BERITA, img(3, 'Bengkel'), [TERPOPULER]),
+    // Kolom samping: draft/private bertag populer (tidak boleh tampil) dan batas jendela 14/15 hari.
+    post(111, 'draft', 2, 'Draft populer yang tidak boleh tampil di kolom samping', BERITA, img(1, 'Draft populer'), [TERPOPULER]),
+    post(112, 'private', 4, 'Artikel privat populer yang tidak boleh tampil di kolom samping', BERITA, img(1, 'Privat populer'), [TERPOPULER]),
+    post(114, 'publish', 14 * DAY, 'Pameran Produk UMKM Pekan Ini Berlangsung Tepat Dua Pekan Lalu', BERITA, img(5, 'Stan pameran UMKM'), [TERPOPULER]),
+    post(115, 'publish', 15 * DAY + 60, 'Pelatihan Pemandu Wisata Lebih dari Dua Pekan Lalu', BERITA, img(6, 'Peserta pelatihan pemandu'), [TERPOPULER])
   ]
 }

@@ -31,3 +31,11 @@ export interface RecommendedResponse {
 
 /** Respons daftar artikel satu kategori section (bentuk sama dengan Rekomendasi). */
 export type CategoryArticlesResponse = RecommendedResponse
+
+/** Respons kolom samping Beranda (HOME-03): satu `now` untuk kedua daftar. `popular` kosong = tab Terpopuler disembunyikan. */
+export interface SidebarResponse {
+  latest: Article[]
+  popular: Article[]
+  /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
+  now: string
+}
