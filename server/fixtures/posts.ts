@@ -7,8 +7,12 @@
  * Gambar di public/fixtures/ berasal dari Figma, hanya untuk pengembangan, WAJIB dihapus
  * sebelum situs tayang (PRD §13).
  * Bentuk `_embedded['wp:term']` meniru WordPress: grup 0 = kategori, grup 1 = tag (HOME-03).
+ * Ruang Visual (HOME-04): kategori induk `ruang-visual` dengan kategori anak (`parent`); "paling baru dibuat" = id
+ * terbesar (WordPress: `orderby=id&order=desc`). Daftar kategori visual ada di `buildFigmaVisualCategories` /
+ * `buildEdgeVisualCategories` (anak tanpa artikel hanya ada di daftar itu).
  */
-export interface WpTerm { id: number, slug: string, name: string }
+/** `parent` hanya ada pada kategori anak (seperti `parent` di REST WordPress; tanpa nilai = kategori induk). */
+export interface WpTerm { id: number, slug: string, name: string, parent?: number }
 export interface WpMedia { source_url: string, alt_text: string, media_details: { width: number, height: number } }
 export interface WpPost {
   id: number
@@ -38,6 +42,25 @@ const SELEBRITI: WpTerm = { id: 12, slug: 'selebriti', name: 'Selebriti' }
 // Tag editor (PRD §3.6): `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
 const TERPOPULER: WpTerm = { id: 31, slug: 'terpopuler', name: 'Terpopuler' }
 const HEADLINE: WpTerm = { id: 32, slug: 'headline', name: 'Headline' }
+
+// Ruang Visual (HOME-04). Induk id 20; anak id 24-29 (set `figma`) dan 35-41 (set `edge`). Slug anak [I]: final di gerbang WordPress.
+const RUANG_VISUAL: WpTerm = { id: 20, slug: 'ruang-visual', name: 'Ruang Visual' }
+const visualChild = (id: number, slug: string, name: string): WpTerm => ({ id, slug, name, parent: RUANG_VISUAL.id })
+// Set `figma`: id terbesar = tampil pertama = urutan blok di Figma 21:4950 (nama dari teks aktual node 105:468, 105:477, 101:2713, 101:2729).
+const V_PEMERINTAHAN = visualChild(28, 'visual-pemerintahan', 'Pemerintahan')
+const V_EKONOMI = visualChild(27, 'visual-ekonomi-inovasi', 'Ekonomi &amp; Inovasi')
+const V_WISATA = visualChild(26, 'visual-wisata', 'Wisata')
+const V_OLAHRAGA = visualChild(25, 'visual-olahraga', 'Olahraga')
+const V_BUDAYA = visualChild(24, 'visual-budaya', 'Budaya') // anak ke-5 (lebih lama): tidak masuk 4 topik terbaru
+const V_KOSONG = visualChild(29, 'visual-kosong', 'Topik Kosong') // anak terbaru tanpa artikel: dilewati
+// Set `edge`
+const E_KOSONG = visualChild(41, 'edge-kosong', 'Topik Tanpa Artikel')
+const E_HANYA_DRAFT = visualChild(40, 'edge-hanya-draft', 'Topik Hanya Draft') // hanya draft/private: dianggap kosong
+const E_PANJANG = visualChild(39, 'edge-judul-panjang', 'Kolaborasi Lintas Sektor untuk Pembangunan Berkelanjutan dan Pemberdayaan Masyarakat Desa di Kabupaten Sumedang')
+const E_SATU = visualChild(38, 'edge-satu-artikel', 'Satu Artikel')
+const E_DUA = visualChild(37, 'edge-dua-artikel', 'Dua Artikel')
+const E_ENTITAS = visualChild(36, 'edge-seni-budaya', 'Seni &amp; Budaya &#8211; Tradisi')
+const E_LAMA = visualChild(35, 'edge-lama', 'Topik Lama') // anak ke-5: tidak tampil
 
 // Dimensi nyata semua berkas public/fixtures/figma-*.jpg (JPEG 716x400, diukur dengan System.Drawing).
 const IMG_WIDTH = 716
@@ -138,8 +161,36 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     pop(69, 14 * DAY, 'Pasar Rakyat Kembali Ramai Dikunjungi Pembeli dari Luar Kota', BERITA, 1),
     pop(70, 14 * DAY - 1 * HOUR, 'Pemuda Desa Rintis Usaha Kerajinan Bambu Bernilai Ekspor', EKONOMI, 2),
     pop(71, 15 * DAY, 'Kajian Ketahanan Pangan Daerah Dipaparkan di Balai Kabupaten', BERITA, 3),
-    pop(72, 15 * DAY + 1 * HOUR, 'Peringatan Hari Jadi Kota Digelar Sederhana di Alun-Alun', BERITA, 4)
+    pop(72, 15 * DAY + 1 * HOUR, 'Peringatan Hari Jadi Kota Digelar Sederhana di Alun-Alun', BERITA, 4),
+
+    // Ruang Visual (HOME-04; 101:2708, 101:2709, 101:2710, 101:2726). Teks [F] dari node: judul kartu besar dan 3 judul item
+    // (item sama di Figma). Semua > 360 menit supaya 8 kartu Rekomendasi dan kolom samping tidak berubah; tanpa tag.
+    // Tanggal sengaja tidak mengikuti urutan topik: urutan topik = kategori paling baru dibuat (id), bukan artikel terbaru.
+    p(81, 2 * DAY + 4 * HOUR, 'Pemkab Sumedang Percepat Transformasi Layanan Publik', V_PEMERINTAHAN, 1),
+    p(82, 2 * DAY + 6 * HOUR, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah', V_PEMERINTAHAN, 2),
+    p(83, 2 * DAY + 8 * HOUR, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah', V_PEMERINTAHAN, 3),
+    p(84, 2 * DAY + 10 * HOUR, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah', V_PEMERINTAHAN, 4),
+    p(85, 1 * DAY + 14 * HOUR, 'UMKM Lokal Tumbuh Lewat Kolaborasi dan Teknologi', V_EKONOMI, 5),
+    p(86, 1 * DAY + 16 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_EKONOMI, 6),
+    p(87, 1 * DAY + 18 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_EKONOMI, 7),
+    p(88, 1 * DAY + 20 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_EKONOMI, 8),
+    p(89, 1 * DAY + 1 * HOUR, 'UMKM Lokal Tumbuh Lewat Kolaborasi dan Teknologi', V_WISATA, 1),
+    p(90, 1 * DAY + 3 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_WISATA, 2),
+    p(91, 1 * DAY + 5 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_WISATA, 3),
+    p(92, 1 * DAY + 7 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_WISATA, 4),
+    p(93, 15 * HOUR, 'UMKM Lokal Tumbuh Lewat Kolaborasi dan Teknologi', V_OLAHRAGA, 5),
+    p(94, 17 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 6),
+    p(95, 19 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 7),
+    p(96, 21 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 8),
+    // [I] anak ke-5 (lebih lama): ada artikel, tetapi tidak termasuk 4 topik terbaru
+    p(97, 3 * DAY + 2 * HOUR, 'Pagelaran Seni Tradisional Sumedang Kembali Digelar', V_BUDAYA, 1),
+    p(98, 3 * DAY + 5 * HOUR, 'Pengrajin Lokal Perkenalkan Kerajinan Khas Sumedang', V_BUDAYA, 2)
   ]
+}
+
+/** Kategori Ruang Visual set `figma` (induk + anak). Anak `visual-kosong` tidak punya artikel. */
+export function buildFigmaVisualCategories(): WpTerm[] {
+  return [RUANG_VISUAL, V_BUDAYA, V_OLAHRAGA, V_WISATA, V_EKONOMI, V_PEMERINTAHAN, V_KOSONG]
 }
 
 /**
@@ -178,6 +229,35 @@ export function buildEdgePosts(now: Date): WpPost[] {
     post(111, 'draft', 2, 'Draft populer yang tidak boleh tampil di kolom samping', BERITA, img(1, 'Draft populer'), [TERPOPULER]),
     post(112, 'private', 4, 'Artikel privat populer yang tidak boleh tampil di kolom samping', BERITA, img(1, 'Privat populer'), [TERPOPULER]),
     post(114, 'publish', 14 * DAY, 'Pameran Produk UMKM Pekan Ini Berlangsung Tepat Dua Pekan Lalu', BERITA, img(5, 'Stan pameran UMKM'), [TERPOPULER]),
-    post(115, 'publish', 15 * DAY + 60, 'Pelatihan Pemandu Wisata Lebih dari Dua Pekan Lalu', BERITA, img(6, 'Peserta pelatihan pemandu'), [TERPOPULER])
+    post(115, 'publish', 15 * DAY + 60, 'Pelatihan Pemandu Wisata Lebih dari Dua Pekan Lalu', BERITA, img(6, 'Peserta pelatihan pemandu'), [TERPOPULER]),
+
+    // Ruang Visual (HOME-04). Semua lebih lama dari 20 hari agar Rekomendasi, kolom samping, dan section tidak berubah.
+    // E_PANJANG (nama topik sangat panjang): kartu besar berjudul sangat panjang, item berjudul pendek, entitas, tanpa gambar, gambar tanpa alt.
+    post(201, 'publish', 22 * DAY, 'Pemerintah Kabupaten Sumedang Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, dan Komunitas Pemuda untuk Meningkatkan Kenyamanan Ruang Publik', E_PANJANG, img(1, 'Penataan kawasan pusat kota')),
+    post(202, 'publish', 22 * DAY + 60, 'Banjir surut', E_PANJANG, img(2, 'Genangan air surut')),
+    post(203, 'publish', 22 * DAY + 120, 'Bisnis &amp; Teknologi Sumedang Tumbuh &#8211; UMKM &#8217;Digital&#8217; Capai Target &#8230;', E_PANJANG, null),
+    post(204, 'publish', 22 * DAY + 180, 'Harga Kebutuhan Pokok di Pasar Tradisional Relatif Stabil di Sejumlah Kecamatan Sumedang Selama Sepekan Terakhir', E_PANJANG, img(3, '')),
+    // E_SATU: tepat 1 artikel terbit (draft/private di topik yang sama tidak tampil): blok tanpa item
+    post(205, 'publish', 23 * DAY, 'Satu-satunya Artikel Terbit di Topik Ini', E_SATU, img(4, 'Satu artikel')),
+    post(206, 'draft', 5, 'Draft di topik satu artikel yang tidak boleh tampil', E_SATU, img(1, 'Draft')),
+    post(207, 'private', 6, 'Artikel privat di topik satu artikel yang tidak boleh tampil', E_SATU, img(1, 'Privat')),
+    // E_DUA: 2 artikel (kartu besar + 1 item), keduanya tanpa gambar
+    post(208, 'publish', 24 * DAY, 'Dua Artikel di Topik Ini: Kartu Besar', E_DUA, null),
+    post(209, 'publish', 24 * DAY + 60, 'Item Tunggal Tanpa Gambar', E_DUA, null),
+    // E_ENTITAS: nama topik ber-entitas; 4 artikel
+    post(210, 'publish', 25 * DAY, 'Pesta Rakyat &amp; Festival Seni &#8211; Warga Padati Alun-Alun', E_ENTITAS, img(5, 'Festival seni')),
+    post(211, 'publish', 25 * DAY + 60, 'Sanggar Tari Latih 100 Penari Cilik', E_ENTITAS, img(6, 'Sanggar tari')),
+    post(212, 'publish', 25 * DAY + 120, 'Pameran Lukisan', E_ENTITAS, img(7, 'Pameran lukisan')),
+    post(213, 'publish', 25 * DAY + 180, 'Pertunjukan Wayang Golek Semalam Suntuk Diikuti Ratusan Penonton dari Berbagai Daerah Sekitar Sumedang', E_ENTITAS, img(8, 'Wayang golek')),
+    // E_HANYA_DRAFT: hanya draft/private (dianggap kosong, dilewati)
+    post(214, 'draft', 7, 'Draft satu-satunya di topik hanya draft', E_HANYA_DRAFT, img(1, 'Draft')),
+    post(215, 'private', 8, 'Privat satu-satunya di topik hanya draft', E_HANYA_DRAFT, img(1, 'Privat')),
+    // E_LAMA: anak ke-5 (lebih lama), ada artikel tetapi tidak termasuk 4 topik terbaru
+    post(216, 'publish', 26 * DAY, 'Artikel di Topik Lama yang Tidak Tampil di Beranda', E_LAMA, img(2, 'Topik lama'))
   ]
+}
+
+/** Kategori Ruang Visual set `edge`: anak tanpa artikel (E_KOSONG) dan anak ke-5 (E_LAMA) ikut di daftar. */
+export function buildEdgeVisualCategories(): WpTerm[] {
+  return [RUANG_VISUAL, E_LAMA, E_ENTITAS, E_DUA, E_SATU, E_PANJANG, E_HANYA_DRAFT, E_KOSONG]
 }

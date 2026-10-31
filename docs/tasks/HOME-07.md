@@ -62,4 +62,10 @@ Ditetapkan saat READY.
 | – | – | – | – | – |
 
 ## Catatan
+- **Keputusan pemilik (31 Okt 2026, dicatat PM saat menjalankan HOME-04) tentang font judul hero:**
+  1. **Merriweather Sans tetap di-host sendiri** (PRD §10; tidak memuat dari CDN pihak ketiga saat runtime).
+  2. **Pemilik menyetujui di muka unduhan berkas font dari Fontsource melalui jsDelivr** (persetujuan untuk aturan 3 AGENTS.md atas unduhan aset) dengan syarat: **versi dipin** (nomor versi paket Fontsource tercatat), **hanya bobot yang dipakai** di hero (bobot persisnya dari node `21:4974` saat dibaca), lisensi diambil dari **repositori pencipta** (bukan dari Fontsource), dan **SHA-256 tiap berkas dicatat** di Bukti beserta URL, versi, dan tanggal (pola S44/S45 SET-002). Berkas dan lisensi ke `public/fonts/`, blok `@font-face` mengikuti pola font yang ada tanpa mengubah `nuxt.config.ts`.
+  3. **Pemeriksaan Reserved Font Name (RFN)** pada teks OFL repositori pencipta Merriweather Sans wajib dilakukan FE sebelum berkas dipakai: **jika RFN sama dengan Merriweather** ("Merriweather"), risikonya **tercakup keputusan `docs/decisions/0004-merriweather-rfn.md`** (mitigasi 0004 berlaku: OFL asli dan baris hak cipta ikut, tidak diklaim versi asli, sumber dan SHA-256 tercatat); **jika RFN berbeda** (atau tidak ada kejelasan), berhenti dan **ajukan ke pemilik** sebelum berkas dipakai — jangan memperluas 0004 sendiri.
+  4. Keputusan "font baru atau memakai Merriweather yang ada" (butir 2 di "Keputusan yang dibutuhkan sebelum READY") dengan ini condong ke **Merriweather Sans**; token `--font-serif`/`--font-sans` yang dipakai judul hero dan token baru (bila ada) masih butuh persetujuan PM/pemilik saat READY.
+  5. Deviasi Figma yang kelak diterima di slice ini ditambahkan PM ke `docs/tasks/POLISH-01.md`.
 - Riwayat: 30 Okt 2026 → BACKLOG → PM.

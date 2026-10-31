@@ -662,10 +662,11 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | FIX-001 | `DONE` | Fixture default meniru Figma, kasus buruk jadi set `edge` (`FIXTURE_SET=edge`); `docs/tasks/FIX-001.md` |
 | HOME-02 | `DONE` | Section Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif (`HOME_SECTION_COUNTS`, `/api/articles/by-category`); dimensi gambar fixture 716×400; `docs/tasks/HOME-02.md` |
 | HOME-03 | `DONE` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
-| HOME-04 | `BACKLOG` | Ruang Visual; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
-| HOME-05 | `BACKLOG` | Footer; menunggu persetujuan pemilik atas perilaku mobile |
-| HOME-06 | `BACKLOG` | Header, menu, laci; prasyarat: usulan visual laci disetujui pemilik |
-| HOME-07 | `BACKLOG` | Hero `Switch`; prasyarat: node dibaca PM dan keputusan Merriweather Sans |
+| HOME-04 | `DONE` | Ruang Visual (`/api/articles/visual-topics`, `HomeVisualTopic`); setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
+| HOME-05 | `BACKLOG` | Footer; perilaku mobile (akordeon, node `101:2600`, semua item teks biasa) diputuskan pemilik 31 Okt 2026, dicatat di `docs/tasks/HOME-05.md`; siap dibuka `READY` |
+| HOME-06 | `BACKLOG` | Header, menu, laci; usulan visual laci tertulis di `docs/tasks/HOME-06.md`, menunggu persetujuan pemilik (prasyarat `READY`) |
+| HOME-07 | `BACKLOG` | Hero `Switch`; prasyarat: node dibaca PM; Merriweather Sans di-host sendiri, unduhan Fontsource via jsDelivr disetujui di muka (31 Okt 2026), RFN diperiksa (`docs/tasks/HOME-07.md`) |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D3 dari HOME-03; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
 | PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13), tidak ada pengecualian. PAGE-002 juga bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |

@@ -67,6 +67,31 @@ Toggle tema (tidak dirender, PRD §3.7); kolom dan logika pencarian (PAGE-004); 
 | – | – | – | – | – |
 
 ## Catatan
-- **Prasyarat READY (dari LAY-001):** PM menyiapkan usulan visual laci (panel, daftar 9 kategori bergaya teks menu, tombol tutup, perilaku fokus dan Esc); belum ditulis.
+- **Prasyarat READY (dari LAY-001):** PM menyiapkan usulan visual laci (panel, daftar 9 kategori bergaya teks menu, tombol tutup, perilaku fokus dan Esc); usulan kini **tertulis di bawah, menunggu persetujuan pemilik**. Status berkas ini **tetap `BACKLOG`**.
+- **Catatan pemilik (31 Okt 2026, dicatat PM saat menjalankan HOME-04):**
+  1. Header mobile (node `116:1662`) = **hamburger + logo di kiri, ikon cari di kanan**.
+  2. **Tombol bulan (ubah mode) TIDAK dirender** karena dark mode ditunda (keputusan tetap berlaku; tombol bulan `116:1636` di frame diabaikan).
+  3. **Hamburger membuka laci berisi 9 kategori** (G20; sama di desktop dan mobile).
+  4. Ikon cari di header mobile: keputusan PM 4 di atas (slot pencarian tidak dirender sampai PAGE-004) tetap berlaku kecuali pemilik menyatakan lain; ruang tata letaknya dijaga agar header mobile tidak bergeser. Pertanyaan ke pemilik: apakah ikon cari mobile dirender sebagai ikon non-interaktif sampai PAGE-004, atau tidak dirender.
+  5. Deviasi Figma yang kelak diterima di slice ini ditambahkan PM ke `docs/tasks/POLISH-01.md`.
+
+## Usulan visual (menunggu persetujuan pemilik)
+Usulan PM [I]; tidak dibangun sebelum disetujui pemilik. **Hanya token yang sudah ada di `tokens.css`; tidak ada token, font, atau aset baru** (ikon tutup digambar dengan dua garis SVG inline, tanpa unduhan). Berlaku sama di desktop dan mobile (G20).
+
+| Aspek | Usulan |
+|---|---|
+| Bentuk | Panel samping dengan `role="dialog"`, `aria-modal="true"`, `aria-labelledby` ke judul panel; di-render di server dalam keadaan tertutup (`hidden`), tidak mempengaruhi tata letak header |
+| Arah geser | Dari **kiri** (hamburger berada di kiri header); durasi 250 ms `ease`; **tanpa animasi** bila `prefers-reduced-motion: reduce` |
+| Lebar | `--container-mobile` (354 px), dibatasi `max-width: calc(100% - var(--space-24))`; tinggi penuh viewport; isi dapat di-scroll di dalam panel; scroll halaman di belakangnya dikunci selama terbuka |
+| Latar panel | `--color-white`; pemisah dari halaman dengan garis kanan `--color-border`; tanpa bayangan (tidak ada token bayangan) |
+| Overlay | Menutupi sisa layar; warna turunan dari token yang ada: `color-mix(in srgb, var(--color-black-1) 40%, transparent)` (alfa 40 % = usulan, bukan token baru); klik overlay menutup laci |
+| Judul panel | "Kategori", `--type-heading-mobile`, `--color-text`; `<h2>` di dalam dialog |
+| Tombol tutup | Kanan atas panel, 40×40 (ukuran tombol hamburger desktop `21:5352`), `--radius-6`, latar `--color-surface`, ikon X dua garis `--color-black-1`; `aria-label="Tutup menu kategori"`; cincin fokus 4 px (`--color-focus`) |
+| Daftar | 9 kategori resmi dari `getCategories()` (ejaan data: Berita, Nasional, Pemerintahan, Politik, Hukum, Sepak Bola, Otomotif, Jelajah, Bisnis & Teknologi), `<ul>` vertikal; padding item `--space-16` vertikal dan `--space-24` horizontal; garis pemisah antar item `--color-border` |
+| Gaya item | Meniru teks menu kategori desktop (`21:4951`): warna `--color-brand`, `--type-text-l-medium`; FE memastikan gaya persisnya dari node. Item tanpa tujuan (`categoryPath(slug)` = `null`) = teks biasa, bukan `<a>`, tidak dapat difokus; item bertujuan = `<a>` dengan fokus terlihat |
+| Fokus | Saat terbuka, fokus pindah ke tombol tutup; fokus **terkurung** di dalam panel (Tab/Shift+Tab berputar); Esc menutup; setelah ditutup fokus kembali ke tombol hamburger; `aria-expanded` dan `aria-controls` pada hamburger |
+| Tablet | 768–1023: sama seperti mobile (PRD §3.4); ≥ 1024: sama |
+
+Pertanyaan persetujuan untuk pemilik: (1) arah geser dari kiri; (2) lebar 354 px; (3) alfa overlay 40 %; (4) judul panel "Kategori"; (5) item tanpa tautan tampil sebagai teks biasa sampai PAGE-003.
 - Header Detail desktop (`130:553`) berbeda geometri dari Beranda: diputuskan saat slice Detail.
 - Riwayat: 30 Okt 2026 → BACKLOG → PM.

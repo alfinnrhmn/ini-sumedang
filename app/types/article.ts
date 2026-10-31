@@ -32,6 +32,22 @@ export interface RecommendedResponse {
 /** Respons daftar artikel satu kategori section (bentuk sama dengan Rekomendasi). */
 export type CategoryArticlesResponse = RecommendedResponse
 
+/**
+ * Satu topik Ruang Visual (HOME-04): kategori anak dari induk `ruang-visual`,
+ * 1 kartu besar (`lead`, artikel terbaru topik) dan hingga 3 berita berthumbnail (`items`).
+ * Topik dengan artikel kurang dari 4 punya `items` lebih pendek (kosong bila hanya 1 artikel).
+ */
+export interface VisualTopic {
+  topic: ArticleCategory
+  lead: Article
+  items: Article[]
+}
+
+/** Respons Ruang Visual: urutan topik = kategori paling baru dibuat dulu; `topics` kosong = section tidak dirender. */
+export interface VisualTopicsResponse {
+  topics: VisualTopic[]
+}
+
 /** Respons kolom samping Beranda (HOME-03): satu `now` untuk kedua daftar. `popular` kosong = tab Terpopuler disembunyikan. */
 export interface SidebarResponse {
   latest: Article[]

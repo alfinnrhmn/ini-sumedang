@@ -1,9 +1,13 @@
-import type { Article } from '../../app/types/article'
+import type { Article, VisualTopic } from '../../app/types/article'
 import { POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
-import { buildEdgePosts, buildFigmaPosts } from '../fixtures/posts'
+import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
 
 const RECOMMENDED_COUNT = 8
+// Ruang Visual (HOME-04): induk, jumlah topik, dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel).
+const VISUAL_PARENT_SLUG = 'ruang-visual'
+const VISUAL_TOPIC_COUNT = 4
+const VISUAL_ITEM_COUNT = 3
 const DEFAULT_AUTHOR = 'IniSumedang'
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -55,12 +59,17 @@ function mapPost(post: WpPost): Article {
   }
 }
 
+/** Set fixture `edge` (kasus buruk) dipilih lewat env FIXTURE_SET. */
+function isEdgeSet(): boolean {
+  // `process` tidak bertipe di proyek ini (tanpa @types/node); baca env lewat globalThis.
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  return env?.FIXTURE_SET === 'edge'
+}
+
 /** Semua post terbit (hanya status `publish`), terbaru dulu, tanpa duplikat id. */
 function getPublishedPosts(now: Date): WpPost[] {
   const seen = new Set<number>()
-  // `process` tidak bertipe di proyek ini (tanpa @types/node); baca env lewat globalThis.
-  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
-  const posts = env?.FIXTURE_SET === 'edge' ? buildEdgePosts(now) : buildFigmaPosts(now)
+  const posts = isEdgeSet() ? buildEdgePosts(now) : buildFigmaPosts(now)
   return posts
     .filter(post => post.status === 'publish')
     .sort((a, b) => Date.parse(publishedAtOf(b)) - Date.parse(publishedAtOf(a)))
@@ -104,4 +113,31 @@ export function getPopularArticles(limit: number = SIDEBAR_COUNT, now: Date = ne
     .filter(post => hasTag(post, POPULAR_TAG_SLUG) && Date.parse(publishedAtOf(post)) >= earliest)
     .slice(0, limit)
     .map(mapPost)
+}
+
+/**
+ * Ruang Visual (HOME-04): topik = kategori anak dari kategori induk `ruang-visual`; ambil `VISUAL_TOPIC_COUNT` anak
+ * non-kosong yang paling baru dibuat (id terbesar dulu, bukan tanggal artikel). Anak tanpa artikel terbit dilewati
+ * (draft/private tidak dihitung, setara `hide_empty=true`). Tiap topik: kartu besar = artikel terbaru topik,
+ * `items` = sampai 3 artikel berikutnya (lebih sedikit bila artikel kurang). Induk tak ada: array kosong.
+ */
+export function getVisualTopics(now: Date = new Date()): VisualTopic[] {
+  const categories = isEdgeSet() ? buildEdgeVisualCategories() : buildFigmaVisualCategories()
+  const parent = categories.find(category => category.slug === VISUAL_PARENT_SLUG && !category.parent)
+  if (!parent) return []
+
+  const published = getPublishedArticles(now)
+  const topics: VisualTopic[] = []
+  const children = categories.filter(category => category.parent === parent.id).sort((a, b) => b.id - a.id)
+  for (const child of children) {
+    const [lead, ...rest] = published.filter(article => article.categories.some(category => category.id === child.id))
+    if (!lead) continue
+    topics.push({
+      topic: { id: child.id, slug: child.slug, name: decodeEntities(child.name) },
+      lead,
+      items: rest.slice(0, VISUAL_ITEM_COUNT)
+    })
+    if (topics.length === VISUAL_TOPIC_COUNT) break
+  }
+  return topics
 }

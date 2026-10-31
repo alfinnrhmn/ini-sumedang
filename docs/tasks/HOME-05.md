@@ -70,4 +70,12 @@ Panel berlangganan, halaman tujuan (STATIC-001, PAGE-003), header, tautan "Terba
 
 ## Catatan
 - Pertanyaan ke pemilik: setuju akordeon untuk footer mobile; URL akun sosial; tujuan Redaksi/Terbaru/Terpopuler (tidak menghalangi, tetap teks biasa).
+- **Keputusan pemilik (31 Okt 2026, dicatat PM saat menjalankan HOME-04; menggantikan bagian yang bertentangan di "Keputusan PM" 2, 3, dan 5):**
+  1. Footer mobile mengikuti desain Figma node `101:2600`: logo, tagline, **enam ikon sosial (Facebook, X, WordPress, Instagram, YouTube, TikTok — termasuk WordPress)**, tiga baris berpanah **Navigasi / Kategori / Tentang IniSumedang**, dan baris legal.
+  2. **Default (perilaku mobile):** tiga baris = **akordeon**: `<button>` dengan `aria-expanded` dan `aria-controls`, panah berputar saat terbuka, fokus terlihat; daftar tertutup `hidden` namun ada di HTML server. Isi: **Navigasi** = Terbaru, Terpopuler; **Kategori** = 9 kategori resmi (Berita, Nasional, Pemerintahan, Politik, Hukum, Sepak Bola, Otomotif, Jelajah, Bisnis & Teknologi; ejaan dari data, bukan dari teks Figma); **Tentang IniSumedang** = Redaksi, Pedoman Siber, Iklan, Kontak.
+  3. **Semua item teks biasa (`to: null`)** sampai halaman tujuannya ada: bukan `<a>`, tanpa `href`, tidak dapat difokus. Konsekuensi: "Beranda" **tidak lagi** ada di Navigasi (keputusan PM 2 versi lama menaruhnya sebagai `to: '/'`), dan Kategori berisi 9 kategori (bukan 4 seperti usulan lama).
+  4. **Enam ikon sosial = ikon biasa tanpa tautan** (dekoratif, bukan `<a>`) sampai pemilik memberi URL akun; konfigurasi tetap menyiapkan `url` opsional (hanya `https`, `rel="noopener noreferrer"`).
+  5. **Kebijakan Privasi dan Ketentuan Penggunaan** di baris legal = teks biasa.
+  6. Prasyarat `READY` HOME-05 ("pemilik menyetujui perilaku footer mobile, keputusan 5") dengan ini **terpenuhi**; status berkas ini **tidak diubah** di sini (diubah PM saat HOME-05 dijalankan). Konfigurasi tautan tetap satu daftar untuk desktop dan mobile (keputusan PM 1), sehingga isi dan `to: null` pada butir 2–3 berlaku juga di footer desktop; tata letak desktop tetap mengikuti node `60:486`.
+  7. Deviasi Figma yang kelak diterima di slice ini ditambahkan PM ke `docs/tasks/POLISH-01.md`.
 - Riwayat: 30 Okt 2026 → BACKLOG → PM.
