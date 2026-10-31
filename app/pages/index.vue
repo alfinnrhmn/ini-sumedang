@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import type { CategoryArticlesResponse, RecommendedResponse, SidebarResponse, VisualTopicsResponse } from '~/types/article'
+import type { CategoryArticlesResponse, HeroResponse, RecommendedResponse, SidebarResponse, VisualTopicsResponse } from '~/types/article'
 import { HOME_SECTIONS, HOME_SECTION_COUNTS } from '~/config/home'
 
 useSeoMeta({ title: 'IniSumedang' })
 
 const { data } = await useFetch<RecommendedResponse>('/api/articles/recommended', {
   key: 'articles-recommended'
+})
+
+// Hero (HOME-07): carousel manual 4 artikel terbaru; kosong = hero tidak dirender, kurang dari 2 = tanpa titik.
+const { data: hero } = await useFetch<HeroResponse>('/api/articles/hero', {
+  key: 'articles-hero'
 })
 
 // Kolom samping (HOME-03): tab Terbaru | Terpopuler; `popular` kosong = tab Terpopuler tidak ditampilkan.
@@ -45,12 +50,15 @@ const sections = computed(() =>
     <h1 class="visually-hidden">
       IniSumedang
     </h1>
-    <aside v-if="sidebar && sidebar.latest.length" class="sidebar" aria-labelledby="sidebar-title">
-      <h2 id="sidebar-title" class="visually-hidden">
-        {{ sidebar.popular.length ? 'Terbaru dan Terpopuler' : 'Terbaru' }}
-      </h2>
-      <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
-    </aside>
+    <div v-if="(hero && hero.articles.length) || (sidebar && sidebar.latest.length)" class="top">
+      <HomeHero v-if="hero && hero.articles.length" class="hero-slot" :articles="hero.articles" :now="hero.now" />
+      <aside v-if="sidebar && sidebar.latest.length" class="sidebar" aria-labelledby="sidebar-title">
+        <h2 id="sidebar-title" class="visually-hidden">
+          {{ sidebar.popular.length ? 'Terbaru dan Terpopuler' : 'Terbaru' }}
+        </h2>
+        <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
+      </aside>
+    </div>
     <section class="recommended">
       <HomeSectionTitle title="Rekomendasi" />
       <ul v-if="data && data.articles.length" class="list">
@@ -113,8 +121,13 @@ const sections = computed(() =>
   margin-top: var(--space-24);
 }
 
-/* Mobile 90:1611: kolom samping 100:2461 (y 353, tinggi 460) di atas Rekomendasi; jarak ke judul Rekomendasi 165:1727 34 (813 ke 847) */
-.sidebar + .recommended {
+/* Mobile 90:1611: hero 90:2130 (y 82, tinggi 238) lalu kolom samping 100:2461 (y 353, tinggi 460), jarak hero ke kolom samping 33 (320 ke 353);
+   jarak ke judul Rekomendasi 165:1727 34 (813 ke 847) */
+.hero-slot + .sidebar {
+  margin-top: 33px;
+}
+
+.top + .recommended {
   margin-top: 34px;
 }
 
@@ -138,14 +151,28 @@ const sections = computed(() =>
     margin-top: 50px;
   }
 
-  /* Kolom samping di kolom kanan: x 923 (130:2202) = 160 + 739 + 24, lebar 357; kolom kiri (hero) kosong sampai task hero */
+  /* Baris atas: hero di kolom kiri (x 160, lebar 739, 21:4974) dan kolom samping di kolom kanan (x 923 = 160 + 739 + 24, lebar 357, 130:2202) */
+  .top {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .hero-slot {
+    flex: none;
+    width: calc(100% * 739 / 1120);
+  }
+
   .sidebar {
     width: calc(100% * 357 / 1120);
     margin-left: auto;
   }
 
-  /* Dasar kolom samping 34:354 (daftar 482 @ y 227, berakhir y 709) ke judul Rekomendasi 42:376 (y 782): 73 [I, hero 531 berakhir y 692] */
-  .sidebar + .recommended {
+  .hero-slot + .sidebar {
+    margin-top: 0;
+  }
+
+  /* Dasar baris atas (hero 21:4974 y 178 + 531 = 709, daftar kolom samping 34:354 berakhir y 709) ke judul Rekomendasi 42:376 (y 782): 73 */
+  .top + .recommended {
     margin-top: 73px;
   }
 

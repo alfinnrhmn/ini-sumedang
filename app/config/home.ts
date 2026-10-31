@@ -34,3 +34,6 @@ export const SIDEBAR_COUNT = 4
  */
 export const POPULAR_WINDOW_DAYS = 14
 export const POPULAR_TAG_SLUG = 'terpopuler'
+
+/** Hero Beranda (HOME-07): jumlah slide = jumlah titik di Figma [V 21:4981 dan 90:2137: 4 titik]. */
+export const HERO_SLIDE_COUNT = 4

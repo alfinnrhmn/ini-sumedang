@@ -1,5 +1,5 @@
 import type { Article, VisualTopic } from '../../app/types/article'
-import { POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
+import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
 import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
 
@@ -88,6 +88,11 @@ function getPublishedArticles(now: Date): Article[] {
 /** 8 artikel terbit terbaru, tanpa duplikat. Hanya status `publish`. */
 export function getRecommendedArticles(now: Date = new Date()): Article[] {
   return getPublishedArticles(now).slice(0, RECOMMENDED_COUNT)
+}
+
+/** `limit` artikel terbit terbaru untuk slide hero Beranda (HOME-07). Hanya status `publish`; sama dengan 4 kartu Rekomendasi pertama (diterima PM). */
+export function getHeroArticles(limit: number = HERO_SLIDE_COUNT, now: Date = new Date()): Article[] {
+  return getPublishedArticles(now).slice(0, limit)
 }
 
 /** `limit` artikel terbit terbaru di kategori `slug` (kategori kosong atau tak dikenal: array kosong). */

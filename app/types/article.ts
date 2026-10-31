@@ -55,3 +55,6 @@ export interface SidebarResponse {
   /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
   now: string
 }
+
+/** Respons hero Beranda (HOME-07): artikel terbit terbaru, urutan = urutan slide; kosong = hero tidak dirender. */
+export type HeroResponse = RecommendedResponse

@@ -34,6 +34,7 @@
 
   /* ---- Tipografi: famili ---- */
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* [usulan] fallback */
+  --font-hero: "Merriweather Sans", var(--font-sans); /* HOME-07: judul hero desktop 21:4980; fallback Inter lalu sans sistem */
   --font-serif: "Merriweather", Georgia, "Times New Roman", serif; /* [usulan] fallback */
 
   /* ---- Tipografi: gaya = font singkat (bobot ukuran/line-height famili) ---- */
@@ -55,10 +56,12 @@
   --type-card-mobile-category: 400 11.111px/15.555px var(--font-sans); /* A3 label kategori kartu mobile */
   --type-card-mobile-timestamp: 300 11.111px/15.555px var(--font-sans); /* A3 timestamp kartu mobile (Light) */
   --type-footer-heading-mobile: 600 16px/25.6px var(--font-sans); /* A3 judul kolom footer mobile */
+  --type-hero-headline-desktop: 400 32px/38.4px var(--font-hero); /* HOME-07: 21:4980 Merriweather Sans Regular 32, line-height 1,2; + --tracking-hero-headline. Hero mobile (90:2136) memakai --type-heading-mobile (Merriweather SemiBold), bukan Merriweather Sans */
 
   /* ---- Tipografi: letter-spacing ---- */
   --tracking-text-l: -0.72px; /* A1 Text/L "-4" = -4% x 18px [turunan] */
   --tracking-headline: -0.2px; /* 130:3352 tracking-[-0.2px]; variabel -0.2 */
+  --tracking-hero-headline: -1.28px; /* HOME-07: 21:4980 "-4" = -4% x 32px [turunan] */
 
   /* ---- Spacing (skala PRD §4.5) ---- */
   --space-8: 8px;
@@ -128,4 +131,17 @@
   font-weight: 600;
   font-display: swap;
   src: url("/fonts/merriweather-latin-600-normal.woff2") format("woff2");
+}
+
+/*
+ * HOME-07: Merriweather Sans Regular 400 (judul hero desktop 21:4980). Berkas woff2 = turunan subset Latin dari
+ * Fontsource 5.3.0 (paket @fontsource/merriweather-sans); bukan distribusi resmi pencipta. Lisensi: public/fonts/LICENSE-MerriweatherSans.txt.
+ * Catatan: docs/decisions/0005-merriweather-sans.md (RFN sama dengan 0004).
+ */
+@font-face {
+  font-family: "Merriweather Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/merriweather-sans-latin-400-normal.woff2") format("woff2");
 }
