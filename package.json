@@ -9,6 +9,7 @@
     "preview": "nuxt preview",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "node --test \"tests/unit/**/*.test.ts\"",
     "postinstall": "nuxt prepare"
   },
   "engines": {
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "nuxt": "4.6.3",
+    "sanitize-html": "2.18.1",
     "vue": "^3.5.44",
     "vue-router": "^5.4.0"
   },

@@ -2,6 +2,7 @@ import type { Article, ArticleCategory, VisualTopic } from '../../app/types/arti
 import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
 import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories, buildMenuCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
+import { sanitizeArticleHtml } from '../utils/sanitize-article-html'
 
 const RECOMMENDED_COUNT = 8
 // Ruang Visual (HOME-04): induk, jumlah topik, dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel).
@@ -153,4 +154,13 @@ export function getVisualTopics(now: Date = new Date()): VisualTopic[] {
  */
 export function getCategories(): ArticleCategory[] {
   return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
+}
+
+/**
+ * Titik pemanggilan sanitasi isi artikel (SANITIZE-001). `body` HTML dari CMS/fixture WAJIB lewat fungsi ini sebelum
+ * keluar sebagai tipe domain atau dirender (PAGE-002 memanggilnya saat menambah `body`). Satu-satunya jalur HTML CMS.
+ * Allowlist: server/utils/sanitize-config.ts. Tidak pernah melempar; masukan tak valid atau terlalu besar: ''.
+ */
+export function sanitizeBodyHtml(html: unknown): string {
+  return sanitizeArticleHtml(html)
 }

@@ -592,11 +592,15 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 4. Sumber field kredit foto (caption media bawaan atau meta kustom).
 5. Hasil pencarian "peraturan pemerintah terbaru" (perilaku semua-kata vs longgar, §3.5).
 6. Versi Node hosting memenuhi `engines` Nuxt.
-**Wajib lulus (atau hasilnya dicatat dan PM menyesuaikan task) sebelum:** PAGE-002, PAGE-003, PAGE-004, dan bagian PAGE-001 yang bergantung data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial). **Bagian PAGE-001 yang hanya UI** (tata letak, kartu, judul section, Rekomendasi/kategori dari fixture) **boleh memakai fixture** tanpa gerbang. Titik cek adalah himpunan bagian DISC-002; DISC-002 penuh (plugin SEO, bentuk plugin iklan/ACF, URL lama) tetap `DITUNDA`.
+**Wajib lulus (atau hasilnya dicatat dan PM menyesuaikan task) sebelum:** integrasi WordPress untuk PAGE-002, PAGE-003, PAGE-004 (bagian UI/layanan fixture dikecualikan sejak 2 Nov 2026, lihat "Perluasan pengecualian gerbang" di bawah), dan bagian PAGE-001 yang bergantung data WordPress (Ruang Visual, Terpopuler, iklan, widget sosial). **Bagian PAGE-001 yang hanya UI** (tata letak, kartu, judul section, Rekomendasi/kategori dari fixture) **boleh memakai fixture** tanpa gerbang. Titik cek adalah himpunan bagian DISC-002; DISC-002 penuh (plugin SEO, bentuk plugin iklan/ACF, URL lama) tetap `DITUNDA`.
 
 **Pengecualian gerbang (keputusan pemilik 30 Okt 2026).** HOME-03 (kolom samping, termasuk Terpopuler) dan HOME-04 (Ruang Visual) boleh dikerjakan dengan fixture di balik fungsi layanan: bagian UI dan layanan memakai data contoh; integrasi WordPress menjadi task terpisah setelah gerbang titik cek. Gerbang G-WP **tetap wajib** sebelum PAGE-002, PAGE-003, PAGE-004, sebelum integrasi WordPress untuk HOME-03/04, dan sebelum situs tayang.
 
 **Catatan uji data nyata (keputusan pemilik 31 Okt 2026, dari HOME-04).** Saat WordPress terhubung (task integrasi WordPress untuk HOME-04 dan hasil gerbang G-WP), kasus **"kategori induk `ruang-visual` tidak ada atau semua topiknya kosong"** wajib diuji dengan **data nyata**: Beranda harus tetap tampil tanpa section Ruang Visual (tanpa judul tanpa isi, tanpa galat, tanpa layout shift, section lain tidak bergeser dari urutan). Di fixture kasus ini belum diuji (hanya ditinjau dari kode `getVisualTopics()` yang mengembalikan `[]`); penerimaan integrasi tidak boleh `DONE` tanpa bukti uji dengan data WordPress nyata.
+
+**Perluasan pengecualian gerbang (keputusan pemilik 2 Nov 2026).** **PAGE-002 (Detail), PAGE-003 (halaman kategori), dan PAGE-004 (pencarian) boleh dibangun dengan fixture di balik fungsi layanan**, seperti HOME-03/04: bagian UI dan layanan memakai data contoh; integrasi WordPress menjadi task terpisah. Gerbang titik cek G-WP **tetap wajib sebelum integrasi WordPress dan sebelum situs tayang**. PAGE-002 tetap bergantung SANITIZE-001 (penyanitasi) sebelum `body` dirender.
+
+**Daftar uji data nyata WordPress (ditambah 2 Nov 2026).** Selain kasus `ruang-visual` di atas: **kegagalan atau kosongnya `/api/categories`** (hamburger dan menu kategori tidak dirender, logo bergeser ke x=24 pada header mobile) **wajib diuji dengan data WordPress nyata** dan **dirancang gagal dengan tenang**: header tetap utuh (posisi logo tetap, tanpa layout shift), tanpa galat di konsol atau halaman, tanpa tautan mati; integrasi WordPress tidak boleh `DONE` tanpa bukti uji ini. (Fixture belum menguji kasus ini; hanya ditinjau dari kode QA HOME-06.)
 
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 **Item wajib pra-tayang (ditetapkan 30 Okt 2026, FIX-001):** gambar di `public/fixtures/` berasal dari Figma dan hanya untuk pengembangan (hak pakai tidak diperiksa). **WAJIB dihapus sebelum situs tayang** dan digantikan konten WordPress; fixture dan variabel `FIXTURE_SET` tidak boleh ada di build produksi.
@@ -658,7 +662,7 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | SET-002 | `DONE` | `docs/tasks/SET-002.md`; keputusan font/RFN: `docs/decisions/0004-merriweather-rfn.md` |
 | MOCK-001 | `DITUNDA` | Digantikan oleh HOME-01..05 (data tipis per slice); sisa fungsi layanan dikerjakan bersama PAGE-002/003/004 |
 | STATIC-001 | `BACKLOG` | Menunggu konten dari pemilik; dependensi LAY-001 (daftar footer). Lima halaman; "Redaksi" tetap teks |
-| SANITIZE-001 | `DITUNDA` | Alasan: WordPress ditunda. Penyanitasi HTML sisi server; dependensi PAGE-002; pemicu Vitest bila lebih dulu |
+| SANITIZE-001 | `DONE` | Disetujui pemilik untuk commit 2 Nov 2026. Dibuka kembali pemilik 2 Nov 2026 (prasyarat PAGE-002); QA keamanan lulus (516 payload, 0 eksekusi, 222 uji). Penyanitasi HTML sisi server; `sanitize-html` 2.18.1 dipin eksak (pra-disetujui, syarat diverifikasi PM: rilis 14 Okt 2026, advisori 0); embed default hanya YouTube; uji unit memakai `node:test` (Vitest belum disetujui); berhenti sebelum commit untuk persetujuan pemilik; `docs/tasks/SANITIZE-001.md` |
 | LAY-001 | `DITUNDA` | Digantikan oleh HOME-05 (footer) dan HOME-06 (header, menu, laci) |
 | CARD-001 | `DITUNDA` | Digantikan oleh HOME-01 (kartu), HOME-03, HOME-04 |
 | PAGE-001 | `DITUNDA` | Digantikan oleh HOME-01..07 (tidak punya berkas task). Iklan dan widget sosial tetap di ADS-002/SOC-001 (`DITUNDA`) |
@@ -670,8 +674,8 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | HOME-05 | `DONE` | Footer desktop + mobile (`SiteFooter`, `layouts/default.vue`; accordion mobile; "Beranda" satu-satunya tautan; keputusan pemilik 31 Okt 2026); `docs/tasks/HOME-05.md` |
 | HOME-06 | `DONE` | Header (hamburger + logo), menu kategori 9 item (desktop), laci 9 kategori (usulan visual disetujui pemilik 1 Nov 2026), `/api/categories`; ikon cari dan tombol bulan tidak dirender; `docs/tasks/HOME-06.md` |
 | HOME-07 | `DONE` | Hero `Switch` (`Hero.vue`, `/api/articles/hero`; carousel manual tanpa putar otomatis); Merriweather Sans di-host sendiri (`docs/decisions/0005-merriweather-sans.md`, RFN tercakup 0004); `docs/tasks/HOME-07.md` |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D24 dari HOME-03, HOME-04, HOME-05, HOME-06, HOME-07; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
-| PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13), tidak ada pengecualian. PAGE-002 juga bergantung SANITIZE-001 |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D25 dari HOME-03..07; D25 WAJIB sebelum tayang; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
+| PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Boleh dibangun dengan fixture di balik fungsi layanan (pengecualian pemilik 2 Nov 2026, §13); gerbang G-WP tetap wajib sebelum integrasi WordPress dan sebelum situs tayang. PAGE-002 bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |
 | POP-001 | `DITUNDA` | Alasan: WordPress ditunda |
@@ -706,7 +710,7 @@ Phase 0 Discovery 1–2 hari · Phase 1 Foundation 2–3 hari · Phase 2 Beranda
 | Fixture tidak cocok dengan bentuk respons WordPress asli | Fixture berbentuk respons REST inti dan lewat mapper; dibuktikan di gerbang G-WP (§13); layanan satu pintu (prinsip 9) |
 | Halaman statis footer belum ada konten/isi dari pemilik | Label footer teks biasa (`to: null`) sampai STATIC-001 selesai; tidak ada tautan mati |
 | Tampilan laci hamburger tanpa frame | Usulan visual sederhana PM disiapkan **sebelum LAY-001 `READY`** dan disetujui pemilik; tidak dibangun sebelum disetujui |
-| Rendering `body` HTML artikel (fixture maupun WordPress) tanpa penyanitasi | Penyanitasi (SANITIZE-001, `DITUNDA`; dependensi, butuh persetujuan) wajib ada sebelum `body` dirender dengan `v-html` (AGENTS.md aturan 6); dijaga di PAGE-002. `v-html` untuk data mentah tetap dilarang |
+| Rendering `body` HTML artikel (fixture maupun WordPress) tanpa penyanitasi | Penyanitasi (SANITIZE-001, `READY` sejak 2 Nov 2026; `sanitize-html` pra-disetujui pemilik, versi dipin eksak) wajib ada sebelum `body` dirender dengan `v-html` (AGENTS.md aturan 6); dijaga di PAGE-002. `v-html` untuk data mentah tetap dilarang |
 | "Lihat Lainnya" ada di desain tetapi tidak diputuskan | Tidak dibangun sampai dijawab; judul section tetap non-interaktif |
 | Instagram tidak punya URL share web | Pemilik memilih: Web Share API (mobile), ganti ke tautan akun, atau hapus tombol |
 | Keadaan terbuka pencarian mobile tidak ada di frame | Usulan §3.5, disetujui pemilik sebelum dibangun |
