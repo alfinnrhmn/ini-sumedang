@@ -25,6 +25,7 @@
   --color-footer-link: #172033; /* G18 tautan footer */
   --color-footer-divider: #E5E7EB; /* G18 garis footer desktop */
   --color-footer-divider-mobile: #D5D5D5; /* G18 garis atas footer mobile */
+  --color-article-title: #1A212E; /* PAGE-002: judul, isi, dan label Detail Berita (130:3352, 127:2134, 127:2152); selisih per kanal ke token terdekat (--color-footer-link) 3/1/5, 5 > 4; kontras 16,14:1 vs putih */
   --color-surface: #F8F8F8; /* diterima pemilik: latar pencarian/tombol */
   --color-border-subtle: rgba(8, 8, 8, 0.05); /* diterima pemilik: border kontrol */
   --color-border: rgba(8, 8, 8, 0.1); /* diterima pemilik: border kontrol, garis */

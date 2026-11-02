@@ -23,6 +23,35 @@ export interface Article {
   authorLabel: string
 }
 
+/** Tag artikel (grup `wp:term` ke-2); label sekunder di kepala Detail. */
+export type ArticleTag = ArticleCategory
+
+/**
+ * Tipe domain Detail Berita (PAGE-002): `Article` + isi. `bodyHtml` SUDAH disanitasi di server (`sanitizeBodyHtml`);
+ * HTML mentah dari CMS tidak pernah ada di tipe ini. Kosong = isi tidak tersedia (atau ditolak penyanitasi).
+ */
+export interface ArticleDetail extends Article {
+  /** Ringkasan teks polos (tanpa HTML). */
+  excerpt: string
+  bodyHtml: string
+  tags: ArticleTag[]
+  /** Teks polos kredit foto (mis. "Foto: IniSumedang"); kosong = tanpa kredit. */
+  photoCredit: string
+  /** Menit baca (>= 1), dihitung di server dari teks `bodyHtml`. */
+  readingMinutes: number
+}
+
+/**
+ * Respons `/api/article/<slug>`: Berita Terkait = satu daftar berperingkat. >= 1024 px: sidebar 4 teratas (peringkat 1-4),
+ * `bottom` 3 berikutnya (5-7). < 1024 px (tanpa sidebar): `bottomMobile` = 3 teratas (peringkat 1-3). CSS menampilkan salah satu.
+ */
+export interface ArticleDetailResponse {
+  article: ArticleDetail
+  related: { sidebar: Article[], bottom: Article[], bottomMobile: Article[] }
+  /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
+  now: string
+}
+
 export interface RecommendedResponse {
   articles: Article[]
   /** Waktu server (ISO) untuk menghitung waktu relatif sama di SSR dan hidrasi. */

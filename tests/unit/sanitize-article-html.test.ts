@@ -454,7 +454,7 @@ describe('SN6 masukan kosong, besar, dan bersarang dalam', () => {
   })
 })
 
-describe('SN7/SN8 tanpa direktif HTML mentah Vue dan penyanitasi hanya di server', () => {
+describe('SN7/SN8 direktif HTML mentah Vue hanya di ArticleBody.vue dan penyanitasi hanya di server', () => {
   const root = join(import.meta.dirname, '..', '..')
   const SKIP = new Set(['node_modules', '.nuxt', '.output', '.data', '.nitro', '.git'])
   const files = (dir: string): string[] => readdirSync(dir).flatMap((name) => {
@@ -466,10 +466,64 @@ describe('SN7/SN8 tanpa direktif HTML mentah Vue dan penyanitasi hanya di server
     .filter(path => /\.(vue|ts|js|mjs|mts|css)$/.test(path))
     .map(path => [path, readFileSync(path, 'utf8')])
 
-  it('app/ dan server/ tidak memuat direktif HTML mentah Vue', () => {
+  // PAGE-002 (Keputusan PM 5): satu-satunya pemakaian direktif ada di komponen isi artikel (masukan = keluaran penyanitasi server).
+  it('app/ dan server/ memuat direktif HTML mentah Vue hanya di ArticleBody.vue, tepat satu kali sebagai atribut', () => {
     const directive = 'v-' + 'html'
-    const hits = [...sources('app'), ...sources('server')].filter(([, text]) => text.includes(directive)).map(([path]) => path)
-    assert.deepEqual(hits, [])
+    const all = [...sources('app'), ...sources('server')]
+    const hits = all.filter(([, text]) => text.includes(directive)).map(([path]) => path.slice(root.length + 1).replaceAll('\\', '/'))
+    assert.deepEqual(hits, ['app/components/article/ArticleBody.vue'])
+    const attribute = directive + '='
+    const occurrences = all.reduce((total, [, text]) => total + text.split(attribute).length - 1, 0)
+    assert.equal(occurrences, 1)
+  })
+
+  // PAGE-002 L-6: pindai sumber (komentar dibuang lebih dulu agar dokumentasi tidak memicu false positive) untuk semua sink
+  // HTML mentah, bukan hanya atribut `v-html=`: variasi spasi/huruf, binding `:innerHTML`/`v-bind:innerHTML`, `domProps`, API DOM.
+  // Batas: pengikatan dinamis (`v-bind="obj"` dengan kunci dari variabel) tidak terdeteksi statis; ditutup oleh review + gerbang git grep.
+  const stripComments = (text: string): string => text
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:\w'"`\\])\/\/.*$/gm, '$1')
+  const DIRECTIVE = /(?<![\w/-])v-html(?![\w-])/gi
+  const OTHER_SINKS: Array<[string, RegExp]> = [
+    ['innerHTML', /inner-?html/i],
+    ['outerHTML', /outer-?html/i],
+    ['insertAdjacentHTML', /insertAdjacentHTML/i],
+    ['domProps', /domProps/i],
+    ['document.write', /document\s*\.\s*write(ln)?\s*\(/i],
+    ['createContextualFragment', /createContextualFragment/i],
+    ['setHTMLUnsafe', /setHTMLUnsafe/i]
+  ]
+  const otherSinks = (text: string): string[] => OTHER_SINKS.filter(([, pattern]) => pattern.test(stripComments(text))).map(([name]) => name)
+  const directiveCount = (text: string): number => stripComments(text).match(DIRECTIVE)?.length ?? 0
+
+  it('pemindai mengenali variasi sink dan mengabaikan komentar (uji pemindai itu sendiri)', () => {
+    const sinks = [
+      '<div v-html="x" />', '<div v-html ="x" />', '<div v-html = "x" />', '<div v-html:foo="x" />', '<div v-html />', '<div V-HTML="x" />',
+      '<div v-bind:innerHTML="x" />', '<div :innerHTML="x" />', '<div :inner-html.prop="x" />', '<div v-bind="{ innerHTML: x }" />',
+      'el.innerHTML = x', 'el["innerHTML"] = x', 'el.outerHTML = x', 'el.insertAdjacentHTML(\'beforeend\', x)',
+      'h(\'div\', { domProps: { innerHTML: x } })', 'document.write(x)', 'document . writeln (x)',
+      'range.createContextualFragment(x)', 'el.setHTMLUnsafe(x)'
+    ]
+    for (const source of sinks) {
+      assert.ok(directiveCount(source) + otherSinks(source).length > 0, source)
+    }
+    const harmless = [
+      '// el.innerHTML = x', '/* v-html="x" */', '<!-- v-html="x" -->', '<!-- eslint-disable-next-line vue/no-v-html -- alasan -->',
+      '  // :innerHTML="x"', 'const a = 1 // outerHTML', '<p>teks biasa dengan html</p>', 'const url = \'https://example.com/a\'',
+      'el.textContent = x', '<div v-text="x" />'
+    ]
+    for (const source of harmless) {
+      assert.equal(directiveCount(source) + otherSinks(source).length, 0, source)
+    }
+  })
+
+  it('app/ dan server/ tidak memuat sink HTML mentah selain satu direktif di ArticleBody.vue', () => {
+    const all = [...sources('app'), ...sources('server')].map(([path, text]) => [path.slice(root.length + 1).replaceAll('\\', '/'), text] as const)
+    const others = all.flatMap(([path, text]) => otherSinks(text).map(name => `${path}: ${name}`))
+    assert.deepEqual(others, [])
+    const directives = all.filter(([, text]) => directiveCount(text) > 0).map(([path, text]) => `${path}: ${directiveCount(text)}`)
+    assert.deepEqual(directives, ['app/components/article/ArticleBody.vue: 1'])
   })
 
   it('app/ tidak mengimpor penyanitasi atau sanitize-html (tidak masuk bundel klien)', () => {

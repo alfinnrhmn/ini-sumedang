@@ -1,11 +1,12 @@
 import type { Article } from '~/types/article'
 
 /**
- * Tujuan tautan artikel. Mengembalikan null selama rute /berita/[slug] belum ada
- * (PAGE-002), sehingga kartu dirender tanpa <a>. PAGE-002 mengisinya.
+ * Tujuan tautan artikel (PAGE-002): `/berita/<slug>`. Satu-satunya tempat bentuk URL artikel; kartu, breadcrumb,
+ * dan URL kanonis memakai fungsi ini. `slug` dari data sudah divalidasi di server, tetapi tetap di-encode agar
+ * karakter tak terduga tidak pernah menjadi bagian path.
  */
-export function articlePath(_article: Article): string | null {
-  return null
+export function articlePath(article: Pick<Article, 'slug'>): string {
+  return `/berita/${encodeURIComponent(article.slug)}`
 }
 
 /**

@@ -17,3 +17,9 @@ export function formatRelativeTime(publishedAt: string, now: string | Date): str
   const wib = new Date(published + WIB_OFFSET_MS)
   return `${wib.getUTCDate()} ${MONTHS[wib.getUTCMonth()]} ${wib.getUTCFullYear()}`
 }
+
+/** Tanggal terbit format Indonesia singkat (zona WIB), mis. "2 Nov 2026" [I; PAGE-002 Keputusan 11]. */
+export function formatPublishDate(publishedAt: string): string {
+  const wib = new Date(new Date(publishedAt).getTime() + WIB_OFFSET_MS)
+  return `${wib.getUTCDate()} ${MONTHS[wib.getUTCMonth()]} ${wib.getUTCFullYear()}`
+}

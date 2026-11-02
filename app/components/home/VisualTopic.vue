@@ -4,7 +4,7 @@ import type { VisualTopic } from '~/types/article'
 /**
  * Satu blok topik Ruang Visual (HOME-04; desktop 101:2708/101:2709/101:2710/101:2726, mobile 116:1541/116:1557/116:1573/116:1589):
  * judul topik (h3, tidak menaut) -> kartu besar -> hingga 3 berita berthumbnail. Komponen sendiri, bukan varian NewsCard
- * (alasan di docs/tasks/HOME-04.md, Bukti). Artikel tanpa tujuan tetap <article> tanpa <a> (keputusan HOME-01).
+ * (alasan di docs/tasks/HOME-04.md, Bukti). Tiap kartu = satu tautan (judul; PAGE-002).
  */
 const props = defineProps<{ entry: VisualTopic }>()
 
@@ -199,6 +199,13 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: var(--radius-8);
+}
+
+/* Hover (PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
+@media (hover: hover) {
+  .link:hover {
+    text-decoration: underline;
+  }
 }
 
 @media (min-width: 1024px) {

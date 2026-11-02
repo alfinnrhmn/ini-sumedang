@@ -35,6 +35,7 @@ const slides = computed(() =>
   props.articles.map(article => ({
     article,
     category: article.categories[0]?.name ?? '',
+    href: articlePath(article),
     time: formatRelativeTime(article.publishedAt, props.now)
   }))
 )
@@ -66,7 +67,9 @@ const slides = computed(() =>
           {{ slide.category }}
         </p>
         <h2 class="title">
-          {{ slide.article.title }}
+          <NuxtLink :to="slide.href" class="link">
+            {{ slide.article.title }}
+          </NuxtLink>
         </h2>
         <div class="meta">
           <div class="publisher">
@@ -159,6 +162,36 @@ const slides = computed(() =>
   z-index: 1;
 }
 
+/* PAGE-002: judul = satu-satunya tautan slide (satu titik tab). Tautan memakai overlay ::after seluruh slide sebagai area klik, jadi
+   judul tidak boleh menjadi blok penampung (position: static; z-index berlaku karena judul adalah item grid). Foto bukan tautan. */
+.slide > .title {
+  position: static;
+  z-index: 1;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+/* Cincin fokus 4 px total (2 + jarak 2) di luar hero (slide ber-overflow hidden akan memotongnya, jadi digambar pada .hero) */
+.link:focus-visible {
+  outline: none;
+}
+
+.hero:has(.link:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Hover (PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
+@media (hover: hover) {
+  .link:hover {
+    text-decoration: underline;
+  }
+}
+
 /* Chip 90:2134: tinggi 18, radius 4, latar putih 20%. Figma: lebar tetap 117 dengan px 15, teks (97,56) terpusat dan melewati padding,
    jadi jarak tepi teks sebenarnya ~9,7; dipakai padding 10 dengan lebar mengikuti teks (selisih lebar 0,56 untuk label contoh) [I] */
 .chip {
@@ -195,6 +228,7 @@ const slides = computed(() =>
   grid-area: meta;
   align-self: end;
   justify-self: end;
+  pointer-events: none; /* klik di atas penerbit/waktu tembus ke tautan slide (PAGE-002) */
   display: flex;
   flex-direction: column;
   align-items: flex-end;

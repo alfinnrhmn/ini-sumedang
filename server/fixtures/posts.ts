@@ -11,15 +11,22 @@
  * terbesar (WordPress: `orderby=id&order=desc`). Daftar kategori visual ada di `buildFigmaVisualCategories` /
  * `buildEdgeVisualCategories` (anak tanpa artikel hanya ada di daftar itu).
  */
+import { EDGE_IFRAME_BODY, EDGE_XSS_BODY } from './article-content'
+
 /** `parent` hanya ada pada kategori anak (seperti `parent` di REST WordPress; tanpa nilai = kategori induk). */
 export interface WpTerm { id: number, slug: string, name: string, parent?: number }
-export interface WpMedia { source_url: string, alt_text: string, media_details: { width: number, height: number } }
+/** `caption` = keterangan media WordPress (kredit foto, PAGE-002); tanpa caption = tanpa kredit. */
+export interface WpMedia { source_url: string, alt_text: string, caption?: { rendered: string }, media_details: { width: number, height: number } }
 export interface WpPost {
   id: number
   slug: string
   status: string
   date_gmt: string
   title: { rendered: string }
+  /** Isi HTML mentah dari CMS (PAGE-002). Tanpa nilai: isi dibangkitkan `buildDefaultBody`. Kosong ('') = body kosong. */
+  content?: { rendered: string }
+  /** Ringkasan HTML mentah ala WordPress. Tanpa nilai: dibangkitkan `buildDefaultExcerpt`. */
+  excerpt?: { rendered: string }
   _embedded: {
     'wp:term': WpTerm[][]
     'wp:featuredmedia'?: WpMedia[]
@@ -42,6 +49,27 @@ const SELEBRITI: WpTerm = { id: 12, slug: 'selebriti', name: 'Selebriti' }
 // Tag editor (PRD §3.6): `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
 const TERPOPULER: WpTerm = { id: 31, slug: 'terpopuler', name: 'Terpopuler' }
 const HEADLINE: WpTerm = { id: 32, slug: 'headline', name: 'Headline' }
+
+// Tag topik Detail Berita (PAGE-002; slug dan id [I], final di gerbang WordPress). Hanya mempengaruhi urutan Berita Terkait
+// (tidak dipakai Beranda; `terpopuler` tetap satu-satunya tag yang dibaca kolom samping).
+const LAYANAN_PUBLIK: WpTerm = { id: 33, slug: 'layanan-publik', name: 'Layanan Publik' }
+const TRANSFORMASI_DIGITAL: WpTerm = { id: 34, slug: 'transformasi-digital', name: 'Transformasi Digital' }
+const INFRASTRUKTUR: WpTerm = { id: 35, slug: 'infrastruktur', name: 'Infrastruktur' }
+const UMKM: WpTerm = { id: 36, slug: 'umkm', name: 'UMKM' }
+
+/** Tag topik tambahan set `figma` per id artikel (digabung dengan tag yang sudah ada, mis. `terpopuler`). */
+const FIGMA_TOPIC_TAGS: Record<number, WpTerm[]> = {
+  81: [LAYANAN_PUBLIK, TRANSFORMASI_DIGITAL],
+  1: [LAYANAN_PUBLIK, TRANSFORMASI_DIGITAL],
+  5: [LAYANAN_PUBLIK, TRANSFORMASI_DIGITAL],
+  2: [LAYANAN_PUBLIK],
+  6: [LAYANAN_PUBLIK, INFRASTRUKTUR],
+  42: [TRANSFORMASI_DIGITAL, UMKM],
+  43: [UMKM],
+  85: [UMKM, TRANSFORMASI_DIGITAL],
+  86: [TRANSFORMASI_DIGITAL],
+  65: [LAYANAN_PUBLIK]
+}
 
 // Ruang Visual (HOME-04). Induk id 20; anak id 24-29 (set `figma`) dan 35-41 (set `edge`). Slug anak [I]: final di gerbang WordPress.
 const RUANG_VISUAL: WpTerm = { id: 20, slug: 'ruang-visual', name: 'Ruang Visual' }
@@ -66,8 +94,16 @@ const E_LAMA = visualChild(35, 'edge-lama', 'Topik Lama') // anak ke-5: tidak ta
 const IMG_WIDTH = 716
 const IMG_HEIGHT = 400
 
-function img(n: number, alt: string): WpMedia {
-  return { source_url: `/fixtures/figma-${n}.jpg`, alt_text: alt, media_details: { width: IMG_WIDTH, height: IMG_HEIGHT } }
+/** Kredit foto default seluruh fixture (Figma 127:2145: "Foto: IniSumedang"). */
+const PHOTO_CREDIT = 'Foto: IniSumedang'
+
+function img(n: number, alt: string, credit: string | null = PHOTO_CREDIT): WpMedia {
+  return {
+    source_url: `/fixtures/figma-${n}.jpg`,
+    alt_text: alt,
+    ...(credit === null ? {} : { caption: { rendered: `<p>${credit}</p>` } }),
+    media_details: { width: IMG_WIDTH, height: IMG_HEIGHT }
+  }
 }
 
 function makePost(
@@ -103,7 +139,7 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     makePost(now, id, 'publish', minutes, title, [term], img(image, title), [TERPOPULER])
   const HOUR = 60
   const DAY = 24 * 60
-  return [
+  const posts: WpPost[] = [
     p(1, 12, 'Pemkab Sumedang Dorong Transformasi Digital untuk Tingkatkan Pelayanan Publik', BERITA, 1),
     p(2, 35, 'Aktivitas Warga di Pusat Kota Sumedang Meningkat Menjelang Akhir Pekan', BERITA, 2),
     p(3, 60, 'Pemerintah Siapkan Langkah Strategis untuk Memperkuat Pertumbuhan Ekonomi Nasional', NASIONAL, 3),
@@ -186,6 +222,13 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(97, 3 * DAY + 2 * HOUR, 'Pagelaran Seni Tradisional Sumedang Kembali Digelar', V_BUDAYA, 1),
     p(98, 3 * DAY + 5 * HOUR, 'Pengrajin Lokal Perkenalkan Kerajinan Khas Sumedang', V_BUDAYA, 2)
   ]
+  // Tag topik (PAGE-002): hanya menambah grup tag; tidak mengubah kategori, judul, tanggal, atau tag `terpopuler`.
+  return posts.map((post) => {
+    const extra = FIGMA_TOPIC_TAGS[post.id]
+    if (!extra) return post
+    const [categories = [], tags = []] = post._embedded['wp:term']
+    return { ...post, _embedded: { ...post._embedded, 'wp:term': [categories, [...tags, ...extra]] } }
+  })
 }
 
 /** Kategori Ruang Visual set `figma` (induk + anak). Anak `visual-kosong` tidak punya artikel. */
@@ -194,7 +237,9 @@ export function buildFigmaVisualCategories(): WpTerm[] {
 }
 
 /**
- * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Per kategori section:
+ * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Detail Berita (PAGE-002): id 301-308 = artikel khusus lama
+ * (XSS dasar, iframe bukan YouTube, isi kosong, judul sangat panjang tanpa gambar, tanpa kategori/gambar/kredit,
+ * gambar tanpa alt/kredit, draft, private). Per kategori section:
  * Sepak Bola = tepat 1 artikel terbit (id 5); Otomotif = kosong (hanya 1 artikel `private`, id 103);
  * Nasional = banyak (+ draft/private id 101, 102); Bisnis dan Teknologi = 2 (ber-entitas).
  * Kolom samping (HOME-03): Terbaru = id 1-4 (judul sangat panjang, judul pendek, entitas, tanpa gambar).
@@ -208,6 +253,11 @@ export function buildEdgePosts(now: Date): WpPost[] {
   ) => makePost(now, id, status, minutes, title, term ? [term] : [], media, tags)
 
   const DAY = 24 * 60
+  /** Artikel khusus Detail (slug deskriptif; `content`/`excerpt` opsional). */
+  const detail = (
+    id: number, slug: string, minutes: number, title: string, term: WpTerm | null, media: WpMedia | null,
+    extra: Pick<WpPost, 'content' | 'excerpt'>, status = 'publish'
+  ): WpPost => ({ ...post(id, status, minutes, title, term, media), slug, ...extra })
   return [
     post(101, 'draft', 1, 'Draft yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Draft')),
     post(102, 'private', 2, 'Artikel privat yang tidak boleh tampil di Beranda', NASIONAL, img(1, 'Privat')),
@@ -253,7 +303,22 @@ export function buildEdgePosts(now: Date): WpPost[] {
     post(214, 'draft', 7, 'Draft satu-satunya di topik hanya draft', E_HANYA_DRAFT, img(1, 'Draft')),
     post(215, 'private', 8, 'Privat satu-satunya di topik hanya draft', E_HANYA_DRAFT, img(1, 'Privat')),
     // E_LAMA: anak ke-5 (lebih lama), ada artikel tetapi tidak termasuk 4 topik terbaru
-    post(216, 'publish', 26 * DAY, 'Artikel di Topik Lama yang Tidak Tampil di Beranda', E_LAMA, img(2, 'Topik lama'))
+    post(216, 'publish', 26 * DAY, 'Artikel di Topik Lama yang Tidak Tampil di Beranda', E_LAMA, img(2, 'Topik lama')),
+
+    // Detail Berita (PAGE-002): artikel khusus LAMA (>= 27 hari, lebih tua dari semua artikel Beranda edge) tanpa kategori section
+    // dan tanpa tag `terpopuler`, sehingga Beranda edge tidak berubah. Dibuka langsung lewat slug (`/berita/<slug>`).
+    detail(301, 'edge-xss-dasar', 27 * DAY, 'Uji Payload XSS Dasar pada Isi Artikel', BERITA, img(1, 'Gambar uji payload'), { content: { rendered: EDGE_XSS_BODY } }),
+    detail(302, 'edge-iframe-bukan-youtube', 27 * DAY + 60, 'Uji Iframe Bukan YouTube dan YouTube Palsu', BERITA, img(2, 'Gambar uji iframe'), { content: { rendered: EDGE_IFRAME_BODY } }),
+    detail(303, 'edge-isi-kosong', 27 * DAY + 120, 'Artikel dengan Isi Kosong Tetap Menampilkan Judul dan Foto', BERITA, img(3, 'Foto artikel tanpa isi'), { content: { rendered: '' } }),
+    detail(304, 'edge-judul-sangat-panjang', 28 * DAY, 'Pemerintah Kabupaten Sumedang Bersama Seluruh Pemangku Kepentingan Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, Komunitas Pemuda, Pengelola Pasar Tradisional, dan Pegiat Budaya untuk Meningkatkan Kenyamanan Ruang Publik di Seluruh Kecamatan Sumedang', BERITA, null, {}),
+    detail(305, 'edge-tanpa-kategori-gambar-kredit', 28 * DAY + 60, 'Bisnis &amp; Teknologi Sumedang Tumbuh &#8211; UMKM &#8217;Digital&#8217; Capai Target &#8230; Tanpa Kategori', null, null, {
+      excerpt: { rendered: '<p>Ringkasan dengan entitas &amp; tanda &#8211; baca, tanpa kategori, tanpa gambar, dan tanpa kredit foto.</p>' }
+    }),
+    detail(306, 'edge-gambar-tanpa-alt-kredit', 28 * DAY + 120, 'Gambar Tanpa Teks Alternatif dan Tanpa Kredit Foto', BERITA, img(4, '', null), {}),
+    detail(307, 'edge-draft', 29 * DAY, 'Draft yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Draft'), {}, 'draft'),
+    detail(308, 'edge-private', 29 * DAY + 60, 'Artikel privat yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Privat'), {}, 'private'),
+    // Isi hanya spasi/tag kosong (L-1): server mengembalikan bodyHtml '' sehingga pesan netral tampil, bukan div kosong.
+    detail(309, 'edge-isi-spasi', 29 * DAY + 120, 'Artikel dengan Isi Hanya Spasi Menampilkan Pesan Netral', BERITA, img(2, 'Foto artikel isi spasi'), { content: { rendered: '  <p> </p>\n<p>&nbsp;</p>\n<p><br></p>  ' } })
   ]
 }
 

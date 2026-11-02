@@ -13,6 +13,11 @@ const props = defineProps<{
    * Bawaan (tanpa prop) mengikuti lebar layar seperti sebelumnya.
    */
   layout?: 'compact'
+  /**
+   * Hanya bersama `layout="compact"`: thumbnail di kanan teks (daftar Berita Terkait Detail, 130:2226: teks 237 + celah 16 +
+   * thumbnail 104). Tanpa prop ini thumbnail di kiri (kolom samping Beranda).
+   */
+  mediaEnd?: boolean
 }>()
 
 const href = computed(() => articlePath(props.article))
@@ -21,7 +26,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 </script>
 
 <template>
-  <article class="card" :class="{ 'card--compact': layout === 'compact' }">
+  <article class="card" :class="{ 'card--compact': layout === 'compact', 'card--media-end': mediaEnd }">
     <div class="media">
       <img
         v-if="article.heroImage"
@@ -116,6 +121,14 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   border-radius: var(--radius-10);
 }
 
+/* Hover (tidak digambar di Figma; PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover.
+   Overlay ::after milik tautan, jadi hover di mana pun pada kartu menggarisbawahi judul. */
+@media (hover: hover) {
+  .link:hover {
+    text-decoration: underline;
+  }
+}
+
 .meta {
   display: flex;
   align-items: center;
@@ -182,6 +195,15 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   .card--compact .title {
     font: var(--type-caption);
   }
+}
+
+/* Thumbnail di kanan (Detail 130:2226, item 357 = teks 237 + celah 16 + thumbnail 104; celah dari .card) */
+.card--media-end {
+  grid-template-columns: minmax(0, 1fr) 104px;
+}
+
+.card--media-end .media {
+  order: 2;
 }
 
 /* Varian vertikal (desktop, 57:514): 358 x <=350. Tidak berlaku untuk layout="compact" (kolom samping). */

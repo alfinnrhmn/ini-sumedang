@@ -1,7 +1,12 @@
-import type { Article, ArticleCategory, VisualTopic } from '../../app/types/article'
+import type { Article, ArticleCategory, ArticleDetail, ArticleTag, VisualTopic } from '../../app/types/article'
+import { RELATED_BOTTOM_COUNT, RELATED_BOTTOM_MOBILE_COUNT, RELATED_SIDEBAR_COUNT } from '../../app/config/article'
 import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
+import { buildDefaultBody, buildDefaultExcerpt } from '../fixtures/article-content'
 import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories, buildMenuCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
+import { hasVisibleContent, readingMinutes, stripTags } from '../utils/article-detail'
+import type { RelatedCandidate } from '../utils/related-ranking'
+import { rankRelated, relatedBlocks } from '../utils/related-ranking'
 import { sanitizeArticleHtml } from '../utils/sanitize-article-html'
 
 const RECOMMENDED_COUNT = 8
@@ -154,6 +159,56 @@ export function getVisualTopics(now: Date = new Date()): VisualTopic[] {
  */
 export function getCategories(): ArticleCategory[] {
   return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
+}
+
+function mapTags(post: WpPost): ArticleTag[] {
+  return (post._embedded['wp:term'][1] ?? []).map(tag => ({ id: tag.id, slug: tag.slug, name: decodeEntities(tag.name) }))
+}
+
+/**
+ * Detail artikel (PAGE-002): `Article` + isi. `bodyHtml` = HTML CMS yang SUDAH disanitasi (`sanitizeBodyHtml`); HTML mentah
+ * (`content.rendered`) tidak pernah keluar dari fungsi ini. Ringkasan dan kredit foto dikeluarkan sebagai teks polos.
+ */
+function mapDetail(post: WpPost): ArticleDetail {
+  // Isi tanpa teks, gambar, atau embed (hanya spasi/tag kosong) dianggap kosong: '' agar halaman menampilkan pesan netral.
+  const sanitized = sanitizeBodyHtml(post.content?.rendered ?? buildDefaultBody(post.id, post.title.rendered))
+  const bodyHtml = hasVisibleContent(sanitized) ? sanitized : ''
+  const excerptHtml = post.excerpt?.rendered ?? buildDefaultExcerpt(post.id, post.title.rendered)
+  return {
+    ...mapPost(post),
+    excerpt: decodeEntities(stripTags(excerptHtml)),
+    bodyHtml,
+    tags: mapTags(post),
+    photoCredit: decodeEntities(stripTags(post._embedded['wp:featuredmedia']?.[0]?.caption?.rendered ?? '')),
+    readingMinutes: readingMinutes(bodyHtml)
+  }
+}
+
+/** Artikel terbit dengan `slug` persis (pemanggil sudah memvalidasi bentuk slug); draft/private/tak ada: null. */
+export function getArticleBySlug(slug: string, now: Date = new Date()): ArticleDetail | null {
+  const post = getPublishedPosts(now).find(item => item.slug === slug)
+  return post ? mapDetail(post) : null
+}
+
+function toCandidate(post: WpPost): RelatedCandidate {
+  const [categories = [], tags = []] = post._embedded['wp:term']
+  return { id: post.id, publishedAt: publishedAtOf(post), categoryIds: categories.map(term => term.id), tagIds: tags.map(term => term.id) }
+}
+
+/**
+ * Berita Terkait (PRD §3.8, FR-07): satu daftar berperingkat (tag sama, lalu kategori sama, lalu terbaru) dari artikel
+ * terbit selain `articleId`; sidebar = `RELATED_SIDEBAR_COUNT` teratas, blok bawah = `RELATED_BOTTOM_COUNT` berikutnya (>= 1024 px),
+ * `bottomMobile` = `RELATED_BOTTOM_MOBILE_COUNT` teratas (< 1024 px, tanpa sidebar; CSS memilih satu). Artikel tak ada atau tak terbit: semua kosong.
+ */
+export function getRelatedArticles(articleId: number, now: Date = new Date()): { sidebar: Article[], bottom: Article[], bottomMobile: Article[] } {
+  const posts = getPublishedPosts(now)
+  const current = posts.find(post => post.id === articleId)
+  if (!current) return { sidebar: [], bottom: [], bottomMobile: [] }
+  const byId = new Map(posts.map(post => [post.id, post]))
+  const ranked = rankRelated(toCandidate(current), posts.map(toCandidate))
+  const { sidebar, bottom, bottomMobile } = relatedBlocks(ranked, RELATED_SIDEBAR_COUNT, RELATED_BOTTOM_COUNT, RELATED_BOTTOM_MOBILE_COUNT)
+  const toArticle = (id: number): Article => mapPost(byId.get(id) as WpPost)
+  return { sidebar: sidebar.map(toArticle), bottom: bottom.map(toArticle), bottomMobile: bottomMobile.map(toArticle) }
 }
 
 /**

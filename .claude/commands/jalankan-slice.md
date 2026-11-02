@@ -23,7 +23,7 @@ a. Cabang aktif feat/<id>.
 b. git --no-pager status --short --untracked-files=all: setiap jalur berada dalam daftar berkas yang diizinkan task, ditambah docs/tasks/<ID>.md dan docs/PRD.md.
 c. Tidak ada berkas .env selain .env.example. package.json, package-lock.json, nuxt.config.ts, dan .github tidak berubah, kecuali task mengizinkannya secara eksplisit.
 d. Tidak ada berkas baru di atas 300 KB, kecuali task menyebutnya.
-e. git grep -n "v-html" -- app server kosong, kecuali task mengizinkan.
+e. git grep -n 'v-html=' -- app server harus menghasilkan tepat satu baris, yaitu di app/components/article/ArticleBody.vue.
 f. Tidak ada server atau proses browser yang dimulai olehmu atau subagen yang masih hidup.
 
 TAHAP D. Commit, merge, push
