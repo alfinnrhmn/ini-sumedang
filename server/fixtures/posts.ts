@@ -261,3 +261,14 @@ export function buildEdgePosts(now: Date): WpPost[] {
 export function buildEdgeVisualCategories(): WpTerm[] {
   return [RUANG_VISUAL, E_LAMA, E_ENTITAS, E_DUA, E_SATU, E_PANJANG, E_HANYA_DRAFT, E_KOSONG]
 }
+
+// Kategori menu header dan laci (HOME-06): 9 kategori resmi (PRD §4.4), urutan menu Figma 21:4951.
+// Hukum dan Jelajah belum punya artikel di fixture; id dan slug [I], final di gerbang WordPress.
+// Bukan bagian dari 8 kartu Rekomendasi atau section Beranda; kategori anak Ruang Visual tidak termasuk.
+const HUKUM: WpTerm = { id: 8, slug: 'hukum', name: 'Hukum' }
+const JELAJAH: WpTerm = { id: 13, slug: 'jelajah', name: 'Jelajah' }
+
+/** 9 kategori resmi untuk menu (sama di set `figma` dan `edge`). */
+export function buildMenuCategories(): WpTerm[] {
+  return [BERITA, NASIONAL, PEMERINTAHAN, POLITIK, HUKUM, SEPAK_BOLA, OTOMOTIF, JELAJAH, BISNIS]
+}

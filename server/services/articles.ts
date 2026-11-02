@@ -1,6 +1,6 @@
-import type { Article, VisualTopic } from '../../app/types/article'
+import type { Article, ArticleCategory, VisualTopic } from '../../app/types/article'
 import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
-import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories } from '../fixtures/posts'
+import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories, buildMenuCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
 
 const RECOMMENDED_COUNT = 8
@@ -145,4 +145,12 @@ export function getVisualTopics(now: Date = new Date()): VisualTopic[] {
     if (topics.length === VISUAL_TOPIC_COUNT) break
   }
   return topics
+}
+
+/**
+ * Kategori menu header dan laci (HOME-06): 9 kategori resmi sesuai urutan menu, dengan nama terdekode
+ * ("Bisnis & Teknologi"). Tidak bergantung pada artikel; kategori anak Ruang Visual tidak termasuk.
+ */
+export function getCategories(): ArticleCategory[] {
+  return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
 }

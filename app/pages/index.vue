@@ -94,7 +94,7 @@ const sections = computed(() =>
   width: 100%;
   max-width: calc(var(--container-desktop) + 2 * var(--space-24));
   margin: 0 auto;
-  padding: var(--space-24);
+  padding: 31px var(--space-24) var(--space-24); /* atas: header mobile berakhir y 51 (116:1662), hero mulai y 82 (90:2130): 31 */
 }
 
 .visually-hidden {
@@ -146,6 +146,10 @@ const sections = computed(() =>
 }
 
 @media (min-width: 1024px) {
+  .home {
+    padding-top: 37px; /* header 94 + menu kategori 47 berakhir y 141 (21:4951), hero mulai y 178 (21:4974): 37 */
+  }
+
   .category-section {
     width: calc(100% * 739 / 1120); /* garis section 739 (84:1435), sama dengan kolom kiri */
     margin-top: 50px;

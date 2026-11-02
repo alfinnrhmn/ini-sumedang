@@ -58,3 +58,8 @@ export interface SidebarResponse {
 
 /** Respons hero Beranda (HOME-07): artikel terbit terbaru, urutan = urutan slide; kosong = hero tidak dirender. */
 export type HeroResponse = RecommendedResponse
+
+/** Respons kategori menu header dan laci (HOME-06): 9 kategori resmi, urutan = urutan menu. */
+export interface CategoriesResponse {
+  categories: ArticleCategory[]
+}

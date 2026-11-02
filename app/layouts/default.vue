@@ -1,6 +1,6 @@
 <template>
   <div class="layout">
-    <!-- Ruang untuk header situs (HOME-06). -->
+    <LayoutSiteHeader />
     <div class="content">
       <slot />
     </div>

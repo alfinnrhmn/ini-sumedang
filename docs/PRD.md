@@ -668,9 +668,9 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 | HOME-03 | `DONE` | Kolom samping Terbaru | Terpopuler; setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-04 | `DONE` | Ruang Visual (`/api/articles/visual-topics`, `HomeVisualTopic`); setelah HOME-01; fixture diizinkan (pengecualian pemilik 30 Okt 2026, §13); integrasi WordPress menunggu gerbang G-WP |
 | HOME-05 | `DONE` | Footer desktop + mobile (`SiteFooter`, `layouts/default.vue`; accordion mobile; "Beranda" satu-satunya tautan; keputusan pemilik 31 Okt 2026); `docs/tasks/HOME-05.md` |
-| HOME-06 | `BACKLOG` | Header, menu, laci; usulan visual laci tertulis di `docs/tasks/HOME-06.md`, menunggu persetujuan pemilik (prasyarat `READY`) |
+| HOME-06 | `DONE` | Header (hamburger + logo), menu kategori 9 item (desktop), laci 9 kategori (usulan visual disetujui pemilik 1 Nov 2026), `/api/categories`; ikon cari dan tombol bulan tidak dirender; `docs/tasks/HOME-06.md` |
 | HOME-07 | `DONE` | Hero `Switch` (`Hero.vue`, `/api/articles/hero`; carousel manual tanpa putar otomatis); Merriweather Sans di-host sendiri (`docs/decisions/0005-merriweather-sans.md`, RFN tercakup 0004); `docs/tasks/HOME-07.md` |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D18 dari HOME-03, HOME-04, HOME-05, HOME-07; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D24 dari HOME-03, HOME-04, HOME-05, HOME-06, HOME-07; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
 | PAGE-002, PAGE-003, PAGE-004 | `BACKLOG` | Menunggu gerbang G-WP (§13), tidak ada pengecualian. PAGE-002 juga bergantung SANITIZE-001 |
 | API-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | DISC-002 | `DITUNDA` | Alasan: WordPress ditunda (subset 1 jam = gerbang G-WP, §13) |
