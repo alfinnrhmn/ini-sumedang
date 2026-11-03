@@ -79,8 +79,9 @@ const wideHeadingId = useId()
         </p>
         <ArticleShare class="share" :url="canonical" :title="article.title" />
       </article>
-      <!-- Kolom kanan desktop (E6, papan iklan): iklan 357x237 (128:503) di atas Berita Terkait dan 357x368 (128:508) di bawahnya; mobile 130:2945 tanpa iklan -->
+      <!-- Kolom kanan desktop: widget sosial 357x200 (SOC-001, 127:2810) paling atas, lalu (E6, papan iklan) iklan 357x237 (128:503, y 232) di atas Berita Terkait dan 357x368 (128:508) di bawahnya; mobile 130:2945 tanpa iklan -->
       <div class="sidebar-col">
+        <HomeSocialWidget />
         <AdSlot variant="sidebar-m" />
         <aside v-if="detail.related.sidebar.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
           <ArticleRelatedHeading title="Berita Terkait" variant="sidebar" :heading-id="sidebarHeadingId" />
@@ -234,7 +235,7 @@ const wideHeadingId = useId()
     font: 400 12px/18px var(--font-sans);
   }
 
-  /* Sidebar 357 dari 1120; Figma 127:2170: iklan 128:503 (y 232) setelah widget sosial yang belum dibangun (SOC-001), Berita Terkait, iklan 128:508 (celah 32) */
+  /* Sidebar 357 dari 1120; Figma 127:2170: widget sosial 127:2810 (y 0, 200), iklan 128:503 (y 232), Berita Terkait, iklan 128:508 (celah 32) */
   .sidebar-col {
     display: flex;
     flex-direction: column;

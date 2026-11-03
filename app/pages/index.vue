@@ -21,6 +21,8 @@ const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar
 // Ruang Visual (HOME-04): 4 topik (kategori anak `ruang-visual`); `topics` kosong = section tidak dirender.
 // Urutan section (HOME-02): Rekomendasi -> Sepak Bola -> Ruang Visual -> Nasional -> Bisnis dan Teknologi -> Otomotif.
 const VISUAL_AFTER_SLUG = 'sepak-bola'
+// Widget sosial mobile (SOC-001): setelah section "Bisnis dan Teknologi".
+const SOCIAL_AFTER_SLUG = 'bisnis-teknologi'
 const { data: visual } = await useFetch<VisualTopicsResponse>('/api/articles/visual-topics', {
   key: 'articles-visual-topics'
 })
@@ -59,7 +61,8 @@ const sections = computed(() =>
         <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
       </aside>
     </div>
-    <!-- Papan iklan (E6): penampung statis `AdSlot` di posisi iklan frame final. Rekomendasi: 237 + 368 di kolom kanan (desktop 57:589, 63:600),
+    <!-- Papan iklan (E6): penampung statis `AdSlot` di posisi iklan frame final. Rekomendasi: kolom kanan desktop = widget sosial 357x200 (SOC-001,
+         101:2601 y 848 sejajar kartu pertama) lalu 237 + 368 (desktop 57:589 y 1080, 63:600 y 1349),
          lebar 737 setelah baris ketiga (desktop 84:1442), 354x78 setelah kartu ketiga (mobile 165:1933). Rekomendasi dan Ruang Visual tanpa "Lainnya" (E4). -->
     <section class="recommended">
       <HomeSectionTitle title="Rekomendasi" />
@@ -80,6 +83,7 @@ const sections = computed(() =>
         Belum ada berita.
       </p>
       <div class="side-ads">
+        <HomeSocialWidget />
         <AdSlot variant="sidebar-m" />
         <AdSlot variant="sidebar-l" />
       </div>
@@ -110,6 +114,10 @@ const sections = computed(() =>
       <div v-if="sectionIndex === 0 && section.articles.length" class="mobile-ads">
         <AdSlot variant="mobile-m" />
         <AdSlot variant="mobile-s" />
+      </div>
+      <!-- Mobile/tablet 100:2447 (354x200): setelah section "Bisnis dan Teknologi" (padanan "Teknologi" 165:1835, jarak 30); desktop memakai salinan di kolom kanan Rekomendasi -->
+      <div v-if="section.slug === SOCIAL_AFTER_SLUG" class="mobile-social">
+        <HomeSocialWidget />
       </div>
       <template v-if="section.slug === VISUAL_AFTER_SLUG && visual && visual.topics.length">
         <section class="category-section">
@@ -189,6 +197,11 @@ const sections = computed(() =>
   margin-top: 34px;
 }
 
+/* Mobile 100:2447 y 2850 setelah kartu terakhir "Teknologi" (y 2820): jarak 30 = jarak section mobile */
+.mobile-social {
+  margin-top: 30px;
+}
+
 @media (min-width: 768px) {
   .ad-item--compact {
     display: none;
@@ -265,7 +278,7 @@ const sections = computed(() =>
   .side-ads {
     display: flex;
     flex-direction: column;
-    gap: var(--space-32); /* 57:589 berakhir y 1317, 63:600 mulai y 1349 */
+    gap: var(--space-32); /* widget 101:2601 (y 848-1048) lalu 57:589 y 1080; 57:589 berakhir y 1317, 63:600 mulai y 1349 */
     grid-column: 2;
     grid-row: 2;
     align-self: start;
@@ -315,7 +328,8 @@ const sections = computed(() =>
     margin-top: 28px;
   }
 
-  .mobile-ads {
+  .mobile-ads,
+  .mobile-social {
     display: none;
   }
 

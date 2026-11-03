@@ -612,6 +612,7 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 5. **CSP `frame-src` sama dengan `EMBED_ALLOWED_HOSTS`** (SEC-001; sandbox iframe memuat `allow-scripts allow-same-origin`).
 6. **Halaman error/404 berlayout** (task terpisah) dan **SEO-001** (judul/deskripsi/canonical lengkap; format judul diselaraskan: Detail `"<judul> — IniSumedang"` vs Kategori `"<Kategori> - Ini Sumedang"`).
 7. **Keputusan pemilik yang menunggu** di `docs/tasks/POLISH-01.md` (font isi Merriweather 400 dan Inter 700 [D29], warna selisih > 4 level [D30], platform bagikan [D33], tinjauan tata letak halaman kategori [D34–D40], dan **D41** area klik tautan kategori/footer/breadcrumb/label ≥ 24 px yang diusulkan PM menjadi wajib seperti D25).
+10. **Widget sosial "Ikuti IniSumedang"** (SOC-001; angka pengikut = penampung dari Figma di `app/config/social.ts`; POLISH-01 D49): **angka diganti angka nyata (konfigurasi dari pemilik atau WordPress) atau widget disembunyikan sebelum tayang**; URL akun diisi pemilik agar kotak menjadi tautan (hanya `https://`).
 9. **Papan iklan** (penampung statis bertuliskan "Advertisement" di Beranda, Detail, dan kolom kanan kategori; POLISH-01 D47): **diganti konten CMS (ADS-002: gambar + tautan `https`, tanpa HTML/skrip) atau disembunyikan sebelum tayang**; teks penampung tidak boleh tayang.
 8. **Satukan daftar kategori resmi** (`OFFICIAL_CATEGORY_SLUGS` di klien menduplikasi `getCategories()` di server; PAGE-003) dari satu sumber saat integrasi WordPress, dan nyatakan perlakuan kategori non-resmi (anak `ruang-visual`, Teknologi/Ekonomi/Selebriti di fixture) di UI (teks biasa tanpa halaman).
 Daftar uji data nyata WordPress yang wajib (selain butir di atas): `ruang-visual` kosong, `/api/categories` kosong/gagal, dan **kategori resmi tanpa artikel (keadaan kosong halaman kategori)**.
@@ -688,7 +689,7 @@ Daftar uji data nyata WordPress yang wajib (selain butir di atas): `ruang-visual
 | HOME-05 | `DONE` | Footer desktop + mobile (`SiteFooter`, `layouts/default.vue`; accordion mobile; "Beranda" satu-satunya tautan; keputusan pemilik 31 Okt 2026); `docs/tasks/HOME-05.md` |
 | HOME-06 | `DONE` | Header (hamburger + logo), menu kategori 9 item (desktop), laci 9 kategori (usulan visual disetujui pemilik 1 Nov 2026), `/api/categories`; ikon cari dan tombol bulan tidak dirender; `docs/tasks/HOME-06.md` |
 | HOME-07 | `DONE` | Hero `Switch` (`Hero.vue`, `/api/articles/hero`; carousel manual tanpa putar otomatis); Merriweather Sans di-host sendiri (`docs/decisions/0005-merriweather-sans.md`, RFN tercakup 0004); `docs/tasks/HOME-07.md` |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D48 dari HOME-03..07, PAGE-002, PAGE-003; D25 dan D47 WAJIB sebelum tayang; D29, D30, D41 menunggu keputusan pemilik; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma yang diterima pemilik (D1–D49 dari HOME-03..07, PAGE-002, PAGE-003, SOC-001; D25, D47, D49 WAJIB sebelum tayang; D29, D30, D41 menunggu keputusan pemilik; slice berikutnya menambah); `docs/tasks/POLISH-01.md` |
 | PAGE-002 | `DONE` | Detail `/berita/[slug]` (fixture); QA lulus 2 putaran (XSS end-to-end 0 eksekusi, 292 uji); `v-html=` tunggal di `ArticleBody.vue`; disetujui pemilik untuk commit 2 Nov 2026; `docs/tasks/PAGE-002.md` |
 | PAGE-003 | `DONE` | (evaluasi visual pemilik E1–E7 lulus QA 3 Nov 2026; 391 uji; disetujui pemilik untuk commit 3 Nov 2026) Halaman kategori `/kategori/[slug]` + semua tautan kategori (fixture; paginasi 10/halaman; 374 uji); QA lulus + perbaikan M1/L1; **menunggu persetujuan pemilik untuk commit** (perubahan `ci.yml`); keputusan tata letak butuh tinjauan pemilik (POLISH-01 D34–D41); `docs/tasks/PAGE-003.md` |
 | PAGE-004 | `BACKLOG` | Boleh dibangun dengan fixture di balik fungsi layanan (pengecualian pemilik 2 Nov 2026, §13); gerbang G-WP tetap wajib sebelum integrasi WordPress dan sebelum situs tayang. PAGE-002 bergantung SANITIZE-001 |
@@ -697,7 +698,7 @@ Daftar uji data nyata WordPress yang wajib (selain butir di atas): `ruang-visual
 | POP-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | ADS-001 | `DITUNDA` | Alasan: WordPress ditunda |
 | ADS-002 | `DITUNDA` | Alasan: WordPress ditunda |
-| SOC-001 | `DITUNDA` | Alasan: WordPress ditunda |
+| SOC-001 | `QA_PASSED` (UI) | **menunggu persetujuan pemilik untuk commit.** Widget sosial "Ikuti IniSumedang" (`Frame 283`) dibuka sebagian 3 Nov 2026: UI + data konfigurasi (angka contoh); bagian WordPress (angka/URL dari opsi editor) tetap `DITUNDA`; `docs/tasks/SOC-001.md` |
 | Lainnya (DISC-001, DISC-003, SEC-001, SEO-001, RESP-001, REL-001) | tidak berubah | SEO-001 (redirect map URL lama) dan SEC-001 (uji XSS konten) bergantung data WordPress pada bagian tertentu [I]; PM menilai saat task dibuka |
 
 ## 16. Fase & Estimasi (baseline)

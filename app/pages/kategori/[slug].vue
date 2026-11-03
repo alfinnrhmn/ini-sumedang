@@ -130,7 +130,7 @@ watch(data, (value, previous) => {
           :total-pages="pagination.totalPages"
         />
       </div>
-      <!-- Kolom kanan seperti Beranda (357): Terbaru | Terpopuler lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda) -->
+      <!-- Kolom kanan seperti Beranda (357): Terbaru | Terpopuler, widget sosial (SOC-001), lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda) -->
       <div class="secondary">
         <aside v-if="sidebar && sidebar.latest.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
           <h2 :id="sidebarHeadingId" class="visually-hidden">
@@ -138,6 +138,7 @@ watch(data, (value, previous) => {
           </h2>
           <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
         </aside>
+        <HomeSocialWidget />
         <div class="ads ads--desktop">
           <AdSlot variant="sidebar-m" />
           <AdSlot variant="sidebar-l" />
