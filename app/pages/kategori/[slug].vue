@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { CategoryPageResponse, SidebarResponse } from '~/types/article'
+import type { Article, CategoryPageResponse, SidebarResponse } from '~/types/article'
 
 // Halaman kategori (PAGE-003; tanpa frame Figma, PRD §3.2 G1): daftar berita satu kategori resmi, berhalaman, tanpa hero.
-// E5 (evaluasi pemilik): tata letak Beranda/Detail = kolom kiri 739 (judul h1, kartu 2 kolom, paginasi) + kolom kanan 357 (Terbaru | Terpopuler
-// dari /api/articles/sidebar dan papan iklan AdSlot). Dibangun dari komponen yang ada (SectionTitle sebagai h1, NewsCard, ArticleBreadcrumb,
-// HomeSidebarTabs, AdSlot); keputusan tata letak = butuh peninjauan pemilik (POLISH-01). Data hanya lewat /api/category/<slug>?halaman=N.
+// E5 (evaluasi pemilik): tata letak Beranda/Detail = kolom kiri 739 (judul h1, kartu 2 kolom, "Lebih banyak") + kolom kanan 357.
+// UX-001 (instruksi pemilik 3 Nov 2026): tab Terbaru | Terpopuler dihapus dari halaman ini; kolom kanan = widget sosial -> Trending (artikel Terpopuler,
+// /api/articles/sidebar `popular`; kosong atau gagal dimuat = tidak dirender) -> papan iklan AdSlot; paginasi diganti tombol "Lebih banyak"
+// (CategoryLoadMore: menambah kartu di bawah daftar tanpa memuat ulang halaman). Dibangun dari komponen yang ada (SectionTitle sebagai h1, NewsCard,
+// ArticleBreadcrumb, AdSlot); keputusan tata letak = butuh peninjauan pemilik (POLISH-01). Data hanya lewat /api/category/<slug>?halaman=N.
 // Slug tak dikenal, halaman tak valid, atau halaman melewati batas = status 404 (halaman error berlayout = task terpisah).
 // Kategori tanpa artikel: halaman 1 menampilkan keadaan kosong netral. Kategori Berita = Beranda (E1): tidak punya halaman, dialihkan 308 ke "/".
 
@@ -37,20 +39,42 @@ function pageError(statusCode: number) {
 
 if (error.value || !data.value) throw pageError(error.value ? (error.value.statusCode ?? 500) : 404)
 
-// Kolom kanan (sama dengan Beranda): data kolom samping dibagikan lewat kunci yang sama; kegagalan memuatnya tidak menggagalkan halaman.
+// Trending (UX-001): hanya `popular` yang dipakai; data kolom samping dibagikan dengan Beranda lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
 const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar', { key: 'articles-sidebar' })
-const sidebarHeadingId = useId()
 
 // Gagal memuat pada navigasi berikutnya (mis. halaman sudah tidak ada): tampilkan halaman error yang sama.
 watch(error, (value) => {
   if (value) showError(pageError(value.statusCode ?? 500))
 })
 
-// Tampilan mengikuti data (bukan rute) agar judul, kartu, dan paginasi selalu sinkron; data lama tetap tampil selama permintaan berikutnya berjalan.
+// Tampilan mengikuti data (bukan rute) agar judul, kartu, dan tombol "Lebih banyak" selalu sinkron; data lama tetap tampil selama permintaan berikutnya berjalan.
 const category = computed(() => data.value?.category)
 const articles = computed(() => data.value?.articles ?? [])
 const pagination = computed(() => data.value?.pagination)
 const now = computed(() => data.value?.now ?? '')
+
+// "Lebih banyak" (UX-001): `shown` = artikel halaman awal + yang ditambahkan di klien; `loadedPage` = halaman terakhir yang sudah dimuat.
+// Keduanya dibuang (kembali ke data rute) saat kategori atau ?halaman berubah lewat navigasi. Waktu relatif memakai `now` halaman awal.
+const shown = ref<Article[]>([...articles.value])
+const loadedPage = ref(data.value?.pagination.page ?? 1)
+watch(data, (value) => {
+  shown.value = [...(value?.articles ?? [])]
+  loadedPage.value = value?.pagination.page ?? 1
+})
+const listEl = ref<HTMLElement | null>(null)
+async function onLoaded(payload: { articles: Article[], page: number, added: number }) {
+  const firstNew = shown.value.length
+  shown.value = payload.articles
+  loadedPage.value = payload.page
+  if (payload.added < 1) return
+  // Fokus ke tautan judul kartu baru pertama (tombol bisa hilang di halaman terakhir); tanpa menggulir agar tampilan tidak melompat.
+  await nextTick()
+  listEl.value?.children[firstNew]?.querySelector<HTMLElement>('a[href^="/berita/"]')?.focus({ preventScroll: true })
+}
+
+// Kolom kanan menempel pada >= 1024 px (UX-001 Keputusan PM 5)
+const secondary = ref<HTMLElement | null>(null)
+useStickyColumn(secondary)
 
 // Judul dokumen "<Kategori> - Ini Sumedang" (catatan pemilik; Detail memakai "— IniSumedang", penyelarasan di SEO-001); deskripsi sederhana [I].
 // Canonical = origin permintaan + /kategori/<slug> (+ ?halaman=N bila N > 1); basis produksi ditetapkan saat hosting [I].
@@ -109,13 +133,13 @@ watch(data, (value, previous) => {
     <div class="columns">
       <div class="primary">
         <HomeSectionTitle :title="category.name" tag="h1" />
-        <section v-if="articles.length" :aria-labelledby="listHeadingId">
+        <section v-if="shown.length" :aria-labelledby="listHeadingId">
           <!-- h2 tersembunyi menjaga urutan heading (h1 > h2 > h3 judul kartu), seperti judul section di Beranda -->
           <h2 :id="listHeadingId" class="visually-hidden">
             Berita {{ category.name }} terbaru
           </h2>
-          <ul class="list">
-            <li v-for="(article, index) in articles" :key="article.id">
+          <ul ref="listEl" class="list">
+            <li v-for="(article, index) in shown" :key="article.id">
               <NewsCard :article="article" :now="now" :eager="index < 2" />
             </li>
           </ul>
@@ -123,22 +147,18 @@ watch(data, (value, previous) => {
         <p v-else class="empty">
           Belum ada berita di kategori ini.
         </p>
-        <CategoryPagination
-          class="pager"
+        <CategoryLoadMore
           :slug="category.slug"
-          :page="pagination.page"
+          :loaded-page="loadedPage"
           :total-pages="pagination.totalPages"
+          :articles="shown"
+          @loaded="onLoaded"
         />
       </div>
-      <!-- Kolom kanan seperti Beranda (357): Terbaru | Terpopuler, widget sosial (SOC-001), lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda) -->
-      <div class="secondary">
-        <aside v-if="sidebar && sidebar.latest.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
-          <h2 :id="sidebarHeadingId" class="visually-hidden">
-            {{ sidebar.popular.length ? 'Terbaru dan Terpopuler' : 'Terbaru' }}
-          </h2>
-          <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
-        </aside>
+      <!-- Kolom kanan (357): widget sosial (SOC-001), Trending (UX-001; kosong = tidak dirender), lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda); urutan sama di mobile -->
+      <div ref="secondary" class="secondary">
         <HomeSocialWidget />
+        <HomeTrendingList v-if="sidebar" :articles="sidebar.popular" :now="sidebar.now" />
         <div class="ads ads--desktop">
           <AdSlot variant="sidebar-m" />
           <AdSlot variant="sidebar-l" />
@@ -166,7 +186,7 @@ watch(data, (value, previous) => {
   margin-top: var(--space-8);
 }
 
-/* < 1024: kolom kanan di bawah kolom kiri (tab Terbaru | Terpopuler lalu dua iklan mobile), jarak seperti jarak section mobile Beranda (30) */
+/* < 1024: kolom kanan di bawah kolom kiri (widget sosial, Trending, lalu dua iklan mobile), jarak seperti jarak section mobile Beranda (30) */
 .secondary {
   display: grid;
   gap: var(--space-32);
@@ -209,11 +229,6 @@ watch(data, (value, previous) => {
   color: var(--color-footer-muted);
 }
 
-/* Navigasi paginasi: jarak ke daftar kartu terakhir (tanpa frame) [?] */
-.pager {
-  margin-top: var(--space-40);
-}
-
 @media (min-width: 1024px) {
   .category-page {
     padding-top: 9px;
@@ -236,6 +251,9 @@ watch(data, (value, previous) => {
     flex: none;
     width: calc(100% * 357 / 1120);
     margin-top: 0;
+    /* UX-001 Keputusan PM 5: menempel di dalam .columns; nilai top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    position: sticky;
+    top: var(--space-24);
   }
 
   .ads--desktop {

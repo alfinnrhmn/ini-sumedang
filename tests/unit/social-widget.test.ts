@@ -104,7 +104,7 @@ describe('SOC-001 komponen SocialWidget (penjaga sumber)', () => {
 describe('SOC-001 penempatan (penjaga sumber)', () => {
   it('Beranda: salinan desktop di kolom kanan Rekomendasi sebelum iklan; salinan mobile setelah "Bisnis dan Teknologi"', () => {
     const page = source('app/pages/index.vue')
-    assert.match(page, /<div class="side-ads">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
+    assert.match(page, /<div ref="sideAds" class="side-ads">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
     assert.match(page, /const SOCIAL_AFTER_SLUG = 'bisnis-teknologi'/)
     assert.match(page, /<div v-if="section\.slug === SOCIAL_AFTER_SLUG" class="mobile-social">\s*<HomeSocialWidget \/>/)
     assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 2)
@@ -112,14 +112,14 @@ describe('SOC-001 penempatan (penjaga sumber)', () => {
 
   it('Detail: widget paling atas kolom kanan (desktop saja: kolom kanan display none di bawah 1024) sebelum iklan', () => {
     const page = source('app/pages/berita/[slug].vue')
-    assert.match(page, /<div class="sidebar-col">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
+    assert.match(page, /<div ref="sidebarCol" class="sidebar-col">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
     assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 1)
     assert.match(page, /\.sidebar-col \{\s*display: none;/)
   })
 
-  it('kategori: komponen yang sama di kolom kanan sebelum iklan', () => {
+  it('kategori: komponen yang sama paling atas kolom kanan, lalu Trending (UX-001), lalu iklan', () => {
     const page = source('app/pages/kategori/[slug].vue')
-    assert.match(page, /<HomeSocialWidget \/>\s*<div class="ads ads--desktop">/)
+    assert.match(page, /<HomeSocialWidget \/>\s*<HomeTrendingList [^>]*\/>\s*<div class="ads ads--desktop">/)
     assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 1)
   })
 })

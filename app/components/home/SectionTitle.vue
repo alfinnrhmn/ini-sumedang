@@ -18,7 +18,7 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
     </component>
     <NuxtLink v-if="moreTo" :to="moreTo" :aria-label="moreLabel" :aria-current="undefined" class="more">
       <span class="more-text">Lainnya</span>
-      <img class="more-arrow" src="/icons/arrow-right.svg" alt="" width="13" height="13">
+      <img class="more-arrow" src="/icons/arrow-right.svg" alt="" width="14" height="14">
     </NuxtLink>
   </div>
 </template>
@@ -37,23 +37,32 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
   color: var(--color-black);
 }
 
-/* E4: "Lainnya" di kanan judul. Mobile 165:1720: x 268 dari 354 (rata kanan), y 4,5, tinggi 16, teks Inter Medium 11,111/15,555, panah 13 setelah celah 3.
-   Warna #525252 -> --color-gray-2 (#4F4F4F, selisih 3/3/3; kontras 8,6:1). Area sentuh diperluas 6 px ke segala sisi (tinggi >= 25) tanpa mengubah tampilan. */
+/* E4: "Lainnya" di kanan judul, rata kanan (tepi kanan = tepi kanan garis). Figma 165:1720 (mobile) memakai Inter Medium 11,111 dengan panah 13 dan
+   68:1145 (desktop) Inter Regular 10; UX-001 Keputusan PM 4 (instruksi pemilik 3 Nov 2026) memperbesarnya: mobile teks dan panah 14, desktop 16
+   (judul 19,2 dan 23,04, jadi tetap lebih kecil dari judul). Deviasi dari Figma, dicatat untuk POLISH-01. Kotak tautan setinggi baris judul
+   (24,96 mobile; 29,95 desktop) dan diratakan tengah, sehingga sejajar vertikal dengan teks judul; tinggi >= 24, area sentuh diperluas 6 px ke segala sisi.
+   Warna #525252 -> --color-gray-2 (#4F4F4F, selisih 3/3/3; kontras 8,6:1). Judul diberi max-width agar tidak pernah tumpang-tindih dengan tautan (lihat .heading). */
 .section-title--more {
   position: relative;
 }
 
 .more {
   position: absolute;
-  top: 4.5px; /* 165:1720 */
+  top: 0;
   right: 0;
   display: flex;
   align-items: center;
-  gap: 3px; /* 165:1720 celah teks-panah */
-  height: 16px; /* 165:1720 */
-  font: 500 11.111px/15.555px var(--font-sans); /* 165:1721 Inter Medium (= --type-metadata) */
+  gap: 4px; /* celah teks-panah (Figma 3 pada 11 px; proporsional) */
+  height: 24.96px; /* = line-height --type-heading-mobile */
+  font: 500 14px/normal var(--font-sans); /* UX-001 Keputusan PM 4 */
   color: var(--color-gray-2);
   white-space: nowrap;
+}
+
+/* Tautan di luar alur: judul diberi batas lebar (lebar tautan "Lainnya" 14 px = teks + celah + panah ~ 70, ditambah 4) agar tidak pernah menimpa
+   tautan; judul terpanjang ("Bisnis dan Teknologi", 197 px) muat sampai 320 px (container 272 - 74 = 198), di bawah itu judul membungkus, tidak tumpang-tindih. */
+.section-title--more .heading {
+  max-width: calc(100% - 74px);
 }
 
 .more::after {
@@ -64,8 +73,8 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
 
 .more-arrow {
   flex: none;
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 @media (hover: hover) {
@@ -91,11 +100,15 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
 }
 
 @media (min-width: 1024px) {
-  /* Desktop 68:1145: tepi kanan = tepi kanan garis (x 899), y 10 dari atas teks judul (2951 - 2941), tinggi 13, Inter Regular 10 */
+  /* Desktop (68:1145: tepi kanan = tepi kanan garis x 899): UX-001 teks dan panah 16, Inter Regular; kotak setinggi baris judul desktop (29,95) */
   .more {
-    top: 10px;
-    height: 13px;
-    font: 400 10px/normal var(--font-sans); /* 84:1439 */
+    height: 29.95px; /* = line-height --type-heading-desktop */
+    font: 400 16px/normal var(--font-sans);
+  }
+
+  .more-arrow {
+    width: 16px;
+    height: 16px;
   }
 
   .heading {

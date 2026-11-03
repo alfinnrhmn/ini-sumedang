@@ -37,6 +37,16 @@ const sectionFetches = HOME_SECTIONS.map(section =>
 )
 await Promise.all(sectionFetches)
 
+// Kolom kanan menempel (UX-001 Keputusan PM 5), hanya >= 1024 px: kolom iklan Rekomendasi (widget sosial + 2 iklan, kontainer = grid Rekomendasi) dan
+// iklan section kategori pertama (kontainer = section itu). Tab Terbaru | Terpopuler tidak ditempel: kontainernya (.top) setinggi hero, tanpa ruang gulir.
+const sideAds = ref<HTMLElement | null>(null)
+const sectionAd = ref<HTMLElement | null>(null)
+function setSectionAd(el: unknown) {
+  sectionAd.value = el as HTMLElement | null
+}
+useStickyColumn(sideAds)
+useStickyColumn(sectionAd)
+
 // Section tanpa artikel (atau gagal dimuat) tidak dirender (v-if di template; Ruang Visual tetap di posisinya).
 const sections = computed(() =>
   HOME_SECTIONS.map((section, index) => ({
@@ -82,7 +92,7 @@ const sections = computed(() =>
       <p v-else class="empty">
         Belum ada berita.
       </p>
-      <div class="side-ads">
+      <div ref="sideAds" class="side-ads">
         <HomeSocialWidget />
         <AdSlot variant="sidebar-m" />
         <AdSlot variant="sidebar-l" />
@@ -106,7 +116,7 @@ const sections = computed(() =>
             </li>
           </template>
         </ul>
-        <div v-if="sectionIndex === 0" class="section-ad">
+        <div v-if="sectionIndex === 0" :ref="setSectionAd" class="section-ad">
           <AdSlot variant="sidebar-s" />
         </div>
       </section>
@@ -283,6 +293,9 @@ const sections = computed(() =>
     grid-row: 2;
     align-self: start;
     margin-top: 28px; /* sejajar kartu pertama (garis ke kartu 28) */
+    /* UX-001 Keputusan PM 5: menempel di dalam area grid baris 2 (setinggi daftar Rekomendasi); top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    position: sticky;
+    top: var(--space-24);
   }
 
   /* Kolom kiri 739 dari 1120 */
@@ -326,6 +339,9 @@ const sections = computed(() =>
     grid-row: 2;
     align-self: start;
     margin-top: 28px;
+    /* UX-001 Keputusan PM 5: menempel di dalam area grid baris 2 (setinggi daftar section); top dihitung useStickyColumn */
+    position: sticky;
+    top: var(--space-24);
   }
 
   .mobile-ads,

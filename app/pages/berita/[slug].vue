@@ -51,6 +51,10 @@ const hasBody = article.bodyHtml.trim() !== ''
 const sidebarHeadingId = useId()
 const compactHeadingId = useId()
 const wideHeadingId = useId()
+
+// Kolom kanan menempel pada >= 1024 px (UX-001 Keputusan PM 5); kontainer = .columns
+const sidebarCol = ref<HTMLElement | null>(null)
+useStickyColumn(sidebarCol)
 </script>
 
 <template>
@@ -80,7 +84,7 @@ const wideHeadingId = useId()
         <ArticleShare class="share" :url="canonical" :title="article.title" />
       </article>
       <!-- Kolom kanan desktop: widget sosial 357x200 (SOC-001, 127:2810) paling atas, lalu (E6, papan iklan) iklan 357x237 (128:503, y 232) di atas Berita Terkait dan 357x368 (128:508) di bawahnya; mobile 130:2945 tanpa iklan -->
-      <div class="sidebar-col">
+      <div ref="sidebarCol" class="sidebar-col">
         <HomeSocialWidget />
         <AdSlot variant="sidebar-m" />
         <aside v-if="detail.related.sidebar.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
@@ -241,6 +245,9 @@ const wideHeadingId = useId()
     flex-direction: column;
     gap: var(--space-32);
     width: calc(100% * 357 / 1120);
+    /* UX-001 Keputusan PM 5: menempel di dalam .columns; top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    position: sticky;
+    top: var(--space-24);
   }
 
   /* Sidebar 130:2226: judul (43) lalu daftar 24 di bawahnya (y 67), celah item 22 (482 = 4 x 104 + 3 x 22) */

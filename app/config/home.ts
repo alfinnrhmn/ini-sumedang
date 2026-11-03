@@ -40,3 +40,42 @@ export const HERO_SLIDE_COUNT = 4
 
 /** Durasi animasi geser-kiri hero (E3, evaluasi pemilik; rentang 350-450 ms, ease). Satu sumber untuk CSS (variabel) dan cadangan waktu. */
 export const HERO_SLIDE_MS = 400
+
+/**
+ * Putar otomatis hero (UX-001, Keputusan PM 1; instruksi pemilik 3 Nov 2026 menggantikan "tanpa putar otomatis" HOME-07).
+ * Interval antar slide; animasi geser-kiri memakai `HERO_SLIDE_MS` yang sama dengan perpindahan manual.
+ */
+export const HERO_AUTOPLAY_MS = 5000
+
+/** Keadaan putar otomatis: `manual` = tidak berputar (kurang dari 2 slide, reduced-motion, atau belum di klien), `paused` = dijeda, `running` = berputar. */
+export type HeroAutoplayStatus = 'manual' | 'paused' | 'running'
+
+export interface HeroAutoplayInput {
+  /** Sudah di klien (setelah mount): SSR dan hidrasi selalu `manual`, tanpa perubahan tata letak. */
+  mounted: boolean
+  slideCount: number
+  /** `prefers-reduced-motion: reduce`. */
+  reducedMotion: boolean
+  /** Pointer (mouse/pen) di atas hero. */
+  hovering: boolean
+  /** Fokus keyboard di dalam hero. */
+  focused: boolean
+  /** Tab browser tersembunyi (`visibilitychange`). */
+  hidden: boolean
+}
+
+/** Murni: menentukan apakah hero berputar, dijeda, atau manual. Timer hanya berjalan saat `running`. */
+export function heroAutoplayStatus(input: HeroAutoplayInput): HeroAutoplayStatus {
+  if (!input.mounted || input.slideCount < 2 || input.reducedMotion) return 'manual'
+  return input.hovering || input.focused || input.hidden ? 'paused' : 'running'
+}
+
+/** `aria-live` area slide: `off` selama berputar otomatis (tanpa pengumuman tiap 5 detik), `polite` saat dijeda atau manual. */
+export function heroLiveMode(status: HeroAutoplayStatus): 'off' | 'polite' {
+  return status === 'running' ? 'off' : 'polite'
+}
+
+/** Slide berikutnya, berputar (1 > 2 > 3 > 4 > 1). `count` < 1 = 0. */
+export function nextHeroSlide(current: number, count: number): number {
+  return count < 1 ? 0 : (current + 1) % count
+}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
-import { HERO_SLIDE_MS } from '~/config/home'
+import { HERO_AUTOPLAY_MS, HERO_SLIDE_MS, heroAutoplayStatus, heroLiveMode, nextHeroSlide } from '~/config/home'
 
 const props = defineProps<{
   /** Slide hero, urutan = urutan slide. Kosong: hero tidak dirender; kurang dari 2: titik tidak dirender. */
@@ -9,7 +9,7 @@ const props = defineProps<{
   now: string
 }>()
 
-// Carousel manual (keputusan PM 1): tanpa putar otomatis, tanpa tombol prev/next dan geser sentuh.
+// Carousel (HOME-07 keputusan PM 1, tanpa tombol prev/next dan geser sentuh); UX-001 Keputusan PM 1 menambah putar otomatis (di bawah).
 // Empat titik = tombol; roving tabindex; panah kiri/kanan (berputar), Home, End memindahkan fokus dan slide.
 // E3 (evaluasi pemilik): perpindahan slide = geser ke kiri (slide lama keluar ke kiri, slide baru masuk dari kanan, HERO_SLIDE_MS ease),
 // tanpa pergeseran tata letak (slide bertumpuk absolut di kotak tetap). Selama animasi slide lama tetap dirender tetapi `inert` +
@@ -46,7 +46,86 @@ function onSlideAnimationEnd(event: AnimationEvent) {
   if (event.target === event.currentTarget) settle()
 }
 
-onBeforeUnmount(() => clearTimeout(settleTimer))
+// UX-001 Keputusan PM 1: putar otomatis tiap HERO_AUTOPLAY_MS, hanya di klien setelah mount (SSR/hidrasi tidak berubah, tanpa layout shift).
+// Dijeda saat pointer di atas hero, fokus keyboard di dalam hero, atau tab tersembunyi; `prefers-reduced-motion: reduce` = tanpa putar.
+// Fokus dihitung hanya bila `:focus-visible` (keyboard): titik yang baru diklik mouse/sentuh tetap fokus tetapi tidak boleh menjeda
+// selamanya setelah pointer meninggalkan hero. Pilihan titik / panah keyboard memulai ulang timer dari 0 (`restartAutoplay`).
+// Keputusan logika (status, slide berikutnya, aria-live) ada di app/config/home.ts agar bisa diuji murni. Satu timer (setTimeout) yang
+// dipasang ulang tiap status/slide berubah, dibersihkan saat unmount.
+const root = ref<HTMLElement | null>(null)
+const mounted = ref(false)
+const reducedMotion = ref(false)
+const hovering = ref(false)
+const focused = ref(false)
+const hidden = ref(false)
+const status = computed(() => heroAutoplayStatus({
+  mounted: mounted.value,
+  slideCount: props.articles.length,
+  reducedMotion: reducedMotion.value,
+  hovering: hovering.value,
+  focused: focused.value,
+  hidden: hidden.value
+}))
+const liveMode = computed(() => heroLiveMode(status.value))
+let autoplayTimer: ReturnType<typeof setTimeout> | undefined
+
+function stopAutoplay() {
+  clearTimeout(autoplayTimer)
+  autoplayTimer = undefined
+}
+
+function restartAutoplay() {
+  stopAutoplay()
+  if (status.value !== 'running') return
+  autoplayTimer = setTimeout(() => select(nextHeroSlide(active.value, props.articles.length)), HERO_AUTOPLAY_MS)
+}
+
+watch([status, active], restartAutoplay, { flush: 'post' })
+
+function onPointerEnter(event: PointerEvent) {
+  if (event.pointerType !== 'touch') hovering.value = true
+}
+
+function onPointerLeave() {
+  hovering.value = false
+}
+
+function onFocusIn(event: FocusEvent) {
+  try {
+    focused.value = (event.target as HTMLElement).matches(':focus-visible')
+  }
+  catch {
+    focused.value = true // peramban tanpa :focus-visible: anggap fokus keyboard (lebih aman: menjeda)
+  }
+}
+
+function onFocusOut(event: FocusEvent) {
+  if (!root.value?.contains(event.relatedTarget as Node | null)) focused.value = false
+}
+
+const reducedMotionQuery = typeof window === 'undefined' ? null : window.matchMedia('(prefers-reduced-motion: reduce)')
+const onReducedMotionChange = () => { reducedMotion.value = reducedMotionQuery?.matches ?? false }
+const onVisibilityChange = () => { hidden.value = document.visibilityState === 'hidden' }
+
+onMounted(() => {
+  onReducedMotionChange()
+  onVisibilityChange()
+  reducedMotionQuery?.addEventListener('change', onReducedMotionChange)
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  mounted.value = true
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(settleTimer)
+  stopAutoplay()
+  reducedMotionQuery?.removeEventListener('change', onReducedMotionChange)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+})
+
+function onDotClick(index: number) {
+  select(index)
+  restartAutoplay()
+}
 
 function onKeydown(event: KeyboardEvent) {
   if (event.altKey || event.ctrlKey || event.metaKey) return
@@ -61,6 +140,7 @@ function onKeydown(event: KeyboardEvent) {
   }
   event.preventDefault()
   select(next)
+  restartAutoplay()
   dotEls[next]?.focus()
 }
 
@@ -80,12 +160,17 @@ const slides = computed(() =>
 <template>
   <section
     v-if="articles.length"
+    ref="root"
     class="hero"
     aria-roledescription="carousel"
     aria-label="Berita utama"
     :style="{ '--hero-slide-ms': `${HERO_SLIDE_MS}ms` }"
+    @pointerenter="onPointerEnter"
+    @pointerleave="onPointerLeave"
+    @focusin="onFocusIn"
+    @focusout="onFocusOut"
   >
-    <div class="slides" aria-live="polite">
+    <div class="slides" :aria-live="liveMode">
       <div
         v-for="(slide, index) in slides"
         :key="slide.article.id"
@@ -139,7 +224,7 @@ const slides = computed(() =>
         :aria-label="`Slide ${index + 1}`"
         :aria-current="active === index ? 'true' : 'false'"
         :tabindex="active === index ? 0 : -1"
-        @click="select(index)"
+        @click="onDotClick(index)"
       />
     </div>
   </section>

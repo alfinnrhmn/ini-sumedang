@@ -52,3 +52,18 @@ export function isCategoryRoute(route: { name?: unknown, params: Record<string, 
   if (slug === HOME_CATEGORY_SLUG) return route.name === HOME_ROUTE_NAME
   return route.name === CATEGORY_ROUTE_NAME && route.params.slug === slug
 }
+
+/**
+ * "Lebih banyak" (UX-001 Keputusan PM 3): gabungkan artikel halaman berikutnya ke daftar yang sudah tampil, tanpa duplikat berdasarkan `id`
+ * (juga di dalam `incoming` sendiri). Urutan terjaga (yang lama dulu, yang baru di bawah); tidak mengubah masukan. Murni agar bisa diuji.
+ */
+export function mergeArticles<T extends { id: number }>(existing: readonly T[], incoming: readonly T[]): T[] {
+  const seen = new Set(existing.map(item => item.id))
+  const merged = [...existing]
+  for (const item of incoming) {
+    if (seen.has(item.id)) continue
+    seen.add(item.id)
+    merged.push(item)
+  }
+  return merged
+}
