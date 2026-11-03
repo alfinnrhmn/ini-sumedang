@@ -131,8 +131,9 @@ watch(data, (value, previous) => {
   <main v-if="category && pagination" class="category-page">
     <ArticleBreadcrumb :category="null" :title="category.name" />
     <div class="columns">
+      <!-- Judul di baris sendiri (>= 1024: baris 1 grid kolom kiri) supaya kolom kanan mulai di baris 2, sejajar tepi atas daftar kartu -->
+      <HomeSectionTitle :title="category.name" tag="h1" class="page-title" />
       <div class="primary">
-        <HomeSectionTitle :title="category.name" tag="h1" />
         <section v-if="shown.length" :aria-labelledby="listHeadingId">
           <!-- h2 tersembunyi menjaga urutan heading (h1 > h2 > h3 judul kartu), seperti judul section di Beranda -->
           <h2 :id="listHeadingId" class="visually-hidden">
@@ -234,24 +235,37 @@ watch(data, (value, previous) => {
     padding-top: 9px;
   }
 
+  /* Grid 2 kolom x 2 baris: judul (kolom 1, baris 1), daftar + "Lebih banyak" (kolom 1, baris 2), kolom kanan (kolom 2, baris 2).
+     Kolom kanan sejajar tepi atas gambar kartu pertama tanpa angka tinggi judul: ia mulai di baris 2 (di bawah judul, berapa pun tingginya)
+     dan diberi jarak atas yang sama dengan daftar (--list-gap, 28 = garis judul ke kartu, sama dengan Beranda). Terukur di 1440/1280/1024:
+     atas widget = atas gambar kartu pertama. Sticky terbatas pada area baris 2, jadi kolom tidak pernah naik ke judul atau menimpa footer. */
   .columns {
-    display: flex;
-    align-items: flex-start;
+    --list-gap: 28px;
+
+    display: grid;
+    /* Kolom kiri 739 dan kolom kanan 357 dari 1120 (21:4950: daftar x 160 lebar 739, kolom kanan x 923 lebar 357), fluid di bawah 1280 seperti Beranda */
+    grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
+    grid-template-rows: auto auto;
     justify-content: space-between;
+    align-items: start;
     margin-top: 18px;
   }
 
-  /* Kolom kiri 739 dan kolom kanan 357 dari 1120 (21:4950: daftar x 160 lebar 739, kolom kanan x 923 lebar 357), fluid di bawah 1280 seperti Beranda */
+  .page-title {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
   .primary {
-    flex: none;
-    width: calc(100% * 739 / 1120);
+    grid-column: 1;
+    grid-row: 2;
   }
 
   .secondary {
-    flex: none;
-    width: calc(100% * 357 / 1120);
-    margin-top: 0;
-    /* UX-001 Keputusan PM 5: menempel di dalam .columns; nilai top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: var(--list-gap);
+    /* UX-001 Keputusan PM 5: menempel di dalam baris 2 .columns; nilai top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
     position: sticky;
     top: var(--space-24);
   }
@@ -269,7 +283,7 @@ watch(data, (value, previous) => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 23px; /* 21:4950 jarak horizontal kartu 358 + 23 */
     row-gap: 48px; /* sama dengan daftar Beranda */
-    margin-top: 28px; /* garis 42:374 bawah ke kartu: sama dengan Beranda */
+    margin-top: var(--list-gap); /* 28: garis 42:374 bawah ke kartu, sama dengan Beranda; juga jarak atas kolom kanan */
   }
 }
 </style>
