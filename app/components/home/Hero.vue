@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
+import { HERO_SLIDE_MS } from '~/config/home'
 
 const props = defineProps<{
   /** Slide hero, urutan = urutan slide. Kosong: hero tidak dirender; kurang dari 2: titik tidak dirender. */
@@ -10,9 +11,42 @@ const props = defineProps<{
 
 // Carousel manual (keputusan PM 1): tanpa putar otomatis, tanpa tombol prev/next dan geser sentuh.
 // Empat titik = tombol; roving tabindex; panah kiri/kanan (berputar), Home, End memindahkan fokus dan slide.
+// E3 (evaluasi pemilik): perpindahan slide = geser ke kiri (slide lama keluar ke kiri, slide baru masuk dari kanan, HERO_SLIDE_MS ease),
+// tanpa pergeseran tata letak (slide bertumpuk absolut di kotak tetap). Selama animasi slide lama tetap dirender tetapi `inert` +
+// `aria-hidden` (tidak fokus, tidak terbaca); setelah selesai kembali `hidden`. `prefers-reduced-motion: reduce` = berpindah instan.
 const selected = ref(0)
 const active = computed(() => Math.min(selected.value, props.articles.length - 1))
+const leaving = ref<number | null>(null)
+const entering = ref<number | null>(null)
 const dotEls: (HTMLElement | null)[] = []
+let settleTimer: ReturnType<typeof setTimeout> | undefined
+
+function settle() {
+  clearTimeout(settleTimer)
+  leaving.value = null
+  entering.value = null
+}
+
+function select(next: number) {
+  const current = active.value
+  if (next === current) return
+  selected.value = next
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    settle()
+    return
+  }
+  leaving.value = current
+  entering.value = next
+  // Cadangan bila animationend tidak datang (tab di latar belakang): bersihkan sedikit setelah durasi.
+  clearTimeout(settleTimer)
+  settleTimer = setTimeout(settle, HERO_SLIDE_MS + 100)
+}
+
+function onSlideAnimationEnd(event: AnimationEvent) {
+  if (event.target === event.currentTarget) settle()
+}
+
+onBeforeUnmount(() => clearTimeout(settleTimer))
 
 function onKeydown(event: KeyboardEvent) {
   if (event.altKey || event.ctrlKey || event.metaKey) return
@@ -26,15 +60,17 @@ function onKeydown(event: KeyboardEvent) {
     default: return
   }
   event.preventDefault()
-  selected.value = next
+  select(next)
   dotEls[next]?.focus()
 }
 
 // Chip = kategori pertama artikel (nama sudah didekode di server); tanpa kategori chip tidak dirender.
+// PAGE-003: kategori resmi = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul); non-resmi tetap teks.
 const slides = computed(() =>
   props.articles.map(article => ({
     article,
     category: article.categories[0]?.name ?? '',
+    categoryTo: article.categories[0] ? categoryLink(article.categories[0].slug) : null,
     href: articlePath(article),
     time: formatRelativeTime(article.publishedAt, props.now)
   }))
@@ -42,16 +78,26 @@ const slides = computed(() =>
 </script>
 
 <template>
-  <section v-if="articles.length" class="hero" aria-roledescription="carousel" aria-label="Berita utama">
+  <section
+    v-if="articles.length"
+    class="hero"
+    aria-roledescription="carousel"
+    aria-label="Berita utama"
+    :style="{ '--hero-slide-ms': `${HERO_SLIDE_MS}ms` }"
+  >
     <div class="slides" aria-live="polite">
       <div
         v-for="(slide, index) in slides"
         :key="slide.article.id"
         class="slide"
+        :class="{ 'slide--enter': entering === index, 'slide--leave': leaving === index }"
         role="group"
         aria-roledescription="slide"
         :aria-label="`${index + 1} dari ${slides.length}`"
-        :hidden="active !== index"
+        :hidden="active !== index && leaving !== index"
+        :aria-hidden="leaving === index ? 'true' : undefined"
+        :inert="leaving === index ? true : undefined"
+        @animationend="onSlideAnimationEnd"
       >
         <img
           v-if="slide.article.heroImage"
@@ -63,7 +109,10 @@ const slides = computed(() =>
           :loading="index === 0 ? 'eager' : 'lazy'"
           :fetchpriority="index === 0 ? 'high' : undefined"
         >
-        <p v-if="slide.category" class="chip">
+        <NuxtLink v-if="slide.category && slide.categoryTo" :to="slide.categoryTo" :aria-current="undefined" class="chip">
+          {{ slide.category }}
+        </NuxtLink>
+        <p v-else-if="slide.category" class="chip">
           {{ slide.category }}
         </p>
         <h2 class="title">
@@ -90,7 +139,7 @@ const slides = computed(() =>
         :aria-label="`Slide ${index + 1}`"
         :aria-current="active === index ? 'true' : 'false'"
         :tabindex="active === index ? 0 : -1"
-        @click="selected = index"
+        @click="select(index)"
       />
     </div>
   </section>
@@ -109,6 +158,8 @@ const slides = computed(() =>
 .slides {
   position: absolute;
   inset: 0;
+  overflow: hidden; /* E3: slide yang bergeser tidak keluar dari kotak hero */
+  border-radius: var(--radius-16);
 }
 
 .slide {
@@ -118,8 +169,8 @@ const slides = computed(() =>
   align-content: end;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto auto 8px; /* baris terakhir = ruang titik 90:2137 (56x8) */
-  grid-template-areas: 'chip' 'title' 'meta' 'dots';
-  row-gap: var(--space-16); /* 90:2150 gap 16 (chip, judul, titik) */
+  grid-template-areas: 'chip' 'title' 'meta' 'dots'; /* E3: penulis + waktu di bawah judul, kiri (sebelumnya kolom kanan 90:2142) */
+  row-gap: var(--space-16); /* 90:2150 gap 16 (chip, judul, meta, titik) */
   padding: 20px 20px 20px 30px; /* 90:2130 py 20, px 30; kanan 20 = 354 - 30 - 304 (kontainer 90:2150 lebar 304) */
   overflow: hidden;
   border-radius: var(--radius-16);
@@ -128,6 +179,42 @@ const slides = computed(() =>
 
 .slide[hidden] {
   display: none;
+}
+
+/* E3: animasi geser-kiri. Slide baru masuk dari kanan, slide lama keluar ke kiri, bersamaan (bersebelahan, tanpa tumpang tindih). */
+.slide--enter {
+  animation: hero-slide-in var(--hero-slide-ms) ease both;
+}
+
+.slide--leave {
+  animation: hero-slide-out var(--hero-slide-ms) ease both;
+}
+
+@keyframes hero-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes hero-slide-out {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide--enter,
+  .slide--leave {
+    animation: none;
+  }
 }
 
 /* Foto memenuhi kotak (object-fit: cover). Lapisan gelap [I]: Figma 21:4974/90:2130 tidak punya gradien atau overlay
@@ -210,6 +297,22 @@ const slides = computed(() =>
   text-overflow: ellipsis;
 }
 
+/* PAGE-003: chip tautan di atas overlay judul (z-index 2 > judul 1); hover bergaris bawah; fokus putih seperti titik (--color-focus tak terlihat di foto gelap) */
+.slide > .chip {
+  z-index: 2;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  a.chip:hover {
+    text-decoration: underline;
+  }
+}
+
 /* Judul mobile 90:2136: Merriweather SemiBold 19,2/24,96, lebar 186 (kolom judul) */
 .title {
   grid-area: title;
@@ -223,26 +326,26 @@ const slides = computed(() =>
   overflow-wrap: anywhere;
 }
 
-/* Penerbit dan waktu 90:2142: kolom 110, rata kanan, sebaris dengan dasar judul */
+/* Penerbit dan waktu (90:2142): E3 (evaluasi pemilik) dipindah dari kolom kanan ke kiri, sejajar tepi kiri judul, di bawah judul */
 .meta {
   grid-area: meta;
   align-self: end;
-  justify-self: end;
+  justify-self: start;
   pointer-events: none; /* klik di atas penerbit/waktu tembus ke tautan slide (PAGE-002) */
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
-  width: 110px; /* 90:2142 */
   max-width: 100%;
+  min-width: 0;
 }
 
 .publisher {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--space-8); /* 90:2143 */
-  width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -256,7 +359,7 @@ const slides = computed(() =>
 .author {
   min-width: 0;
   font: var(--type-caption); /* 90:2145 Inter Regular 13,333/18,666 */
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -305,20 +408,11 @@ const slides = computed(() =>
   outline-offset: 2px;
 }
 
-/* Layar sempit (< 402): penerbit dan waktu di bawah judul, kolom tunggal */
-@media (max-width: 401px) {
-  .meta {
-    width: auto;
-    justify-self: end;
-  }
-}
-
-/* Mobile 402 sampai tablet: dua kolom judul 186 | penerbit 110 (90:2148) */
+/* Mobile 402 sampai tablet: lebar judul 186 (90:2136) dipertahankan; penulis + waktu (E3) memakai seluruh lebar di bawah judul */
 @media (min-width: 402px) {
   .slide {
-    grid-template-columns: minmax(0, 186px) 110px; /* 90:2136 lebar judul 186, 90:2142 lebar 110 */
-    grid-template-rows: auto auto 8px;
-    grid-template-areas: 'chip chip' 'title meta' 'dots dots';
+    grid-template-columns: minmax(0, 186px) 110px; /* 90:2136 lebar judul 186 */
+    grid-template-areas: 'chip chip' 'title .' 'meta meta' 'dots dots';
   }
 }
 
@@ -329,16 +423,16 @@ const slides = computed(() =>
   }
 }
 
-/* Hero desktop 21:4974: 739x531, kolom kiri (chip, judul, titik) 379, kolom kanan (penerbit, waktu) 270 rata kanan */
+/* Hero desktop 21:4974: 739x531, kolom kiri (chip, judul, penulis + waktu, titik) 379 */
 @media (min-width: 1024px) {
   .hero {
     height: 531px; /* 21:4974 */
   }
 
   .slide {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto 12px; /* baris terakhir = ruang titik 21:4981 (72x12) */
-    grid-template-areas: 'chip meta' 'title meta' '. meta';
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto 12px; /* baris terakhir = ruang titik 21:4981 (72x12) */
+    grid-template-areas: 'chip' 'title' 'meta' 'dots';
     row-gap: var(--space-32); /* 21:4976 gap 32 (chip, judul, titik) */
     padding: 0 39px 50px 30px; /* 21:4974 pb 50, px 30; kanan 39 = 739 - 30 - 670 (kontainer 21:4975 lebar 670) */
   }
@@ -361,8 +455,8 @@ const slides = computed(() =>
   }
 
   .meta {
-    width: auto;
     max-width: 270px; /* 21:4986 */
+    margin-top: -16px; /* E3: jarak judul ke penulis 16 (row-gap 32 - 16); penulis ke titik tetap 32 */
     gap: var(--space-8); /* 21:4986 */
   }
 

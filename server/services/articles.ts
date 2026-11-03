@@ -1,10 +1,11 @@
-import type { Article, ArticleCategory, ArticleDetail, ArticleTag, VisualTopic } from '../../app/types/article'
+import type { Article, ArticleCategory, ArticleDetail, ArticleTag, CategoryPageResponse, VisualTopic } from '../../app/types/article'
 import { RELATED_BOTTOM_COUNT, RELATED_BOTTOM_MOBILE_COUNT, RELATED_SIDEBAR_COUNT } from '../../app/config/article'
 import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
 import { buildDefaultBody, buildDefaultExcerpt } from '../fixtures/article-content'
 import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories, buildMenuCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
 import { hasVisibleContent, readingMinutes, stripTags } from '../utils/article-detail'
+import { buildPagination, isPageInRange, sliceForPage } from '../utils/category-page'
 import type { RelatedCandidate } from '../utils/related-ranking'
 import { rankRelated, relatedBlocks } from '../utils/related-ranking'
 import { sanitizeArticleHtml } from '../utils/sanitize-article-html'
@@ -159,6 +160,19 @@ export function getVisualTopics(now: Date = new Date()): VisualTopic[] {
  */
 export function getCategories(): ArticleCategory[] {
   return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
+}
+
+/**
+ * Halaman kategori (PAGE-003): hanya 9 kategori resmi dari `getCategories()` (anak Ruang Visual dan slug lain = null),
+ * hanya status `publish`, terbaru dulu. `page` melewati halaman terakhir = null; halaman 1 kategori kosong tetap
+ * dikembalikan (artikel kosong, `totalPages` 0). Tidak ada `body`/HTML mentah di hasilnya.
+ */
+export function getCategoryPage(slug: string, page: number, perPage: number, now: Date = new Date()): Omit<CategoryPageResponse, 'now'> | null {
+  const category = getCategories().find(item => item.slug === slug)
+  if (!category) return null
+  const all = getPublishedArticles(now).filter(article => article.categories.some(item => item.slug === slug))
+  if (!isPageInRange(page, all.length, perPage)) return null
+  return { category, articles: sliceForPage(all, page, perPage), pagination: buildPagination(page, all.length, perPage) }
 }
 
 function mapTags(post: WpPost): ArticleTag[] {

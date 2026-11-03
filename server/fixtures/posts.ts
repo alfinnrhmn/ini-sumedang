@@ -45,6 +45,36 @@ const SEPAK_BOLA: WpTerm = { id: 5, slug: 'sepak-bola', name: 'Sepak Bola' }
 const TEKNOLOGI: WpTerm = { id: 10, slug: 'teknologi', name: 'Teknologi' }
 const EKONOMI: WpTerm = { id: 11, slug: 'ekonomi', name: 'Ekonomi' }
 const SELEBRITI: WpTerm = { id: 12, slug: 'selebriti', name: 'Selebriti' }
+// Hukum dan Jelajah (HOME-06): kategori resmi menu. Hukum dipakai paginasi halaman kategori (PAGE-003); Jelajah kosong di set `figma`.
+const HUKUM: WpTerm = { id: 8, slug: 'hukum', name: 'Hukum' }
+const JELAJAH: WpTerm = { id: 13, slug: 'jelajah', name: 'Jelajah' }
+
+/** Judul 23 artikel Hukum set `figma` [I] (PAGE-003): 3 halaman pada 10 per halaman, halaman terakhir parsial (3). */
+const HUKUM_TITLES = [
+  'Pengadilan Negeri Sumedang Mulai Terapkan Layanan Sidang Elektronik',
+  'Warga Diajak Pahami Hak dan Kewajiban dalam Transaksi Jual Beli Tanah',
+  'Penyuluhan Hukum Menyasar Pelajar untuk Mencegah Perundungan',
+  'Polres Sumedang Tingkatkan Patroli Siber Cegah Penipuan Daring',
+  'Bantuan Hukum Gratis Tersedia bagi Warga Kurang Mampu',
+  'Kejaksaan Negeri Sosialisasikan Penyelesaian Perkara di Luar Pengadilan',
+  'Perda Ketertiban Umum Kembali Dibahas Bersama Perwakilan Warga',
+  'Notaris Ingatkan Pentingnya Akta Resmi untuk Usaha Kecil',
+  'Layanan Pengaduan Konsumen Dibuka di Setiap Kantor Kecamatan',
+  'Kasus Sengketa Batas Lahan Desa Diselesaikan Lewat Mediasi',
+  'Pelatihan Paralegal Desa Diikuti Puluhan Perangkat Kelurahan',
+  'Aturan Baru Perlindungan Data Pribadi Mulai Disosialisasikan',
+  'Satpol PP Tertibkan Reklame Tanpa Izin di Jalur Utama Kota',
+  'Pakar Hukum Bahas Tanggung Jawab Platform Digital terhadap Pengguna',
+  'Lembaga Bantuan Hukum Dampingi Korban Penipuan Investasi',
+  'Ombudsman Terima Aduan Layanan Perizinan yang Berbelit',
+  'Sosialisasi Hukum Waris Bantu Keluarga Hindari Sengketa',
+  'Pemkab Sumedang Siapkan Rancangan Perda Perlindungan Pekerja Informal',
+  'Diskusi Publik Soroti Penegakan Aturan Lalu Lintas di Jalan Desa',
+  'Mahasiswa Hukum Gelar Klinik Konsultasi Gratis untuk Warga',
+  'Hakim Mediator Tekankan Perdamaian pada Perkara Keluarga',
+  'Aparat Desa Dilatih Menyusun Peraturan Desa yang Partisipatif',
+  'Warga Antusias Ikuti Sosialisasi Hukum Pertanahan di Balai Desa'
+]
 
 // Tag editor (PRD §3.6): `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
 const TERPOPULER: WpTerm = { id: 31, slug: 'terpopuler', name: 'Terpopuler' }
@@ -220,7 +250,12 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(96, 21 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 8),
     // [I] anak ke-5 (lebih lama): ada artikel, tetapi tidak termasuk 4 topik terbaru
     p(97, 3 * DAY + 2 * HOUR, 'Pagelaran Seni Tradisional Sumedang Kembali Digelar', V_BUDAYA, 1),
-    p(98, 3 * DAY + 5 * HOUR, 'Pengrajin Lokal Perkenalkan Kerajinan Khas Sumedang', V_BUDAYA, 2)
+    p(98, 3 * DAY + 5 * HOUR, 'Pengrajin Lokal Perkenalkan Kerajinan Khas Sumedang', V_BUDAYA, 2),
+
+    // Hukum (PAGE-003 K: paginasi halaman kategori). 23 artikel [I, dikarang untuk fixture] = 3 halaman (10 + 10 + 3) pada
+    // 10 per halaman. Semua LEBIH LAMA dari 15 hari (jauh di bawah semua artikel Beranda, kolom samping, dan Ruang Visual) dan tanpa tag,
+    // sehingga 8 kartu Rekomendasi, hero, kolom samping, section HOME-02, dan Ruang Visual tidak berubah. Gambar memakai ulang figma-1..8.
+    ...HUKUM_TITLES.map((title, index) => p(120 + index, (16 + index) * DAY + (index % 5) * 3 * HOUR, title, HUKUM, (index % 8) + 1))
   ]
   // Tag topik (PAGE-002): hanya menambah grup tag; tidak mengubah kategori, judul, tanggal, atau tag `terpopuler`.
   return posts.map((post) => {
@@ -318,7 +353,16 @@ export function buildEdgePosts(now: Date): WpPost[] {
     detail(307, 'edge-draft', 29 * DAY, 'Draft yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Draft'), {}, 'draft'),
     detail(308, 'edge-private', 29 * DAY + 60, 'Artikel privat yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Privat'), {}, 'private'),
     // Isi hanya spasi/tag kosong (L-1): server mengembalikan bodyHtml '' sehingga pesan netral tampil, bukan div kosong.
-    detail(309, 'edge-isi-spasi', 29 * DAY + 120, 'Artikel dengan Isi Hanya Spasi Menampilkan Pesan Netral', BERITA, img(2, 'Foto artikel isi spasi'), { content: { rendered: '  <p> </p>\n<p>&nbsp;</p>\n<p><br></p>  ' } })
+    detail(309, 'edge-isi-spasi', 29 * DAY + 120, 'Artikel dengan Isi Hanya Spasi Menampilkan Pesan Netral', BERITA, img(2, 'Foto artikel isi spasi'), { content: { rendered: '  <p> </p>\n<p>&nbsp;</p>\n<p><br></p>  ' } }),
+
+    // Halaman kategori (PAGE-003). Semua LEBIH LAMA dari artikel edge lain (>= 31 hari), tanpa tag, sehingga Beranda edge tidak berubah.
+    // Hukum: tepat 10 artikel terbit (= 1 halaman penuh; halaman=2 harus 404) + draft dan private terbaru yang tidak boleh tampil.
+    ...Array.from({ length: 10 }, (_, index) => post(311 + index, 'publish', (31 + index) * DAY, `Berita Hukum Edge ${index + 1}`, HUKUM, img((index % 8) + 1, `Hukum edge ${index + 1}`))),
+    post(321, 'draft', 3, 'Draft Hukum yang tidak boleh tampil di halaman kategori', HUKUM, img(1, 'Draft')),
+    post(322, 'private', 4, 'Artikel privat Hukum yang tidak boleh tampil di halaman kategori', HUKUM, img(1, 'Privat')),
+    // Jelajah: kategori resmi tanpa artikel terbit (hanya draft/private) = keadaan kosong halaman kategori.
+    post(323, 'draft', 5, 'Draft Jelajah yang tidak boleh tampil di halaman kategori', JELAJAH, img(1, 'Draft')),
+    post(324, 'private', 6, 'Artikel privat Jelajah yang tidak boleh tampil di halaman kategori', JELAJAH, img(1, 'Privat'))
   ]
 }
 
@@ -328,10 +372,8 @@ export function buildEdgeVisualCategories(): WpTerm[] {
 }
 
 // Kategori menu header dan laci (HOME-06): 9 kategori resmi (PRD §4.4), urutan menu Figma 21:4951.
-// Hukum dan Jelajah belum punya artikel di fixture; id dan slug [I], final di gerbang WordPress.
+// Hukum dan Jelajah: id dan slug [I], final di gerbang WordPress (deklarasi ada di atas, dekat kategori lain).
 // Bukan bagian dari 8 kartu Rekomendasi atau section Beranda; kategori anak Ruang Visual tidak termasuk.
-const HUKUM: WpTerm = { id: 8, slug: 'hukum', name: 'Hukum' }
-const JELAJAH: WpTerm = { id: 13, slug: 'jelajah', name: 'Jelajah' }
 
 /** 9 kategori resmi untuk menu (sama di set `figma` dan `edge`). */
 export function buildMenuCategories(): WpTerm[] {

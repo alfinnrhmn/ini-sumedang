@@ -79,14 +79,19 @@ const wideHeadingId = useId()
         </p>
         <ArticleShare class="share" :url="canonical" :title="article.title" />
       </article>
-      <aside v-if="detail.related.sidebar.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
-        <ArticleRelatedHeading title="Berita Terkait" variant="sidebar" :heading-id="sidebarHeadingId" />
-        <ul class="sidebar-list">
-          <li v-for="item in detail.related.sidebar" :key="item.id">
-            <NewsCard :article="item" :now="now" layout="compact" media-end />
-          </li>
-        </ul>
-      </aside>
+      <!-- Kolom kanan desktop (E6, papan iklan): iklan 357x237 (128:503) di atas Berita Terkait dan 357x368 (128:508) di bawahnya; mobile 130:2945 tanpa iklan -->
+      <div class="sidebar-col">
+        <AdSlot variant="sidebar-m" />
+        <aside v-if="detail.related.sidebar.length" class="sidebar" :aria-labelledby="sidebarHeadingId">
+          <ArticleRelatedHeading title="Berita Terkait" variant="sidebar" :heading-id="sidebarHeadingId" />
+          <ul class="sidebar-list">
+            <li v-for="item in detail.related.sidebar" :key="item.id">
+              <NewsCard :article="item" :now="now" layout="compact" media-end />
+            </li>
+          </ul>
+        </aside>
+        <AdSlot variant="sidebar-l" />
+      </div>
     </div>
     <section v-if="detail.related.bottomMobile.length" class="bottom bottom--compact" :aria-labelledby="compactHeadingId">
       <ArticleRelatedHeading title="Berita Terkait" variant="bottom" :heading-id="compactHeadingId" />
@@ -162,7 +167,7 @@ const wideHeadingId = useId()
   margin-top: var(--space-24);
 }
 
-.sidebar {
+.sidebar-col {
   display: none;
 }
 
@@ -229,8 +234,11 @@ const wideHeadingId = useId()
     font: 400 12px/18px var(--font-sans);
   }
 
-  .sidebar {
-    display: block;
+  /* Sidebar 357 dari 1120; Figma 127:2170: iklan 128:503 (y 232) setelah widget sosial yang belum dibangun (SOC-001), Berita Terkait, iklan 128:508 (celah 32) */
+  .sidebar-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
     width: calc(100% * 357 / 1120);
   }
 

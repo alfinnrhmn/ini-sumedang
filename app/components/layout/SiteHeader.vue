@@ -18,10 +18,21 @@ async function closeDrawer() {
   toggleButton.value?.focus()
 }
 
+// PAGE-003: mengikuti tautan kategori di laci menutup laci TANPA mengembalikan fokus ke hamburger (halaman tujuan memindahkan fokus
+// ke <h1>-nya). Navigasi ke rute lain ditangani watcher di bawah; tautan menuju halaman yang SEDANG dibuka tidak mengubah rute,
+// jadi laci ditutup dan fokus dipindah ke <h1> di sini.
 const route = useRoute()
 watch(() => route.fullPath, () => {
   if (open.value) open.value = false
 })
+
+async function onDrawerNavigate(to: string) {
+  open.value = false
+  if (to === route.fullPath) {
+    await nextTick()
+    focusPageHeading()
+  }
+}
 </script>
 
 <template>
@@ -68,6 +79,7 @@ watch(() => route.fullPath, () => {
         :open="open"
         :categories="categories"
         @close="closeDrawer"
+        @navigate="onDrawerNavigate"
       />
     </template>
   </header>

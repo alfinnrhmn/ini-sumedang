@@ -37,3 +37,6 @@ export const POPULAR_TAG_SLUG = 'terpopuler'
 
 /** Hero Beranda (HOME-07): jumlah slide = jumlah titik di Figma [V 21:4981 dan 90:2137: 4 titik]. */
 export const HERO_SLIDE_COUNT = 4
+
+/** Durasi animasi geser-kiri hero (E3, evaluasi pemilik; rentang 350-450 ms, ease). Satu sumber untuk CSS (variabel) dan cadangan waktu. */
+export const HERO_SLIDE_MS = 400

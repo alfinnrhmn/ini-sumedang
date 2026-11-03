@@ -7,6 +7,11 @@ import type { ArticleDetail } from '~/types/article'
 const props = defineProps<{ article: ArticleDetail }>()
 
 const category = computed(() => props.article.categories[0]?.name ?? '')
+// PAGE-003: kategori resmi = tautan ke /kategori/<slug>; label kedua (tag) tetap teks biasa.
+const categoryTo = computed(() => {
+  const first = props.article.categories[0]
+  return first ? categoryLink(first.slug) : null
+})
 const tag = computed(() => props.article.tags[0]?.name ?? '')
 const date = computed(() => formatPublishDate(props.article.publishedAt))
 </script>
@@ -14,7 +19,8 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
 <template>
   <header class="head">
     <p v-if="category || tag" class="label">
-      <span v-if="category">{{ category }}</span>
+      <NuxtLink v-if="category && categoryTo" :to="categoryTo" :aria-current="undefined" class="category-link">{{ category }}</NuxtLink>
+      <span v-else-if="category">{{ category }}</span>
       <span v-if="category && tag" class="dot" aria-hidden="true" />
       <span v-if="tag">{{ tag }}</span>
     </p>
@@ -57,6 +63,13 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
   font: var(--type-card-label-mobile);
   text-transform: uppercase;
   color: var(--color-brand);
+}
+
+/* PAGE-003: tautan kategori mewarisi warna dan huruf label; hover bergaris bawah */
+@media (hover: hover) {
+  .category-link:hover {
+    text-decoration: underline;
+  }
 }
 
 .dot {

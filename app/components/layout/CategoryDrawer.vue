@@ -4,14 +4,15 @@ import type { ArticleCategory } from '~/types/article'
 // Laci kategori (HOME-06, G20): panel samping dari kiri, sama di desktop dan mobile. Visual = "Usulan visual" di
 // docs/tasks/HOME-06.md (disetujui pemilik 1 Nov 2026). Tertutup = atribut `hidden` (isi tetap ada di HTML server).
 // Terbuka: fokus ke tombol tutup, fokus terkurung di panel, Esc menutup, scroll halaman dikunci.
-// Pemanggil mengembalikan fokus ke tombol hamburger saat `close` dipancarkan.
+// Pemanggil mengembalikan fokus ke tombol hamburger saat `close` dipancarkan. Mengikuti tautan kategori (PAGE-003) memancarkan
+// `navigate` (tujuan = path kategori): pemanggil menutup laci TANPA mengembalikan fokus ke hamburger (fokus pindah ke h1 halaman tujuan).
 const props = defineProps<{
   open: boolean
   /** id elemen dialog; dipakai aria-controls pada tombol hamburger */
   id: string
   categories: ArticleCategory[]
 }>()
-const emit = defineEmits<{ close: [] }>()
+const emit = defineEmits<{ close: [], navigate: [to: string] }>()
 
 const titleId = `${props.id}-title`
 const panel = ref<HTMLElement | null>(null)
@@ -29,6 +30,14 @@ function unlockScroll() {
   const root = document.documentElement
   root.style.overflow = ''
   root.style.paddingRight = ''
+}
+
+// Klik biasa (tombol utama, tanpa pengubah) pada tautan kategori = navigasi. Ctrl/Cmd/Shift/Alt-klik (tab/jendela baru) tidak menutup laci.
+// Didelegasikan ke <li> agar tidak bergantung pada cara NuxtLink meneruskan onClick.
+function onItemClick(event: MouseEvent, slug: string) {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+  if (!(event.target instanceof Element) || !event.target.closest('a[href]')) return
+  emit('navigate', categoryPath(slug))
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -113,7 +122,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <ul class="list">
-        <li v-for="category in categories" :key="category.id">
+        <li v-for="category in categories" :key="category.id" @click="onItemClick($event, category.slug)">
           <LayoutCategoryLabel :category="category" class="item" />
         </li>
       </ul>
@@ -218,8 +227,14 @@ onBeforeUnmount(() => {
   color: var(--color-brand);
 }
 
-a.item:hover,
+/* Aktif (aria-current) selalu berlaku; :hover hanya pada perangkat yang mendukung hover agar latar tidak menempel setelah ketuk di layar sentuh. */
 a.item[aria-current="page"] {
   background: var(--color-surface);
+}
+
+@media (hover: hover) {
+  a.item:hover {
+    background: var(--color-surface);
+  }
 }
 </style>

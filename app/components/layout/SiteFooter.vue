@@ -36,11 +36,7 @@ const SEPARATOR = '  •  '
           <h2 class="col-title">
             {{ section.title }}
           </h2>
-          <ul
-            class="list"
-            :class="{ 'list--split': section.columns }"
-            :style="section.columns ? { '--rows': Math.ceil(section.links.length / section.columns) } : undefined"
-          >
+          <ul class="list">
             <li v-for="link in section.links" :key="link.label">
               <LayoutFooterLabel :link="link" />
             </li>
@@ -134,6 +130,18 @@ ul {
 
 .logo {
   object-fit: cover;
+}
+
+/* PAGE-003: tautan footer (kategori, Beranda). Hover dan kategori aktif = garis bawah (pola hover kartu/breadcrumb; footer tidak punya
+   gaya hover sebelumnya, tanpa token baru). Aktif hanya untuk tautan kategori: penanda otomatis "Beranda" di Beranda tidak diberi gaya. */
+@media (hover: hover) {
+  .footer a:hover {
+    text-decoration: underline;
+  }
+}
+
+.footer a[data-category][aria-current="page"] {
+  text-decoration: underline;
 }
 
 /* ---------- Mobile 101:2600 (402 x 444) ---------- */
@@ -291,8 +299,10 @@ ul {
   .columns {
     display: grid;
     grid-template-columns: 230px 265px 1fr; /* kolom di x 0, 230, 495 */
-    min-height: 152px; /* garis legal 88:468 di y 226 */
+    align-items: start; /* kolom Navigasi, Kategori, Tentang sejajar atas; hanya Kategori (9 item, satu kolom, E7) yang lebih tinggi */
+    min-height: 152px; /* garis legal 88:468 di y 226; kolom Kategori satu kolom lebih tinggi, jadi footer melebihi 270 (pilihan pemilik E7) */
     padding-top: var(--space-24); /* judul kolom y 98 setelah garis y 74 */
+    padding-bottom: 25px; /* jarak item terakhir kolom terpanjang ke garis legal: 60:486 kolom berakhir ±201, garis 88:468 di y 226 (±25); 25 di luar skala [I] */
   }
 
   .col-title {
@@ -303,14 +313,6 @@ ul {
   .list {
     margin-top: 2.4px; /* daftar y 126, judul berakhir y 123,6 */
     font: var(--type-caption);
-  }
-
-  /* Kategori 9 item (keputusan pemilik; Figma 4 item): dua kolom 5 + 4 agar tinggi footer tetap 270 */
-  .list--split {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(var(--rows), auto);
-    grid-auto-flow: column;
   }
 
   .legal-d {

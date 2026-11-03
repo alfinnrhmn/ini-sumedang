@@ -59,32 +59,70 @@ const sections = computed(() =>
         <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
       </aside>
     </div>
+    <!-- Papan iklan (E6): penampung statis `AdSlot` di posisi iklan frame final. Rekomendasi: 237 + 368 di kolom kanan (desktop 57:589, 63:600),
+         lebar 737 setelah baris ketiga (desktop 84:1442), 354x78 setelah kartu ketiga (mobile 165:1933). Rekomendasi dan Ruang Visual tanpa "Lainnya" (E4). -->
     <section class="recommended">
       <HomeSectionTitle title="Rekomendasi" />
       <ul v-if="data && data.articles.length" class="list">
-        <li v-for="(article, index) in data.articles" :key="article.id">
-          <NewsCard :article="article" :now="data.now" :eager="index < 2" />
-        </li>
+        <template v-for="(article, index) in data.articles" :key="article.id">
+          <li>
+            <NewsCard :article="article" :now="data.now" :eager="index < 2" />
+          </li>
+          <li v-if="index === 2" class="ad-item ad-item--compact">
+            <AdSlot variant="mobile-s" />
+          </li>
+          <li v-if="index === 5" class="ad-item ad-item--wide">
+            <AdSlot variant="wide-m" />
+          </li>
+        </template>
       </ul>
       <p v-else class="empty">
         Belum ada berita.
       </p>
+      <div class="side-ads">
+        <AdSlot variant="sidebar-m" />
+        <AdSlot variant="sidebar-l" />
+      </div>
     </section>
-    <template v-for="section in sections" :key="section.slug">
-      <section v-if="section.articles.length" class="category-section">
-        <HomeSectionTitle :title="section.title" />
+    <template v-for="(section, sectionIndex) in sections" :key="section.slug">
+      <!-- Section kategori pertama membawa slot iklan: 357x78 di kolom kanan (desktop 63:627), 354x237 setelah kartu ketiga (mobile 165:1944) -->
+      <section v-if="section.articles.length" class="category-section" :class="{ 'category-section--ad': sectionIndex === 0 }">
+        <HomeSectionTitle
+          :title="section.title"
+          :more-to="categoryPath(section.slug)"
+          :more-label="`Lainnya: ${section.title}`"
+        />
         <ul class="list">
-          <li v-for="article in section.articles" :key="article.id">
-            <NewsCard :article="article" :now="section.now" />
-          </li>
+          <template v-for="(article, index) in section.articles" :key="article.id">
+            <li>
+              <NewsCard :article="article" :now="section.now" />
+            </li>
+            <li v-if="sectionIndex === 0 && index === 2" class="ad-item ad-item--compact">
+              <AdSlot variant="mobile-m" />
+            </li>
+          </template>
         </ul>
-      </section>
-      <section v-if="section.slug === VISUAL_AFTER_SLUG && visual && visual.topics.length" class="category-section">
-        <HomeSectionTitle title="Ruang Visual" />
-        <div class="topics">
-          <HomeVisualTopic v-for="entry in visual.topics" :key="entry.topic.id" :entry="entry" />
+        <div v-if="sectionIndex === 0" class="section-ad">
+          <AdSlot variant="sidebar-s" />
         </div>
       </section>
+      <!-- Mobile 100:2448 (354x237) dan 100:2536 (354x78): sebelum Ruang Visual -->
+      <div v-if="sectionIndex === 0 && section.articles.length" class="mobile-ads">
+        <AdSlot variant="mobile-m" />
+        <AdSlot variant="mobile-s" />
+      </div>
+      <template v-if="section.slug === VISUAL_AFTER_SLUG && visual && visual.topics.length">
+        <section class="category-section">
+          <HomeSectionTitle title="Ruang Visual" />
+          <div class="topics">
+            <HomeVisualTopic v-for="entry in visual.topics" :key="entry.topic.id" :entry="entry" />
+          </div>
+        </section>
+        <!-- Desktop 63:595 (1118x159): setelah Ruang Visual -->
+        <div class="wide-ad">
+          <AdSlot variant="wide-l" />
+        </div>
+      </template>
     </template>
   </main>
 </template>
@@ -127,8 +165,38 @@ const sections = computed(() =>
   margin-top: 33px;
 }
 
+/* Slot iklan (E6) di dalam daftar kartu: mobile (< 768, satu kolom) 354x78 / 354x237 setelah kartu ketiga (165:1933, 165:1944);
+   tablet dan desktop (>= 768) 737x107 setelah kartu keenam (84:1442). Salah satu disembunyikan (display: none) sesuai lebar. */
+.ad-item {
+  grid-column: 1 / -1;
+}
+
+.ad-item--wide,
+.side-ads,
+.section-ad,
+.wide-ad {
+  display: none;
+}
+
+/* Mobile: dua iklan sebelum Ruang Visual, jarak 32 (100:2448 berakhir y 3317, 100:2536 y 3349) */
+.mobile-ads {
+  display: grid;
+  gap: var(--space-32);
+  margin-top: 30px; /* jarak section mobile */
+}
+
 .top + .recommended {
   margin-top: 34px;
+}
+
+@media (min-width: 768px) {
+  .ad-item--compact {
+    display: none;
+  }
+
+  .ad-item--wide {
+    display: block;
+  }
 }
 
 /* Jarak antar section: mobile 30 (165:1735 y 1733 ke akhir kartu y 1703), desktop 50 (kartu 48:475 berakhir y 6334, judul 57:505 y 6384) */
@@ -171,13 +239,37 @@ const sections = computed(() =>
     margin-left: auto;
   }
 
-  .hero-slot + .sidebar {
-    margin-top: 0;
+  /* E2: tab kolom samping mulai 17 di atas hero (130:2202 y 161, hero 21:4974 y 178); tab 50 + celah 16 + daftar 482 = 548, jadi daftar berakhir
+     di y 709 = dasar hero (178 + 531). Tinggi baris atas = 531, Rekomendasi tepat di bawah keduanya. */
+  .hero-slot + .sidebar,
+  .sidebar {
+    margin-top: -17px;
   }
 
   /* Dasar baris atas (hero 21:4974 y 178 + 531 = 709, daftar kolom samping 34:354 berakhir y 709) ke judul Rekomendasi 42:376 (y 782): 73 */
   .top + .recommended {
     margin-top: 73px;
+  }
+
+  /* Rekomendasi: judul selebar kontainer (42:374), daftar di kolom kiri 739, iklan 237 + 368 di kolom kanan 357 (923 = 160 + 739 + 24) */
+  .recommended {
+    display: grid;
+    grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
+    justify-content: space-between;
+  }
+
+  .recommended > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .side-ads {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32); /* 57:589 berakhir y 1317, 63:600 mulai y 1349 */
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    margin-top: 28px; /* sejajar kartu pertama (garis ke kartu 28) */
   }
 
   /* Kolom kiri 739 dari 1120 */
@@ -198,8 +290,43 @@ const sections = computed(() =>
   }
 
   /* Lebar 739 sudah ditetapkan pada .category-section; daftar di dalamnya mengisi penuh agar tidak dipersempit dua kali */
-  .category-section .list {
+  .category-section .list,
+  .recommended .list {
     width: 100%;
+  }
+
+  /* Section kategori pertama: iklan 357x78 di kolom kanan sejajar kartu pertama (63:627 y 3019 = kartu 48:385 y 3019) */
+  .category-section--ad {
+    display: grid;
+    grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .category-section--ad > :not(.section-ad) {
+    grid-column: 1;
+  }
+
+  .section-ad {
+    display: block;
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    margin-top: 28px;
+  }
+
+  .mobile-ads {
+    display: none;
+  }
+
+  /* 63:595 (1118x159) y 4874, 63 di bawah Ruang Visual (berakhir 4811); judul Nasional y 5053, 20 di bawah iklan (berakhir 5033) */
+  .wide-ad {
+    display: block;
+    margin-top: 63px;
+  }
+
+  .wide-ad + .category-section {
+    margin-top: 20px;
   }
 }
 </style>

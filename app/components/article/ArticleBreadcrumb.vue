@@ -2,14 +2,14 @@
 import type { ArticleCategory } from '~/types/article'
 
 // Breadcrumb Detail (130:2399 desktop, 130:3331 mobile): Beranda > kategori > judul.
-// "Beranda" = tautan ke "/". Kategori = teks biasa selama `categoryPath` null (PAGE-003 belum ada), tautan bila terisi.
+// "Beranda" = tautan ke "/". Kategori resmi = tautan ke /kategori/<slug> (PAGE-003); kategori non-resmi tetap teks biasa.
 // Judul = halaman saat ini (aria-current="page"), bukan tautan; satu baris, dipotong "..." bila panjang.
 const props = defineProps<{
   category: ArticleCategory | null
   title: string
 }>()
 
-const categoryTo = computed(() => (props.category ? categoryPath(props.category.slug) : null))
+const categoryTo = computed(() => (props.category ? categoryLink(props.category.slug) : null))
 </script>
 
 <template>

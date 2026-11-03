@@ -92,3 +92,23 @@ export type HeroResponse = RecommendedResponse
 export interface CategoriesResponse {
   categories: ArticleCategory[]
 }
+
+/** Metadata paginasi halaman kategori (PAGE-003). `totalPages` 0 = kategori tanpa artikel terbit. */
+export interface CategoryPagination {
+  page: number
+  perPage: number
+  total: number
+  totalPages: number
+}
+
+/**
+ * Respons `/api/category/<slug>?halaman=N` (PAGE-003): kategori resmi, artikel terbit halaman itu (terbaru dulu, tanpa isi `body`),
+ * dan paginasi. `articles` kosong hanya pada halaman 1 kategori tanpa artikel (keadaan kosong).
+ */
+export interface CategoryPageResponse {
+  category: ArticleCategory
+  articles: Article[]
+  pagination: CategoryPagination
+  /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
+  now: string
+}

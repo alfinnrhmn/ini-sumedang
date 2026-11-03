@@ -60,9 +60,15 @@ defineProps<{ categories: ArticleCategory[] }>()
 
 /* State (tidak digambar di Figma; usulan turunan token, Keputusan PM 5). Aktif 130:2098: latar abu gelap alfa 20 % (42,42,42)
    dipetakan ke --color-black-3 (40,40,40) alfa 20 % (selisih R/G/B 2/2/2, alfa sama); teks oranye (245,178,65) tak punya token
-   (--color-warning selisih R/G/B 19/7/6 > 4) -> deviasi: teks tetap putih. Hitungan dan kontras ada di Bukti HOME-06. */
-a.item:hover,
+   (--color-warning selisih R/G/B 19/7/6 > 4) -> deviasi: teks tetap putih. Hitungan dan kontras ada di Bukti HOME-06.
+   Aktif (aria-current) selalu berlaku; :hover hanya pada perangkat yang mendukung hover agar latar tidak menempel setelah ketuk di layar sentuh. */
 a.item[aria-current="page"] {
   background: color-mix(in srgb, var(--color-black-3) 20%, transparent);
+}
+
+@media (hover: hover) {
+  a.item:hover {
+    background: color-mix(in srgb, var(--color-black-3) 20%, transparent);
+  }
 }
 </style>

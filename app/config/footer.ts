@@ -1,20 +1,26 @@
 /**
  * Konfigurasi footer (HOME-05). Satu daftar untuk footer desktop (60:486) dan mobile (101:2600).
  * `to: null` = teks biasa (bukan <a>, tanpa href, tidak dapat difokus); `to` terisi (path internal "/…") = tautan.
- * Label kategori dari daftar resmi (PRD §4.4), bukan teks Figma (ada salah ketik di desain); slug kategori
- * ditambahkan saat halaman kategori (PAGE-003) ada.
+ * Label kategori dari daftar resmi (PRD §4.4), bukan teks Figma (ada salah ketik di desain); `to` kategori = `categoryPath(slug)` (PAGE-003).
  */
+import { categoryPath } from '../utils/routes.ts'
+
 export interface FooterLink {
   label: string
   to: string | null
+  /** Hanya tautan kategori: slug kategori resmi (dasar `aria-current` saat halaman kategori itu dibuka). */
+  slug?: string
+}
+
+/** Tautan kategori footer: `to` selalu dari `categoryPath` (satu tempat bentuk URL kategori). */
+function categoryItem(label: string, slug: string): FooterLink {
+  return { label, slug, to: categoryPath(slug) }
 }
 
 export interface FooterSection {
   id: string
   title: string
   links: FooterLink[]
-  /** Kolom daftar pada desktop (default 1). Kategori 9 item dibagi dua kolom agar tinggi footer tetap 270. */
-  columns?: 2
 }
 
 export interface FooterSocial {
@@ -42,17 +48,16 @@ export const FOOTER_SECTIONS: FooterSection[] = [
   {
     id: 'kategori',
     title: 'Kategori',
-    columns: 2,
     links: [
-      { label: 'Berita', to: null },
-      { label: 'Nasional', to: null },
-      { label: 'Pemerintahan', to: null },
-      { label: 'Politik', to: null },
-      { label: 'Hukum', to: null },
-      { label: 'Sepak Bola', to: null },
-      { label: 'Otomotif', to: null },
-      { label: 'Jelajah', to: null },
-      { label: 'Bisnis & Teknologi', to: null }
+      categoryItem('Berita', 'berita'),
+      categoryItem('Nasional', 'nasional'),
+      categoryItem('Pemerintahan', 'pemerintahan'),
+      categoryItem('Politik', 'politik'),
+      categoryItem('Hukum', 'hukum'),
+      categoryItem('Sepak Bola', 'sepak-bola'),
+      categoryItem('Otomotif', 'otomotif'),
+      categoryItem('Jelajah', 'jelajah'),
+      categoryItem('Bisnis & Teknologi', 'bisnis-teknologi')
     ]
   },
   {

@@ -22,6 +22,12 @@ const props = defineProps<{
 
 const href = computed(() => articlePath(props.article))
 const category = computed(() => props.article.categories[0]?.name ?? '')
+// PAGE-003: nama kategori resmi menjadi tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); kategori non-resmi tetap teks.
+// `:aria-current="undefined"` pada tautan: penanda otomatis NuxtLink (rute sama, query diabaikan) tidak dipakai di kartu; hanya menu, laci, dan footer yang menandai kategori aktif.
+const categoryTo = computed(() => {
+  const first = props.article.categories[0]
+  return first ? categoryLink(first.slug) : null
+})
 const time = computed(() => formatRelativeTime(props.article.publishedAt, props.now))
 </script>
 
@@ -39,7 +45,12 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
     </div>
     <div class="body">
       <p v-if="category" class="category">
-        {{ category }}
+        <NuxtLink v-if="categoryTo" :to="categoryTo" :aria-current="undefined" class="category-link">
+          {{ category }}
+        </NuxtLink>
+        <template v-else>
+          {{ category }}
+        </template>
       </p>
       <h3 class="title">
         <NuxtLink v-if="href" :to="href" class="link">
@@ -93,6 +104,19 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 .category {
   font: var(--type-card-mobile-category);
   color: var(--color-black);
+}
+
+/* PAGE-003: label kategori = tautan terpisah di atas overlay judul (z-index 1 > overlay auto), warna dan dekorasi diwarisi, hover bergaris bawah.
+   Teks label tidak berubah; hanya area teksnya yang menaut (bukan seluruh baris). */
+.category-link {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .category-link:hover {
+    text-decoration: underline;
+  }
 }
 
 .title {

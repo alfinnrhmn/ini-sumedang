@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import type { ArticleCategory } from '~/types/article'
-import { categoryPath } from '~/utils/routes'
 
-// Item menu/laci kategori (HOME-06). `categoryPath` null (sebelum PAGE-003) = teks biasa: bukan <a>, tanpa href,
-// tidak dapat difokus. Bila terisi = tautan internal; halaman yang sedang dibuka diberi aria-current="page".
+// Item menu/laci kategori (HOME-06, PAGE-003). Kategori resmi = tautan internal /kategori/<slug> (satu tab stop); selain itu
+// teks biasa (tanpa <a>). `aria-current="page"` hanya pada kategori yang sedang dibuka, berbasis slug rute sehingga
+// `?halaman=N` tetap dihitung; di halaman lain tidak ada (nilai `undefined` juga menimpa penanda otomatis NuxtLink).
 const props = defineProps<{ category: ArticleCategory }>()
 
-const to = computed(() => categoryPath(props.category.slug))
+const to = computed(() => categoryLink(props.category.slug))
+const route = useRoute()
+const current = computed(() => isCategoryRoute(route, props.category.slug))
 </script>
 
 <template>
-  <NuxtLink v-if="to" :to="to">
+  <NuxtLink v-if="to" :to="to" :aria-current="current ? 'page' : undefined">
     {{ category.name }}
   </NuxtLink>
   <span v-else>{{ category.name }}</span>
