@@ -555,28 +555,30 @@ a.chip::after {
     line-clamp: 4;
   }
 
+  /* Keputusan pemilik 4 Nov 2026: blok penerbit + waktu desktop diperkecil (Figma 21:4986 avatar 50, nama 23,04, waktu 18 terlalu besar) agar
+     compact dan profesional: avatar 32, nama 16, waktu 13,333, celah dan jarak diperkecil sebanding (~0,64). Mobile/tablet tidak berubah. */
   .meta {
     max-width: 270px; /* 21:4986 */
-    margin-top: -16px; /* E3: jarak judul ke penulis 16 (row-gap 32 - 16); penulis ke titik tetap 32 */
-    gap: var(--space-8); /* 21:4986 */
+    margin-top: -16px; /* jarak judul ke penulis tetap 16 (row-gap 32 - 16): garis dasar judul sudah memberi ruang tambahan */
+    margin-bottom: -12px; /* jarak penulis ke titik 32 -> 20 (32 x 0,64), tanpa mengubah row-gap chip-judul */
+    gap: 4px; /* waktu rapat di bawah penerbit (sebelumnya 8) */
   }
 
   .publisher {
-    gap: var(--space-16); /* 21:4987 */
+    gap: 10px; /* sebelumnya 16 (21:4987) x 0,64 */
   }
 
   .avatar {
-    width: 50px; /* 21:4988 */
-    height: 50px;
+    width: 32px; /* sebelumnya 50 (21:4988) */
+    height: 32px;
   }
 
   .author {
-    font: var(--type-heading-desktop); /* 21:4989 Merriweather SemiBold 23,04/29,952 */
+    font: 600 16px/24px var(--font-serif); /* literal: tidak ada token Merriweather SemiBold 16 px; sebelumnya --type-heading-desktop 23,04 (21:4989) */
   }
 
   .time {
-    font: var(--type-text-l-regular); /* 21:4993 Inter Regular 18/27 */
-    letter-spacing: var(--tracking-text-l);
+    font: var(--type-caption); /* Inter Regular 13,333/18,666; sebelumnya --type-text-l-regular 18/27 (21:4993) */
   }
 
   .dots {
