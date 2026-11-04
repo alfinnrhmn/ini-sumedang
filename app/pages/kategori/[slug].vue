@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Article, CategoryPageResponse, SidebarResponse } from '~/types/article'
+import { siteOrigin } from '~/config/site'
 
 // Halaman kategori (PAGE-003; tanpa frame Figma, PRD §3.2 G1): daftar berita satu kategori resmi, berhalaman, tanpa hero.
 // E5 (evaluasi pemilik): tata letak Beranda/Detail = kolom kiri 739 (judul h1, kartu 2 kolom, "Lebih banyak") + kolom kanan 357.
@@ -77,12 +78,12 @@ const secondary = ref<HTMLElement | null>(null)
 useStickyColumn(secondary)
 
 // Judul dokumen "<Kategori> - Ini Sumedang" (catatan pemilik; Detail memakai "— IniSumedang", penyelarasan di SEO-001); deskripsi sederhana [I].
-// Canonical = origin permintaan + /kategori/<slug> (+ ?halaman=N bila N > 1); basis produksi ditetapkan saat hosting [I].
-const requestUrl = useRequestURL()
+// Canonical = SITE_URL + /kategori/<slug> (+ ?halaman=N bila N > 1); HARD-001: produksi tidak memakai header Host, hanya mode dev memakai origin permintaan.
+const origin = siteOrigin(useRequestURL().origin)
 const title = computed(() => `${category.value?.name ?? 'Kategori'} - Ini Sumedang`)
 const description = computed(() => `Berita ${category.value?.name ?? ''} terbaru dari IniSumedang.`)
 const canonical = computed(() =>
-  `${requestUrl.origin}${categoryPagePath(category.value?.slug ?? slug.value, pagination.value?.page ?? 1)}`
+  `${origin}${categoryPagePath(category.value?.slug ?? slug.value, pagination.value?.page ?? 1)}`
 )
 useSeoMeta({
   title,

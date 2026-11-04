@@ -6,6 +6,7 @@ import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaV
 import type { WpPost } from '../fixtures/posts'
 import { hasVisibleContent, readingMinutes, stripTags } from '../utils/article-detail'
 import { buildPagination, isPageInRange, sliceForPage } from '../utils/category-page'
+import { safeImageUrl } from '../utils/image-url'
 import type { RelatedCandidate } from '../utils/related-ranking'
 import { rankRelated, relatedBlocks } from '../utils/related-ranking'
 import { sanitizeArticleHtml } from '../utils/sanitize-article-html'
@@ -45,6 +46,8 @@ function hasTag(post: WpPost, slug: string): boolean {
 
 function mapPost(post: WpPost): Article {
   const media = post._embedded['wp:featuredmedia']?.[0]
+  // URL gambar tak aman (HARD-001: skema berbahaya, host di luar daftar) = artikel tanpa gambar, bukan galat.
+  const heroUrl = media ? safeImageUrl(media.source_url) : null
   return {
     id: post.id,
     slug: post.slug,
@@ -55,9 +58,9 @@ function mapPost(post: WpPost): Article {
       slug: term.slug,
       name: decodeEntities(term.name)
     })),
-    heroImage: media
+    heroImage: media && heroUrl
       ? {
-          url: media.source_url,
+          url: heroUrl,
           alt: decodeEntities(media.alt_text ?? ''),
           width: media.media_details.width,
           height: media.media_details.height

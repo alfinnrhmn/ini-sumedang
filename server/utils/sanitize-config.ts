@@ -78,6 +78,15 @@ export const EMBED_ALLOWED_HOSTS: readonly string[] = [
   'www.youtube-nocookie.com'
 ]
 
+/**
+ * Nilai header `Content-Security-Policy` (HARD-001): hanya `frame-src`, diturunkan dari `EMBED_ALLOWED_HOSTS`
+ * (satu sumber, tanpa daftar kedua): `frame-src https://<host> ...`. Daftar kosong = `frame-src 'none'`.
+ * Dipasang oleh `server/middleware/security-headers.ts`. Direktif lain = SEC-001.
+ */
+export function embedFrameSrcPolicy(hosts: readonly string[] = EMBED_ALLOWED_HOSTS): string {
+  return hosts.length > 0 ? `frame-src ${hosts.map(host => `https://${host}`).join(' ')}` : 'frame-src \'none\''
+}
+
 /** Path embed yang diizinkan: `/embed/<id>` saja; id 6-20 karakter [A-Za-z0-9_-] [I]. Tanpa garis miring akhir. */
 export const EMBED_PATH_PATTERN: RegExp = /^\/embed\/[A-Za-z0-9_-]{6,20}$/
 

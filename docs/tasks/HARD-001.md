@@ -2,7 +2,7 @@
 
 | Field | Isi |
 |---|---|
-| **ID / Status** | HARD-001 · `READY` (PM 4 Nov 2026, atas keputusan pemilik poin 11, 12, 13) |
+| **ID / Status** | HARD-001 · `DONE` (PM 4 Nov 2026, setelah QA_PASSED dan persetujuan pemilik); sebelumnya `READY` |
 | **Dependensi** | PAGE-002, PAGE-003, SANITIZE-001 `DONE` |
 | **Rujukan** | PRD §13 butir "wajib sebelum tayang" 3, 4, 5; `server/utils/sanitize-config.ts` (`EMBED_ALLOWED_HOSTS`, `IMAGE_ALLOWED_HOSTS`) |
 
@@ -32,7 +32,13 @@ CSP penuh (`script-src` dll.), header keamanan lain, integrasi WordPress, satu s
 P0: `Host` palsu di build produksi; URL gambar berbahaya (via salinan sementara dengan fixture yang diubah); header CSP; iframe YouTube/host lain; korpus XSS penyanitasi lama tetap 0 eksekusi; regresi posisi dan `/api/*`; lint/typecheck/test/build/audit.
 
 ## Bukti (≤ 5 baris)
+- FE: `lint` 0, `typecheck` 0, `npm test` 588/588 (534 lama + 54 baru `tests/unit/hardening.test.ts`), `build` 0; uji perilaku Host palsu, hero berbahaya, header CSP lulus.
+- QA 4 Nov 2026 (putaran pertama dihentikan pemilik tanpa laporan; QA ulang ringkas, salinan identik repo, Edge headless, port 3571-3574): **QA_PASSED**, 0 Critical/High/Medium. `Host`/`X-Forwarded-Host`/`Forwarded` palsu: 24 kombinasi, 0 pantulan "evil", canonical/og:url/og:image/URL bagikan tetap `https://inisumedang.com/...`; hero berbahaya (`javascript:`, `data:`, `http:`, `//host`, `https:\host`, kontrol): 107 halaman + `/api/*`, 0 5xx, 0 URL berbahaya, gambar valid tetap tampil; CSP `frame-src` persis `EMBED_ALLOWED_HOSTS` di HTML (200/404/HEAD), tidak ada di `/api` dan aset, YouTube tidak diblokir, iframe asing diblokir; XSS edge 5 artikel 0 eksekusi, `v-html=` 1 baris; regresi rect 18 kombinasi 0 beda, 0 overflow, `/api/*` identik; lint/typecheck 0, test 588/588, build 0, audit tanpa High. Log: scratchpad `h1r-*.log`.
 
 ## Catatan
 - Domain `https://inisumedang.com` adalah asumsi PM [I]; pemilik mengonfirmasi atau menyebut domain lain.
 - Riwayat: 4 Nov 2026 → READY (PM).
+- Fullstack: `siteOrigin(requestOrigin, dev = import.meta.dev)` di `app/config/site.ts`; `embedFrameSrcPolicy(hosts)` ditaruh di `sanitize-config.ts` (satu sumber dengan `EMBED_ALLOWED_HOSTS`, agar bisa diuji murni); middleware memberi header pada jalur bukan `/api`, bukan `/_*`, dan nama berkas tanpa titik. `safeImageUrl` juga menolak spasi dan userinfo/port. Dev: CSP sama persis (tanpa `'self'`); iframe Nuxt DevTools tidak diuji.
+- Low/Info diterima: `safeImageUrl` menerima jalur relatif apa pun (same-origin; batasi ke prefiks `/fixtures/` atau `/wp-content/` saat integrasi WordPress); respons galat JSON Nitro memakai CSP bawaannya sendiri; CSP di dev sama dengan produksi, iframe Nuxt DevTools (same-origin) mungkin terblokir (tidak diuji; solusi bila mengganggu: `'self'` hanya saat `import.meta.dev`).
+- Riwayat: 4 Nov 2026 → READY → FE → QA (putaran 1 dihentikan pemilik) → QA ulang ringkas QA_PASSED (PM) → menunggu persetujuan pemilik (belum DONE).
+- 4 Nov 2026 → DONE (pemilik menyetujui commit).

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ArticleDetailResponse } from '~/types/article'
+import { siteOrigin } from '~/config/site'
 
 // Detail Berita (PAGE-002; desktop 130:515, mobile 130:2945). Data hanya lewat /api/article/<slug> (layanan bertipe di server);
 // isi artikel = `bodyHtml` tersanitasi di server. Slug tak ada/draft/private/tak valid -> status 404 (halaman error berlayout = task terpisah).
@@ -24,11 +25,12 @@ const detail = data.value
 const article = detail.article
 const now = detail.now
 
-// URL kanonis = origin permintaan + /berita/<slug>; basis produksi ditetapkan saat hosting [I]. Dipakai untuk tautan bagikan dan salin tautan.
-const requestUrl = useRequestURL()
-const canonical = `${requestUrl.origin}${articlePath(article)}`
+// URL kanonis = SITE_URL + /berita/<slug> (HARD-001: produksi tidak memakai header Host; hanya mode dev memakai origin permintaan).
+// Dipakai untuk canonical, og:url, og:image (jalur relatif), tautan bagikan, dan salin tautan. URL gambar sudah divalidasi di server.
+const origin = siteOrigin(useRequestURL().origin)
+const canonical = `${origin}${articlePath(article)}`
 const image = article.heroImage
-  ? (article.heroImage.url.startsWith('/') ? `${requestUrl.origin}${article.heroImage.url}` : article.heroImage.url)
+  ? (article.heroImage.url.startsWith('/') ? `${origin}${article.heroImage.url}` : article.heroImage.url)
   : undefined
 
 useSeoMeta({

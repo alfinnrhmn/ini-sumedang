@@ -493,7 +493,7 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 5. **Widget sosial** (SOC-001; D49): angka contoh dibiarkan sampai data asli diketahui (pemilik 4 Nov); sebelum tayang diganti angka asli atau widget disembunyikan.
 6. **Keputusan pemilik yang menunggu** di `POLISH-01` (daftar ringkas diberikan PM 4 Nov): D29/D2/D4 (font Merriweather 400 dan Inter 700), D30/D49/D1/D21 (warna), D41/D16/D22 (area klik < 24 px), D24, D26, D33, D36, D42, D28, D40, D54, D56, dan butir tampilan lain.
 
-**Sudah diputuskan pemilik (4 Nov 2026):** area klik logo header seukuran logo (D25 diterima, tidak wajib); hero putar otomatis tanpa tombol jeda (celah WCAG 2.2.2 diterima, D50); STATIC-001 berupa halaman teks saja; DISC-001 digantikan slice; basis URL kanonis tetap, validasi URL gambar hero, dan CSP `frame-src` dikerjakan di **HARD-001** (butir ini dicabut dari daftar setelah `DONE`).
+**Sudah diputuskan pemilik (4 Nov 2026):** area klik logo header seukuran logo (D25 diterima, tidak wajib); hero putar otomatis tanpa tombol jeda (celah WCAG 2.2.2 diterima, D50); STATIC-001 berupa halaman teks saja; DISC-001 digantikan slice; basis URL kanonis tetap, validasi URL gambar hero, dan CSP `frame-src` selesai di **HARD-001** (`DONE` 4 Nov 2026; dicabut dari daftar wajib). Domain `https://inisumedang.com` di `app/config/site.ts` masih asumsi PM; pemilik mengonfirmasi.
 
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 
@@ -526,7 +526,7 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | UX-001 | `DONE` | Hero otomatis, kolom kanan kategori, "Lebih banyak", "Lainnya" lebih besar, kolom kanan menempel |
 | UX-002 | `DONE` | Widget kategori sejajar kartu pertama (perubahan kecil, tanpa berkas task) |
 | PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
-| HARD-001 | `READY` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
+| HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
 | POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma D1–D56 (`docs/tasks/POLISH-01.md`) |
 | API-001, DISC-002, POP-001, ADS-001, ADS-002 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
