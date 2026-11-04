@@ -8,7 +8,8 @@ const route = useRoute()
 const slug = String(route.params.slug)
 
 const { data, error } = await useFetch<ArticleDetailResponse>(`/api/article/${encodeURIComponent(slug)}`, {
-  key: `article-${slug}`
+  key: `article-${slug}`,
+  dedupe: 'defer' // dibagikan dengan SiteHeader (sorotan kategori di menu, D26): satu permintaan
 })
 
 if (error.value || !data.value) {

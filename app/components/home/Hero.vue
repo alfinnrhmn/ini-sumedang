@@ -387,6 +387,22 @@ const slides = computed(() =>
   z-index: 2;
 }
 
+/* POLISH-01 D41 (WCAG 2.5.8): chip tautan (mobile 18 px) punya area klik >= 24 x 24 px lewat ::after tak terlihat berpusat pada chip; overflow chip tautan
+   dibuat visible agar ::after tidak terpotong (nama kategori resmi pendek, jadi tidak ada teks yang meluber). Tampilan chip tidak berubah. */
+a.chip {
+  overflow: visible;
+}
+
+a.chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 24px);
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
+
 .chip:focus-visible {
   outline: 2px solid var(--color-white);
   outline-offset: 2px;

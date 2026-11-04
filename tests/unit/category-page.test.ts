@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildPagination, isPageInRange, isValidCategorySlug, parsePageParam, sliceForPage, totalPagesOf } from '../../server/utils/category-page.ts'
+import { buildPagination, isCategoryPageSlug, isPageInRange, isValidCategorySlug, parsePageParam, sliceForPage, totalPagesOf } from '../../server/utils/category-page.ts'
 import { categoryLink, categoryPagePath, categoryPath, isCategoryRoute } from '../../app/utils/routes.ts'
 import { CATEGORY_PER_PAGE, OFFICIAL_CATEGORY_SLUGS } from '../../app/config/category.ts'
 import { FOOTER_SECTIONS } from '../../app/config/footer.ts'
@@ -85,6 +85,18 @@ describe('CP2 isValidCategorySlug', () => {
       assert.equal(isValidCategorySlug(input), false)
     })
   }
+})
+
+describe('CP2b isCategoryPageSlug (D42)', () => {
+  it('kategori Berita (= Beranda) bukan slug halaman kategori: /api/category/berita = 404', () => {
+    assert.equal(isValidCategorySlug('berita'), true)
+    assert.equal(isCategoryPageSlug('berita'), false)
+  })
+
+  it('8 kategori resmi lain tetap valid; slug tidak wajar tetap ditolak', () => {
+    for (const slug of OFFICIAL_CATEGORY_SLUGS.filter(item => item !== 'berita')) assert.equal(isCategoryPageSlug(slug), true)
+    for (const input of ['', 'Hukum', '../x', 'sepak_bola', undefined, ['hukum'], 1]) assert.equal(isCategoryPageSlug(input), false)
+  })
 })
 
 describe('CP3 hitung paginasi', () => {

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict'
 import { countWords, hasVisibleContent, isValidArticleSlug, readingMinutes, stripTags } from '../../server/utils/article-detail.ts'
 import { rankRelated, relatedBlocks, splitRelated } from '../../server/utils/related-ranking.ts'
 import type { RelatedCandidate } from '../../server/utils/related-ranking.ts'
-import { facebookShareUrl, xShareUrl } from '../../app/utils/share.ts'
+import { facebookShareUrl, whatsappShareUrl, xShareUrl } from '../../app/utils/share.ts'
 import { formatPublishDate } from '../../app/utils/relative-time.ts'
 import { articlePath } from '../../app/utils/routes.ts'
 
@@ -232,6 +232,16 @@ describe('AD5 URL bagikan', () => {
       xShareUrl(url, 'Pemkab & "Layanan" Publik?'),
       'https://x.com/intent/post?url=https%3A%2F%2Finisumedang.example%2Fberita%2Ffixture-81&text=Pemkab%20%26%20%22Layanan%22%20Publik%3F'
     )
+  })
+  it('WhatsApp (D33): wa.me/?text=<judul> <URL kanonis>, satu parameter text ter-encode', () => {
+    assert.equal(
+      whatsappShareUrl(url, 'Pemkab & "Layanan" Publik?'),
+      'https://wa.me/?text=Pemkab%20%26%20%22Layanan%22%20Publik%3F%20https%3A%2F%2Finisumedang.example%2Fberita%2Ffixture-81'
+    )
+    const parsed = new URL(whatsappShareUrl('https://a.example/x?y=1&z=2#f', 'a&text=evil'))
+    assert.equal(parsed.origin, 'https://wa.me')
+    assert.deepEqual([...parsed.searchParams.keys()], ['text'])
+    assert.equal(parsed.searchParams.get('text'), 'a&text=evil https://a.example/x?y=1&z=2#f')
   })
   it('semua https; parameter tidak dapat menyisipkan parameter lain', () => {
     const hostile = 'https://a.example/x?y=1&z=2#f'

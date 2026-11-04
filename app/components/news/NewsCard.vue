@@ -24,9 +24,14 @@ const href = computed(() => articlePath(props.article))
 const category = computed(() => props.article.categories[0]?.name ?? '')
 // PAGE-003: nama kategori resmi menjadi tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); kategori non-resmi tetap teks.
 // `:aria-current="undefined"` pada tautan: penanda otomatis NuxtLink (rute sama, query diabaikan) tidak dipakai di kartu; hanya menu, laci, dan footer yang menandai kategori aktif.
+// POLISH-01 D36: di /kategori/<slug> label kategori yang sama dengan halaman itu = teks biasa (bukan tautan ke halaman sendiri, tanpa tab stop berlebih);
+// kategori lain tetap tautan. Hanya rute kategori (Beranda = kategori Berita tidak ikut: di sana label tetap tautan).
+const route = useRoute()
 const categoryTo = computed(() => {
   const first = props.article.categories[0]
-  return first ? categoryLink(first.slug) : null
+  if (!first) return null
+  if (route.name === CATEGORY_ROUTE_NAME && route.params.slug === first.slug) return null
+  return categoryLink(first.slug)
 })
 const time = computed(() => formatRelativeTime(props.article.publishedAt, props.now))
 </script>
@@ -111,6 +116,19 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 .category-link {
   position: relative;
   z-index: 1;
+}
+
+/* POLISH-01 D41 (WCAG 2.5.8): area klik >= 24 x 24 px lewat ::after tak terlihat dari tepi atas label ke bawah (celah 4 px + sedikit ruang atas judul kartu
+   yang sama). Sengaja tidak naik ke atas: label sering menempel di tepi atas kartu dan kartu di atasnya hanya berjarak beberapa px, jadi ke atas
+   area klik akan menimpa kartu lain. Rect label dan tampilan tidak berubah. */
+.category-link::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: max(100%, 24px);
+  height: 24px;
+  transform: translateX(-50%);
 }
 
 @media (hover: hover) {

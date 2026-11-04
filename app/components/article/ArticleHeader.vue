@@ -65,7 +65,22 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
   color: var(--color-brand);
 }
 
-/* PAGE-003: tautan kategori mewarisi warna dan huruf label; hover bergaris bawah */
+/* PAGE-003: tautan kategori mewarisi warna dan huruf label; hover bergaris bawah.
+   POLISH-01 D41 (WCAG 2.5.8): area klik >= 24 x 24 px lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+.category-link {
+  position: relative;
+}
+
+.category-link::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 24px);
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
+
 @media (hover: hover) {
   .category-link:hover {
     text-decoration: underline;

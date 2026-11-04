@@ -77,6 +77,21 @@ const categoryTo = computed(() => (props.category ? categoryLink(props.category.
   height: 8px;
 }
 
+/* POLISH-01 D41 (WCAG 2.5.8): area klik tautan >= 24 x 24 px lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+a.crumb {
+  position: relative;
+}
+
+a.crumb::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 24px);
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
+
 @media (hover: hover) {
   a.crumb:hover {
     text-decoration: underline;

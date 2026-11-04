@@ -1,6 +1,7 @@
 <script setup lang="ts">
-// Bagikan artikel (desktop 127:2160, mobile 130:3392). Hanya Facebook, X (tautan bagikan resmi, tanpa SDK) dan Salin tautan
-// (Clipboard API). Instagram (tanpa URL bagikan web) dan WhatsApp (tidak ada di Figma) tidak dirender; dicatat untuk pemilik.
+// Bagikan artikel (desktop 127:2160, mobile 130:3392). Facebook, X, WhatsApp (tautan bagikan resmi, tanpa SDK) dan Salin tautan
+// (Clipboard API). WhatsApp tidak ada di Figma (POLISH-01 D33, keputusan pemilik): ubin dan ikon diturunkan dari tombol yang ada.
+// Instagram (tanpa URL bagikan web) tidak dirender.
 // Nama layer Figma tidak cocok dengan ikon (mis. "Tombol Salin tautan" berisi Facebook): ikon dan pernyataan pemilik yang dipakai.
 const props = defineProps<{
   /** URL kanonis artikel (origin permintaan + /berita/<slug>). */
@@ -10,6 +11,7 @@ const props = defineProps<{
 
 const facebookHref = computed(() => facebookShareUrl(props.url))
 const xHref = computed(() => xShareUrl(props.url, props.title))
+const whatsappHref = computed(() => whatsappShareUrl(props.url, props.title))
 
 // Umpan balik salin: satu elemen status (aria-live) yang selalu ada di DOM, teks diisi saat tombol ditekan lalu dikosongkan.
 const message = ref('')
@@ -58,6 +60,15 @@ const labelId = useId()
       >
         <img class="icon" src="/icons/share-x.svg" alt="" width="32" height="32">
       </a>
+      <a
+        class="tile tile--whatsapp"
+        :href="whatsappHref"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Bagikan ke WhatsApp"
+      >
+        <img class="icon" src="/icons/share-whatsapp.svg" alt="" width="32" height="32">
+      </a>
       <button type="button" class="tile tile--copy" aria-label="Salin tautan" @click="copy">
         <img class="icon icon--copy" src="/icons/share-copy.svg" alt="" width="23" height="29">
       </button>
@@ -94,8 +105,8 @@ const labelId = useId()
 
 /* Label 130:3395: Inter SemiBold 14/21 #1A212E, lebar 120 */
 .label {
-  flex: none;
-  width: 120px;
+  flex: 0 1 120px; /* D33: dengan 4 ubin, baris 340 px > kontainer 272 pada 320; label boleh menyusut (2 baris, baris tetap 55) */
+  min-width: 0;
   font: 600 14px/21px var(--font-sans);
   color: var(--color-article-title);
 }
@@ -105,8 +116,8 @@ const labelId = useId()
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: none;
-  width: 44px; /* 130:3396 */
+  flex: 0 1 44px; /* 130:3396; boleh menyusut (min 32) hanya bila 4 ubin tidak muat (< ±360 px) */
+  min-width: 32px;
   height: 40px; /* 130:3400 (tombol pertama 39, lainnya 40) */
   padding: 0;
   border: 0;
@@ -122,6 +133,11 @@ const labelId = useId()
 /* X #D5D5D5 = --color-footer-divider-mobile (sama persis) */
 .tile--x {
   background: var(--color-footer-divider-mobile);
+}
+
+/* WhatsApp (tanpa Figma): ubin abu seperti Salin tautan (token yang ada); ikon lingkaran hijau di berkas sendiri */
+.tile--whatsapp {
+  background: var(--color-gray-5);
 }
 
 /* Salin #E3E3E3 -> --color-gray-5 (#E0E0E0, selisih 3/3/3) */
@@ -166,7 +182,7 @@ const labelId = useId()
   }
 
   .tile {
-    width: 60px; /* 127:2164 */
+    flex-basis: 60px; /* 127:2164 */
     height: 54px;
   }
 

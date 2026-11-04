@@ -144,6 +144,12 @@ ul {
   text-decoration: underline;
 }
 
+/* POLISH-01 D41: area klik tautan footer 24 px (FooterLabel). Daftar kategori desktop menumpuk 9 tautan berjarak 1 baris (18,67 px < 24): area klik dibatasi
+   setinggi satu baris (1lh) supaya tidak saling menimpa; 24 px penuh tidak mungkin tanpa menambah jarak antar item (mengubah tampilan, butuh keputusan pemilik). */
+.col-kategori .list a::after {
+  height: 1lh;
+}
+
 /* ---------- Mobile 101:2600 (402 x 444) ---------- */
 .desktop {
   display: none;

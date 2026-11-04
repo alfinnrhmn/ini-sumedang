@@ -21,3 +21,20 @@ const categoryAttrs = computed(() =>
   </NuxtLink>
   <span v-else>{{ link.label }}</span>
 </template>
+
+<style scoped>
+/* POLISH-01 D41 (WCAG 2.5.8): area klik tautan footer >= 24 x 24 px lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+a {
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 24px);
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
+</style>

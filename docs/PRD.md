@@ -491,7 +491,6 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 3. **Satukan daftar kategori resmi** (`OFFICIAL_CATEGORY_SLUGS` di klien menduplikasi `getCategories()` di server): tampilan membaca daftar dari server saja, dikerjakan saat integrasi WordPress (disetujui pemilik 4 Nov).
 4. **Papan iklan** (penampung "Advertisement"; D47): diganti konten CMS (ADS-001/ADS-002: gambar + tautan `https`, tanpa HTML/skrip) saat WordPress tersambung (pemilik 4 Nov); teks penampung tidak boleh tayang.
 5. **Widget sosial** (SOC-001; D49): angka contoh dibiarkan sampai data asli diketahui (pemilik 4 Nov); sebelum tayang diganti angka asli atau widget disembunyikan.
-6. **Keputusan pemilik yang menunggu** di `POLISH-01` (daftar ringkas diberikan PM 4 Nov): D29/D2/D4 (font Merriweather 400 dan Inter 700), D30/D49/D1/D21 (warna), D41/D16/D22 (area klik < 24 px), D24, D26, D33, D36, D42, D28, D40, D54, D56, dan butir tampilan lain.
 
 **Sudah diputuskan pemilik (4 Nov 2026):** area klik logo header seukuran logo (D25 diterima, tidak wajib); hero putar otomatis tanpa tombol jeda (celah WCAG 2.2.2 diterima, D50); STATIC-001 berupa halaman teks saja; DISC-001 digantikan slice; basis URL kanonis tetap, validasi URL gambar hero, dan CSP `frame-src` selesai di **HARD-001** (`DONE` 4 Nov 2026; dicabut dari daftar wajib). Domain situs diisi lead saat deploy lewat env `NUXT_PUBLIC_SITE_URL` (kosong atau tidak valid = cadangan `https://inisumedang.com` di `app/config/site.ts`); pemilik tidak mengatur domain sekarang.
 
@@ -528,7 +527,7 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
 | HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma D1–D56 (`docs/tasks/POLISH-01.md`) |
+| POLISH-01 | `DONE` | Deviasi Figma D1–D56: D26, D33, D36, D41, D42 dikerjakan; sisanya diterima pemilik 4 Nov; `docs/tasks/POLISH-01.md` |
 | API-001, DISC-002, POP-001, ADS-001, ADS-002 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
 | MOCK-001, LAY-001, CARD-001, PAGE-001, DISC-001 | `DITUNDA` | Digantikan slice vertikal HOME-01..07 |
 | DISC-003, SEC-001, SEO-001, RESP-001, REL-001 | belum dibuka | DISC-003 = pertanyaan terbuka ke pemilik; SEO-001 (redirect URL lama) dan SEC-001 (CSP penuh, uji XSS konten) sebagian bergantung data WordPress [I]; PM menilai saat dibuka |

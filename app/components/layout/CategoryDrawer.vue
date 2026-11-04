@@ -11,6 +11,8 @@ const props = defineProps<{
   /** id elemen dialog; dipakai aria-controls pada tombol hamburger */
   id: string
   categories: ArticleCategory[]
+  /** D26: kategori pertama artikel di halaman Detail (sorotan tanpa aria-current). */
+  activeSlug?: string | null
 }>()
 const emit = defineEmits<{ close: [], navigate: [to: string] }>()
 
@@ -123,7 +125,7 @@ onBeforeUnmount(() => {
       </div>
       <ul class="list">
         <li v-for="category in categories" :key="category.id" @click="onItemClick($event, category.slug)">
-          <LayoutCategoryLabel :category="category" class="item" />
+          <LayoutCategoryLabel :category="category" :active="category.slug === activeSlug" class="item" />
         </li>
       </ul>
     </div>
@@ -228,7 +230,8 @@ onBeforeUnmount(() => {
 }
 
 /* Aktif (aria-current) selalu berlaku; :hover hanya pada perangkat yang mendukung hover agar latar tidak menempel setelah ketuk di layar sentuh. */
-a.item[aria-current="page"] {
+a.item[aria-current="page"],
+a.item[data-active] {
   background: var(--color-surface);
 }
 

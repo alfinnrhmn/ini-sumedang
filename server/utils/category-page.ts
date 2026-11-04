@@ -3,6 +3,7 @@
  * dengan `node:test`. Logika penyanitasi HTML TIDAK ada di sini.
  */
 import { CATEGORY_PAGE_PATTERN, CATEGORY_SLUG_MAX_LENGTH } from '../../app/config/category.ts'
+import { HOME_CATEGORY_SLUG } from '../../app/utils/routes.ts'
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -50,4 +51,12 @@ export function buildPagination(page: number, total: number, perPage: number): P
 export function sliceForPage<T>(items: T[], page: number, perPage: number): T[] {
   const start = (page - 1) * perPage
   return items.slice(start, start + perPage)
+}
+
+/**
+ * Slug yang punya halaman kategori (POLISH-01 D42): slug yang bentuknya wajar DAN bukan kategori Berita. Berita = Beranda (E1), tidak punya
+ * halaman `/kategori/berita` (dialihkan 308 ke `/`), jadi `/api/category/berita` diperlakukan seperti slug tak dikenal (404 dengan pesan tetap).
+ */
+export function isCategoryPageSlug(value: unknown): value is string {
+  return isValidCategorySlug(value) && value !== HOME_CATEGORY_SLUG
 }

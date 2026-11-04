@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CategoriesResponse } from '~/types/article'
+import type { ArticleDetailResponse, CategoriesResponse } from '~/types/article'
 
 // Header situs (HOME-06). Desktop >= 1024: hamburger + logo (21:5360, 1440 x 94), kolom pencarian (21:5270, PAGE-004) dan menu kategori
 // (21:4951, 1440 x 47) di bawahnya. Di bawah 1024: hamburger + logo di kiri (116:1662, 354 x 26) dan ikon cari (116:1647, PAGE-004) di kanan.
@@ -10,6 +10,23 @@ import type { CategoriesResponse } from '~/types/article'
 // disembunyikan, tinggi bilah tetap 51), fokus ke input; tombol tutup dan Esc menutupnya dan mengembalikan fokus ke ikon cari; tanpa overlay.
 const { data } = await useFetch<CategoriesResponse>('/api/categories', { key: 'categories' })
 const categories = computed(() => data.value?.categories ?? [])
+
+// POLISH-01 D26: di halaman Detail kategori pertama artikel disorot di menu dan laci (tanpa aria-current). Data artikel dibaca dari payload kunci
+// `article-<slug>` milik halaman Detail (reaktif; terisi saat halaman Detail memuatnya, tanpa permintaan kedua di klien). Di server, header ikut
+// mengambil kunci yang sama (`dedupe: 'defer'` di kedua pemanggil = satu permintaan) supaya sorotan sudah ada di HTML SSR, bukan muncul setelah hidrasi.
+// Kegagalan memuat diabaikan (tanpa sorotan); halaman Detail sendiri yang menampilkan galat.
+const route = useRoute()
+const detailSlug = computed(() => (route.name === 'berita-slug' ? String(route.params.slug) : ''))
+const detailKey = (slug: string) => `article-${slug}`
+if (import.meta.server && detailSlug.value) {
+  await useFetch<ArticleDetailResponse>(`/api/article/${encodeURIComponent(detailSlug.value)}`, { key: detailKey(detailSlug.value), dedupe: 'defer' })
+}
+const nuxtApp = useNuxtApp()
+const activeSlug = computed(() => {
+  if (!detailSlug.value) return null
+  const detail = nuxtApp.payload.data[detailKey(detailSlug.value)] as ArticleDetailResponse | undefined
+  return detail?.article.categories[0]?.slug ?? null
+})
 
 const drawerId = useId()
 const open = ref(false)
@@ -24,7 +41,6 @@ async function closeDrawer() {
 // PAGE-003: mengikuti tautan kategori di laci menutup laci TANPA mengembalikan fokus ke hamburger (halaman tujuan memindahkan fokus
 // ke <h1>-nya). Navigasi ke rute lain ditangani watcher di bawah; tautan menuju halaman yang SEDANG dibuka tidak mengubah rute,
 // jadi laci ditutup dan fokus dipindah ke <h1> di sini.
-const route = useRoute()
 watch(() => route.fullPath, () => {
   if (open.value) open.value = false
   if (searchOpen.value) searchOpen.value = false
@@ -122,11 +138,12 @@ async function onSearchNavigate(to: string) {
       </button>
     </div>
     <template v-if="categories.length">
-      <LayoutCategoryMenu :categories="categories" />
+      <LayoutCategoryMenu :categories="categories" :active-slug="activeSlug" />
       <LayoutCategoryDrawer
         :id="drawerId"
         :open="open"
         :categories="categories"
+        :active-slug="activeSlug"
         @close="closeDrawer"
         @navigate="onDrawerNavigate"
       />

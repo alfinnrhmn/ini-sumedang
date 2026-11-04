@@ -3,14 +3,15 @@ import type { ArticleCategory } from '~/types/article'
 
 // Menu kategori desktop (HOME-06, 21:4951). Teks dari getCategories() (ejaan resmi), bukan teks Figma.
 // Hanya tampil >= 1024; di bawah itu disembunyikan (display: none) dan kategori ada di laci.
-defineProps<{ categories: ArticleCategory[] }>()
+// `activeSlug` (D26): kategori pertama artikel di halaman Detail; disorot seperti kategori aktif tetapi tanpa aria-current.
+defineProps<{ categories: ArticleCategory[], activeSlug?: string | null }>()
 </script>
 
 <template>
   <nav class="menu" aria-label="Kategori">
     <ul class="list">
       <li v-for="category in categories" :key="category.id">
-        <LayoutCategoryLabel :category="category" class="item" />
+        <LayoutCategoryLabel :category="category" :active="category.slug === activeSlug" class="item" />
       </li>
     </ul>
   </nav>
@@ -62,7 +63,8 @@ defineProps<{ categories: ArticleCategory[] }>()
    dipetakan ke --color-black-3 (40,40,40) alfa 20 % (selisih R/G/B 2/2/2, alfa sama); teks oranye (245,178,65) tak punya token
    (--color-warning selisih R/G/B 19/7/6 > 4) -> deviasi: teks tetap putih. Hitungan dan kontras ada di Bukti HOME-06.
    Aktif (aria-current) selalu berlaku; :hover hanya pada perangkat yang mendukung hover agar latar tidak menempel setelah ketuk di layar sentuh. */
-a.item[aria-current="page"] {
+a.item[aria-current="page"],
+a.item[data-active] {
   background: color-mix(in srgb, var(--color-black-3) 20%, transparent);
 }
 

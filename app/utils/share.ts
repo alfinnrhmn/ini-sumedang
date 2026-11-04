@@ -1,6 +1,7 @@
 /**
  * URL bagikan Detail Berita (PAGE-002, FR-06). Hanya platform yang ada di Figma dan punya URL bagikan web standar
- * (Facebook, X); tanpa SDK pihak ketiga. Instagram dan WhatsApp tidak punya/tidak ada di desain dan tidak dibuat.
+ * (Facebook, X) ditambah WhatsApp (POLISH-01 D33, keputusan pemilik; tidak ada di Figma); tanpa SDK pihak ketiga. Instagram tidak punya
+ * URL bagikan web standar dan tidak dibuat.
  * Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
  */
 
@@ -12,4 +13,9 @@ export function facebookShareUrl(url: string): string {
 /** Endpoint resmi X: `https://x.com/intent/post` (`twitter.com/intent/tweet` masih dialihkan; dipakai domain x.com). */
 export function xShareUrl(url: string, text: string): string {
   return `https://x.com/intent/post?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+}
+
+/** WhatsApp (`wa.me`, tautan resmi tanpa SDK): teks = "<judul> <URL kanonis>", di-encode sekali sebagai nilai `text`. */
+export function whatsappShareUrl(url: string, text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`
 }
