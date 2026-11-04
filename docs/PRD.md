@@ -485,18 +485,15 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 
 **Uji data nyata WordPress (wajib saat integrasi; integrasi tidak boleh `DONE` tanpa bukti):** (1) `ruang-visual` tidak ada atau semua topiknya kosong: Beranda tetap tampil tanpa section Ruang Visual (tanpa galat, tanpa layout shift, section lain tidak bergeser); (2) `/api/categories` kosong atau gagal: hamburger dan menu tidak dirender, header utuh (logo di x=24 di mobile, tanpa layout shift, tanpa galat, tanpa tautan mati); (3) kategori resmi tanpa artikel (keadaan kosong halaman kategori); (4) kegagalan `/api/article/<slug>` selain 404 gagal dengan tenang; (5) gambar `body` relatif: konten WordPress memakai URL gambar absolut `https` dari host media.
 
-**Daftar tunggal WAJIB SEBELUM TAYANG (situs tidak boleh tayang sebelum semuanya selesai):**
-1. **D25 — area klik tautan logo header ≥ 24 px** (kini 22 px di mobile; WCAG 2.5.8), lewat padding area klik tanpa mengubah tampilan (`POLISH-01` D25).
-2. **Hapus `public/fixtures/` dan `FIXTURE_SET`** dari build produksi (gambar fixture berasal dari Figma, hak pakai tidak diperiksa); digantikan konten WordPress.
-3. **Basis URL kanonis tetap dari konfigurasi** (bukan header `Host`) untuk `canonical`, `og:url`, dan URL bagikan.
-4. **Validasi skema URL gambar** (`heroImage.url`, `og:image`, gambar `body`): hanya `https:` dari host media yang di-allowlist (`IMAGE_ALLOWED_HOSTS`) atau relatif.
-5. **CSP `frame-src` = `EMBED_ALLOWED_HOSTS`** (SEC-001; sandbox iframe memuat `allow-scripts allow-same-origin`).
-6. **Halaman error/404 berlayout** (task terpisah) dan **SEO-001** (judul/deskripsi/canonical lengkap; samakan format judul Detail `"<judul> — IniSumedang"` dengan Kategori `"<Kategori> - Ini Sumedang"`).
-7. **Keputusan pemilik yang menunggu** di `POLISH-01`: D29 (font isi Merriweather 400 dan Inter 700), D30 (warna selisih > 4 level), D33 (platform bagikan), D34–D40 (tata letak halaman kategori), D41 (area klik tautan kategori/footer/breadcrumb/label ≥ 24 px; PM mengusulkan wajib seperti D25).
-8. **Satukan daftar kategori resmi** (`OFFICIAL_CATEGORY_SLUGS` di klien menduplikasi `getCategories()` di server) dari satu sumber saat integrasi WordPress; nyatakan perlakuan kategori non-resmi di UI (teks biasa tanpa halaman).
-9. **Papan iklan** (penampung statis "Advertisement"; D47): diganti konten CMS (ADS-002: gambar + tautan `https`, tanpa HTML/skrip) atau disembunyikan; teks penampung tidak boleh tayang.
-10. **Widget sosial** (SOC-001; D49): angka penampung dari Figma di `app/config/social.ts` diganti angka nyata (konfigurasi pemilik atau WordPress) atau widget disembunyikan; URL akun `https` diisi pemilik agar kotak menjadi tautan.
-11. **Hero putar otomatis tanpa tombol jeda** (UX-001; D50): WCAG 2.2.2 meminta mekanisme jeda untuk gerakan otomatis > 5 detik; pemilik memutuskan tombol jeda (butuh desain; tidak ada di Figma) atau menerima celahnya.
+**Daftar tunggal WAJIB SEBELUM TAYANG (situs tidak boleh tayang sebelum semuanya selesai; diperbarui 4 Nov 2026 atas keputusan pemilik):**
+1. **Fixture dihapus:** `public/fixtures/` dan `FIXTURE_SET` dibuang dari build produksi; semua konten dari WordPress (gambar fixture berasal dari Figma, hak pakai tidak diperiksa).
+2. **Halaman error/404 berlayout:** menyusul ("coming soon", pemilik 4 Nov); sekarang memakai halaman bawaan Nuxt tanpa header/footer. **SEO-001** (judul/deskripsi/canonical lengkap; samakan format judul Detail `"<judul> — IniSumedang"` dengan Kategori `"<Kategori> - Ini Sumedang"`).
+3. **Satukan daftar kategori resmi** (`OFFICIAL_CATEGORY_SLUGS` di klien menduplikasi `getCategories()` di server): tampilan membaca daftar dari server saja, dikerjakan saat integrasi WordPress (disetujui pemilik 4 Nov).
+4. **Papan iklan** (penampung "Advertisement"; D47): diganti konten CMS (ADS-001/ADS-002: gambar + tautan `https`, tanpa HTML/skrip) saat WordPress tersambung (pemilik 4 Nov); teks penampung tidak boleh tayang.
+5. **Widget sosial** (SOC-001; D49): angka contoh dibiarkan sampai data asli diketahui (pemilik 4 Nov); sebelum tayang diganti angka asli atau widget disembunyikan.
+6. **Keputusan pemilik yang menunggu** di `POLISH-01` (daftar ringkas diberikan PM 4 Nov): D29/D2/D4 (font Merriweather 400 dan Inter 700), D30/D49/D1/D21 (warna), D41/D16/D22 (area klik < 24 px), D24, D26, D33, D36, D42, D28, D40, D54, D56, dan butir tampilan lain.
+
+**Sudah diputuskan pemilik (4 Nov 2026):** area klik logo header seukuran logo (D25 diterima, tidak wajib); hero putar otomatis tanpa tombol jeda (celah WCAG 2.2.2 diterima, D50); STATIC-001 berupa halaman teks saja; DISC-001 digantikan slice; basis URL kanonis tetap, validasi URL gambar hero, dan CSP `frame-src` dikerjakan di **HARD-001** (butir ini dicabut dari daftar setelah `DONE`).
 
 **Definition of Ready:** node dari 4 frame final + screenshot; token dan komponen terpakai; field data dan endpoint; kriteria penerimaan; rencana tes; keputusan tablet; daftar file yang boleh disentuh.
 
@@ -529,11 +526,12 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | UX-001 | `DONE` | Hero otomatis, kolom kanan kategori, "Lebih banyak", "Lainnya" lebih besar, kolom kanan menempel |
 | UX-002 | `DONE` | Widget kategori sejajar kartu pertama (perubahan kecil, tanpa berkas task) |
 | PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
-| STATIC-001 | `BACKLOG` | Lima halaman statis footer; menunggu isi dari pemilik |
+| HARD-001 | `READY` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
+| STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
 | POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma D1–D56 (`docs/tasks/POLISH-01.md`) |
 | API-001, DISC-002, POP-001, ADS-001, ADS-002 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
-| MOCK-001, LAY-001, CARD-001, PAGE-001 | `DITUNDA` | Digantikan slice vertikal HOME-01..07 |
-| DISC-001, DISC-003, SEC-001, SEO-001, RESP-001, REL-001 | belum dibuka | DISC-003 = pertanyaan terbuka ke pemilik; SEO-001 (redirect URL lama) dan SEC-001 (uji XSS konten) sebagian bergantung data WordPress [I]; PM menilai saat dibuka |
+| MOCK-001, LAY-001, CARD-001, PAGE-001, DISC-001 | `DITUNDA` | Digantikan slice vertikal HOME-01..07 |
+| DISC-003, SEC-001, SEO-001, RESP-001, REL-001 | belum dibuka | DISC-003 = pertanyaan terbuka ke pemilik; SEO-001 (redirect URL lama) dan SEC-001 (CSP penuh, uji XSS konten) sebagian bergantung data WordPress [I]; PM menilai saat dibuka |
 
 ## 16. Fase & Estimasi (baseline)
 
