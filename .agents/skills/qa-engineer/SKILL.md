@@ -13,6 +13,15 @@ Dipakai untuk (1) rencana tes **sebelum** implementasi dan (2) verifikasi **sete
 3. Viewport: **1440** (desktop final) dan **402** (mobile final) dulu; tablet **768/820/1024/1280** terhadap aturan PRD §3.4; sampel 320/375. Jangan menyebut sampel sebagai breakpoint Figma. Tablet, kategori, dan pencarian tidak punya frame: uji terhadap PRD dan konsistensi dengan komponen di frame final.
 4. Format kasus: ID · prasyarat · langkah · hasil diharapkan · prioritas. Laporkan ke PM bagian yang tak bisa diuji karena tidak terdefinisi.
 
+## Skala dan batas (wajib; keputusan pemilik 4 Nov 2026)
+- **Cakupan mengikuti besar perubahan.** Butir Fase 2 di bawah adalah *bank pemeriksaan*, bukan daftar yang dijalankan semua: ambil yang relevan dengan diff dan kriteria task.
+  - **Kecil** (satu-dua berkas; CSS, teks, posisi): area yang berubah di 1440 dan 402, regresi singkat di sekitarnya, `lint`, `typecheck`, `npm test`.
+  - **Sedang:** kriteria task, regresi area yang tersentuh, `build`.
+  - **Besar atau berisiko** (keamanan, sanitasi HTML, dependensi, build/CI, WordPress): daftar penuh termasuk audit dan 8 lebar layar.
+- **Putaran kedua dan seterusnya:** verifikasi ulang hanya temuan putaran sebelumnya dan regresi cepat pada area yang diubah perbaikannya. Jangan mengulang pemeriksaan yang sudah lulus dan tidak terkait.
+- **Jangan overthinking.** Bila satu pemeriksaan berputar-putar (≈ dua percobaan tanpa kemajuan) atau QA melewati ±30 menit, berhenti pada hal itu, catat TIDAK TERUJI atau temuan terbuka dengan bukti dan opsi, lalu **serahkan keputusannya ke pemilik**. Jangan memburu penyebab akar sesuatu yang bukan temuan, dan jangan menahan laporan.
+- Temuan Low dan Info tidak memblokir `QA_PASSED`; cukup dicatat.
+
 ## Fase 2 — Verifikasi
 1. Baca diff dan skrip yang tersedia. Jalankan hanya yang ada; jangan berasumsi layanan/screenshot tersedia.
 2. **Visual:** bandingkan screenshot browser dengan `get_screenshot` Figma: font sesuai keputusan pemilik (Inter + Merriweather SemiBold; Outfit tidak boleh muncul — PRD §4.5, G17), ukuran & line-height sesuai gaya frame (Inventaris §A), spacing token, warna, crop gambar, state nav.
