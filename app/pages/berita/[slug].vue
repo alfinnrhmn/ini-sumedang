@@ -27,7 +27,7 @@ const now = detail.now
 
 // URL kanonis = SITE_URL + /berita/<slug> (HARD-001: produksi tidak memakai header Host; hanya mode dev memakai origin permintaan).
 // Dipakai untuk canonical, og:url, og:image (jalur relatif), tautan bagikan, dan salin tautan. URL gambar sudah divalidasi di server.
-const origin = siteOrigin(useRequestURL().origin)
+const origin = siteOrigin(useRequestURL().origin, useRuntimeConfig().public.siteUrl)
 const canonical = `${origin}${articlePath(article)}`
 const image = article.heroImage
   ? (article.heroImage.url.startsWith('/') ? `${origin}${article.heroImage.url}` : article.heroImage.url)

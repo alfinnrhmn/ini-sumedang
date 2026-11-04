@@ -79,7 +79,7 @@ useStickyColumn(secondary)
 
 // Judul dokumen "<Kategori> - Ini Sumedang" (catatan pemilik; Detail memakai "— IniSumedang", penyelarasan di SEO-001); deskripsi sederhana [I].
 // Canonical = SITE_URL + /kategori/<slug> (+ ?halaman=N bila N > 1); HARD-001: produksi tidak memakai header Host, hanya mode dev memakai origin permintaan.
-const origin = siteOrigin(useRequestURL().origin)
+const origin = siteOrigin(useRequestURL().origin, useRuntimeConfig().public.siteUrl)
 const title = computed(() => `${category.value?.name ?? 'Kategori'} - Ini Sumedang`)
 const description = computed(() => `Berita ${category.value?.name ?? ''} terbaru dari IniSumedang.`)
 const canonical = computed(() =>
