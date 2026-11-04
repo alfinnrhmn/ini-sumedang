@@ -112,3 +112,15 @@ export interface CategoryPageResponse {
   /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
   now: string
 }
+
+/**
+ * Respons `/api/search?q=&halaman=N` (PAGE-004): `query` = kata kunci ternormalisasi (dirender hanya sebagai teks), artikel terbit
+ * halaman itu (kata di judul dulu, lalu terbaru; tanpa isi `body`), dan paginasi. `articles` kosong hanya pada halaman 1 tanpa hasil.
+ */
+export interface SearchResponse {
+  query: string
+  articles: Article[]
+  pagination: CategoryPagination
+  /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
+  now: string
+}

@@ -528,9 +528,9 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | SOC-001 | `DONE` (UI) | Widget sosial; angka/URL dari WordPress tetap `DITUNDA` |
 | UX-001 | `DONE` | Hero otomatis, kolom kanan kategori, "Lebih banyak", "Lainnya" lebih besar, kolom kanan menempel |
 | UX-002 | `DONE` | Widget kategori sejajar kartu pertama (perubahan kecil, tanpa berkas task) |
-| PAGE-004 | `BACKLOG` | Pencarian; boleh memakai fixture (§13) |
+| PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer; menunggu isi dari pemilik |
-| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma D1–D53 (`docs/tasks/POLISH-01.md`) |
+| POLISH-01 | `BACKLOG` | Pengumpul deviasi Figma D1–D56 (`docs/tasks/POLISH-01.md`) |
 | API-001, DISC-002, POP-001, ADS-001, ADS-002 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
 | MOCK-001, LAY-001, CARD-001, PAGE-001 | `DITUNDA` | Digantikan slice vertikal HOME-01..07 |
 | DISC-001, DISC-003, SEC-001, SEO-001, RESP-001, REL-001 | belum dibuka | DISC-003 = pertanyaan terbuka ke pemilik; SEO-001 (redirect URL lama) dan SEC-001 (uji XSS konten) sebagian bergantung data WordPress [I]; PM menilai saat dibuka |

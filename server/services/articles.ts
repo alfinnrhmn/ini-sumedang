@@ -1,4 +1,4 @@
-import type { Article, ArticleCategory, ArticleDetail, ArticleTag, CategoryPageResponse, VisualTopic } from '../../app/types/article'
+import type { Article, ArticleCategory, ArticleDetail, ArticleTag, CategoryPageResponse, SearchResponse, VisualTopic } from '../../app/types/article'
 import { RELATED_BOTTOM_COUNT, RELATED_BOTTOM_MOBILE_COUNT, RELATED_SIDEBAR_COUNT } from '../../app/config/article'
 import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
 import { buildDefaultBody, buildDefaultExcerpt } from '../fixtures/article-content'
@@ -9,6 +9,7 @@ import { buildPagination, isPageInRange, sliceForPage } from '../utils/category-
 import type { RelatedCandidate } from '../utils/related-ranking'
 import { rankRelated, relatedBlocks } from '../utils/related-ranking'
 import { sanitizeArticleHtml } from '../utils/sanitize-article-html'
+import { searchPage } from '../utils/search-query'
 
 const RECOMMENDED_COUNT = 8
 // Ruang Visual (HOME-04): induk, jumlah topik, dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel).
@@ -175,6 +176,30 @@ export function getCategoryPage(slug: string, page: number, perPage: number, now
   return { category, articles: sliceForPage(all, page, perPage), pagination: buildPagination(page, all.length, perPage) }
 }
 
+/** Ringkasan teks polos sebuah post (tanpa HTML, entitas didekode); dasar pencarian dan `ArticleDetail.excerpt`. */
+function excerptTextOf(post: WpPost): string {
+  return decodeEntities(stripTags(post.excerpt?.rendered ?? buildDefaultExcerpt(post.id, post.title.rendered)))
+}
+
+/**
+ * Pencarian (PAGE-004, Keputusan PM 3): hanya status `publish`. `query` dinormalisasi (`normalizeSearchQuery`); tidak valid = tanpa hasil.
+ * Semua kata harus muncul di judul atau ringkasan (tanpa membedakan huruf besar/kecil); urutan = jumlah kata di judul terbanyak dulu,
+ * lalu terbaru. `page` melewati halaman terakhir = null; halaman 1 tanpa hasil tetap dikembalikan (artikel kosong, `totalPages` 0).
+ * `query` pada hasil = kata kunci ternormalisasi (kosong bila tidak valid). Tidak ada `body`/HTML mentah di hasilnya.
+ */
+export function searchArticles(query: string, page: number, perPage: number, now: Date = new Date()): Omit<SearchResponse, 'now'> | null {
+  const candidates = getPublishedPosts(now).map(post => ({
+    post,
+    id: post.id,
+    publishedAt: publishedAtOf(post),
+    title: decodeEntities(post.title.rendered),
+    excerpt: excerptTextOf(post)
+  }))
+  const result = searchPage(candidates, query, page, perPage)
+  if (!result) return null
+  return { query: result.query, articles: result.items.map(item => mapPost(item.post)), pagination: result.pagination }
+}
+
 function mapTags(post: WpPost): ArticleTag[] {
   return (post._embedded['wp:term'][1] ?? []).map(tag => ({ id: tag.id, slug: tag.slug, name: decodeEntities(tag.name) }))
 }
@@ -187,10 +212,9 @@ function mapDetail(post: WpPost): ArticleDetail {
   // Isi tanpa teks, gambar, atau embed (hanya spasi/tag kosong) dianggap kosong: '' agar halaman menampilkan pesan netral.
   const sanitized = sanitizeBodyHtml(post.content?.rendered ?? buildDefaultBody(post.id, post.title.rendered))
   const bodyHtml = hasVisibleContent(sanitized) ? sanitized : ''
-  const excerptHtml = post.excerpt?.rendered ?? buildDefaultExcerpt(post.id, post.title.rendered)
   return {
     ...mapPost(post),
-    excerpt: decodeEntities(stripTags(excerptHtml)),
+    excerpt: excerptTextOf(post),
     bodyHtml,
     tags: mapTags(post),
     photoCredit: decodeEntities(stripTags(post._embedded['wp:featuredmedia']?.[0]?.caption?.rendered ?? '')),

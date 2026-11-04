@@ -53,6 +53,20 @@ export function isCategoryRoute(route: { name?: unknown, params: Record<string, 
   return route.name === CATEGORY_ROUTE_NAME && route.params.slug === slug
 }
 
+/** Nama rute Nuxt untuk `app/pages/cari.vue` (PAGE-004). */
+export const SEARCH_ROUTE_NAME = 'cari'
+
+/**
+ * Tujuan halaman hasil pencarian (PAGE-004): `/cari?q=<kata kunci>`, halaman N > 1 menambah `&halaman=N`. `q` di-encode penuh
+ * (`encodeURIComponent`), jadi karakter apa pun hanya menjadi nilai parameter, tidak pernah bagian path atau parameter lain.
+ * Tanpa `q` (kosong) = `/cari` (halaman menampilkan pesan netral). Satu-satunya tempat bentuk URL pencarian; formulir header dan
+ * "Lebih banyak" memakai fungsi ini.
+ */
+export function searchPath(query: string, page = 1): string {
+  if (query === '') return '/cari'
+  return `/cari?q=${encodeURIComponent(query)}${page > 1 ? `&halaman=${page}` : ''}`
+}
+
 /**
  * "Lebih banyak" (UX-001 Keputusan PM 3): gabungkan artikel halaman berikutnya ke daftar yang sudah tampil, tanpa duplikat berdasarkan `id`
  * (juga di dalam `incoming` sendiri). Urutan terjaga (yang lama dulu, yang baru di bawah); tidak mengubah masukan. Murni agar bisa diuji.

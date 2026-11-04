@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Article, CategoryPageResponse } from '~/types/article'
+import type { Article, CategoryPageResponse, SearchResponse } from '~/types/article'
 
 // Tombol "Lebih banyak" halaman kategori (UX-001 Keputusan PM 3; menggantikan Pagination). Komponen visual BARU tanpa frame Figma: gaya hanya dari token
 // (isi --color-brand, teks putih; kontras 5,0:1; deviasi untuk POLISH-01).
@@ -8,8 +8,13 @@ import type { Article, CategoryPageResponse } from '~/types/article'
 // di bawah daftar yang ada (penggabungan tanpa duplikat: mergeArticles). URL tidak berubah. Satu permintaan pada satu waktu.
 // Status: memuat = aria-busy + aria-disabled + teks "Memuat…"; gagal = pesan netral (tombol tetap bisa dicoba ulang). Pengumuman "N berita ditambahkan"
 // lewat region role="status" yang selalu ada (tombol bisa hilang di halaman terakhir). Fokus dipindahkan ke tautan judul kartu baru pertama oleh halaman.
+// PAGE-004 (digeneralisasi): sumber daftar ditentukan salah satu prop. `slug` = halaman kategori (/kategori/<slug>, /api/category/<slug>);
+// `query` = hasil pencarian (/cari?q=..., /api/search?q=...). Perilaku, gaya, dan aksesibilitas sama; halaman kategori tidak berubah.
 const props = defineProps<{
-  slug: string
+  /** Slug kategori (halaman kategori). Kosongkan bila memakai `query`. */
+  slug?: string
+  /** Kata kunci ternormalisasi (halaman hasil pencarian). Kosongkan bila memakai `slug`. */
+  query?: string
   /** Halaman terakhir yang sudah dimuat (halaman awal dari URL, bertambah tiap "Lebih banyak"). */
   loadedPage: number
   totalPages: number
@@ -23,7 +28,10 @@ const emit = defineEmits<{
 
 const hasMore = computed(() => props.loadedPage < props.totalPages)
 const nextPage = computed(() => props.loadedPage + 1)
-const href = computed(() => categoryPagePath(props.slug, nextPage.value))
+const searching = computed(() => props.query !== undefined)
+const href = computed(() => (searching.value ? searchPath(props.query ?? '', nextPage.value) : categoryPagePath(props.slug ?? '', nextPage.value)))
+// Kunci sumber: pengguna berpindah kategori / kata kunci selama permintaan berjalan = hasil usang dibuang
+const sourceKey = computed(() => (searching.value ? `q:${props.query}` : `c:${props.slug}`))
 
 const loading = ref(false)
 const failed = ref(false)
@@ -37,12 +45,14 @@ async function onClick(event: MouseEvent) {
   loading.value = true
   failed.value = false
   announcement.value = ''
-  const slug = props.slug
+  const key = sourceKey.value
   const page = nextPage.value
   try {
-    const response = await $fetch<CategoryPageResponse>(`/api/category/${encodeURIComponent(slug)}`, { query: { halaman: page } })
-    // Pengguna berpindah kategori / halaman selama permintaan berjalan: hasil usang dibuang
-    if (props.slug !== slug || nextPage.value !== page) return
+    const response = props.query !== undefined
+      ? await $fetch<SearchResponse>('/api/search', { query: { q: props.query, halaman: page } })
+      : await $fetch<CategoryPageResponse>(`/api/category/${encodeURIComponent(props.slug ?? '')}`, { query: { halaman: page } })
+    // Pengguna berpindah kategori / kata kunci / halaman selama permintaan berjalan: hasil usang dibuang
+    if (sourceKey.value !== key || nextPage.value !== page) return
     const merged = mergeArticles(props.articles, response.articles)
     const added = merged.length - props.articles.length
     emit('loaded', { articles: merged, page, added })

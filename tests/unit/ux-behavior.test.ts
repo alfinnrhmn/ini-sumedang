@@ -279,7 +279,7 @@ describe('UX4 halaman kategori: kolom kanan dan "Lebih banyak" (penjaga sumber)'
   it('LoadMore: tautan <a> ke ?halaman=N+1 rel=next, dicegat hanya klik tanpa modifier, aria-busy, status role=status, tanpa v-html', () => {
     const component = source('app/components/category/LoadMore.vue')
     assert.match(component, /<a\s+:href="href"\s+rel="next"/)
-    assert.match(component, /categoryPagePath\(props\.slug, nextPage\.value\)/)
+    assert.match(component, /categoryPagePath\(props\.slug \?\? '', nextPage\.value\)/) // PAGE-004: slug opsional (digeneralisasi)
     assert.match(component, /event\.button !== 0 \|\| event\.metaKey \|\| event\.ctrlKey \|\| event\.shiftKey \|\| event\.altKey/)
     assert.match(component, /:aria-busy="loading"/)
     assert.match(component, /role="status"/)
