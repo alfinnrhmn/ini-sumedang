@@ -9,11 +9,11 @@ function notFound() {
   return createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Artikel tidak ditemukan.' })
 }
 
-export default defineEventHandler((event): ArticleDetailResponse => {
+export default defineEventHandler(async (event): Promise<ArticleDetailResponse> => {
   const slug = getRouterParam(event, 'slug')
   if (!isValidArticleSlug(slug)) throw notFound()
   const now = new Date()
-  const article = getArticleBySlug(slug, now)
+  const article = await getArticleBySlug(slug, now)
   if (!article) throw notFound()
-  return { article, related: getRelatedArticles(article.id, now), now: now.toISOString() }
+  return { article, related: await getRelatedArticles(article.id, now), now: now.toISOString() }
 })

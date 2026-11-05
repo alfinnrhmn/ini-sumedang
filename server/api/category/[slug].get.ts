@@ -11,13 +11,13 @@ function notFound() {
   return createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Halaman tidak ditemukan.' })
 }
 
-export default defineEventHandler((event): CategoryPageResponse => {
+export default defineEventHandler(async (event): Promise<CategoryPageResponse> => {
   const slug = getRouterParam(event, 'slug')
   if (!isCategoryPageSlug(slug)) throw notFound()
   const page = parsePageParam(getQuery(event).halaman)
   if (page === null) throw notFound()
   const now = new Date()
-  const result = getCategoryPage(slug, page, CATEGORY_PER_PAGE, now)
+  const result = await getCategoryPage(slug, page, CATEGORY_PER_PAGE, now)
   if (!result) throw notFound()
   return { ...result, now: now.toISOString() }
 })
