@@ -48,13 +48,21 @@ function imageHosts(): readonly string[] {
   return base ? wpImageHosts(base) : []
 }
 
-/** Pemuatan dari WordPress gagal (timeout, 5xx, JSON rusak, ...) = 502 dengan pesan tetap; tanpa stack, path, URL, atau env. */
+/**
+ * Pemuatan dari WordPress gagal (timeout, 5xx, JSON rusak, ...) = 502 dengan pesan tetap; tanpa stack, path, URL, atau env.
+ * Hanya di mode dev, `data` memuat `reason` dan `detail` (kode galat) untuk diagnosis; build produksi tidak pernah menambah `data`.
+ */
 async function fromWordPress<T>(load: () => Promise<T>): Promise<T> {
   try {
     return await load()
   } catch (error) {
     if (error instanceof WpUnavailableError) {
-      throw createError({ statusCode: 502, statusMessage: 'Bad Gateway', message: WP_UNAVAILABLE_MESSAGE })
+      throw createError({
+        statusCode: 502,
+        statusMessage: 'Bad Gateway',
+        message: WP_UNAVAILABLE_MESSAGE,
+        ...(import.meta.dev ? { data: { reason: error.reason, detail: error.detail } } : {})
+      })
     }
     throw error
   }

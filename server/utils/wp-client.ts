@@ -14,16 +14,37 @@ import { normalizeWpPosts, normalizeWpTerms } from './wp-map.ts'
 /** Pesan tetap yang boleh sampai ke klien (tanpa stack, path, URL, env). */
 export const WP_UNAVAILABLE_MESSAGE = 'Sumber data tidak tersedia.'
 
-/** WordPress tidak bisa dipakai (timeout, jaringan, 5xx, JSON rusak, terlalu besar). `reason` = kode singkat untuk log, bukan untuk klien. */
+/**
+ * WordPress tidak bisa dipakai (timeout, jaringan, 5xx, JSON rusak, terlalu besar). `reason` = kode singkat untuk log, bukan untuk klien.
+ * `detail` (opsional) = kode galat jaringan Node/undici (mis. `ECONNREFUSED`) hanya untuk diagnosis: log server dan, di mode dev saja, badan 502.
+ */
 export class WpUnavailableError extends Error {
   readonly reason: string
   readonly retryable: boolean
-  constructor(reason: string, retryable: boolean) {
+  readonly detail?: string
+  constructor(reason: string, retryable: boolean, detail?: string) {
     super(WP_UNAVAILABLE_MESSAGE)
     this.name = 'WpUnavailableError'
     this.reason = reason
     this.retryable = retryable
+    if (detail !== undefined) this.detail = detail
   }
+}
+
+// Kode galat Node/undici/OpenSSL: huruf besar, angka, garis bawah (ECONNREFUSED, UNABLE_TO_VERIFY_LEAF_SIGNATURE, ...).
+const ERROR_CODE = /^[A-Z][A-Z0-9_]{2,40}$/
+
+/**
+ * Kode galat jaringan dari galat `fetch` (`error.cause.code`, lalu `error.code`) HANYA bila berbentuk kode (`ERROR_CODE`);
+ * selain itu `'unknown'`. Tidak pernah memuat pesan galat, URL, host, path, atau isi respons. Tidak melempar.
+ */
+export function networkErrorDetail(error: unknown): string {
+  const codeOf = (value: unknown): unknown => (typeof value === 'object' && value !== null ? (value as { code?: unknown }).code : undefined)
+  const cause = typeof error === 'object' && error !== null ? (error as { cause?: unknown }).cause : undefined
+  for (const candidate of [codeOf(cause), codeOf(error)]) {
+    if (typeof candidate === 'string' && ERROR_CODE.test(candidate)) return candidate
+  }
+  return 'unknown'
 }
 
 // Origin `https://host[:port]` (garis miring akhir opsional); host = label huruf/angka/strip dipisah titik.
@@ -180,7 +201,8 @@ async function requestPage(url: string): Promise<WpPage> {
   } catch (error) {
     if (error instanceof WpUnavailableError) throw error
     const name = (error as { name?: string } | null)?.name
-    throw new WpUnavailableError(name === 'TimeoutError' || name === 'AbortError' ? 'timeout' : 'network', true)
+    if (name === 'TimeoutError' || name === 'AbortError') throw new WpUnavailableError('timeout', true)
+    throw new WpUnavailableError('network', true, networkErrorDetail(error))
   }
 }
 
@@ -189,7 +211,8 @@ async function fetchAll(baseUrl: string, path: string): Promise<unknown[]> {
   try {
     return await collectPages(page => withRetry(() => requestPage(`${baseUrl}/wp-json/wp/v2/${path}&page=${page}`), WP_RETRIES), WP_MAX_PAGES)
   } catch (error) {
-    console.warn(`[wp] gagal memuat data: ${error instanceof WpUnavailableError ? error.reason : 'unknown'}`)
+    const detail = error instanceof WpUnavailableError && error.detail ? ` (${error.detail})` : ''
+    console.warn(`[wp] gagal memuat data: ${error instanceof WpUnavailableError ? error.reason : 'unknown'}${detail}`)
     throw error instanceof WpUnavailableError ? error : new WpUnavailableError('unknown', false)
   }
 }

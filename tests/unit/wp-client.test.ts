@@ -5,7 +5,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  WP_UNAVAILABLE_MESSAGE, WpUnavailableError, collectPages, createCachedLoader, parseTotalPages, validWpBaseUrl, withRetry
+  WP_UNAVAILABLE_MESSAGE, WpUnavailableError, collectPages, createCachedLoader, networkErrorDetail, parseTotalPages, validWpBaseUrl, withRetry
 } from '../../server/utils/wp-client.ts'
 import { excerptText, mapPost, normalizeWpPost, normalizeWpPosts, normalizeWpTerms, pickWordPressCategories, publishedAtOf, wpImageHosts } from '../../server/utils/wp-map.ts'
 import { WP_CACHE_TTL_MS } from '../../app/config/wp.ts'
@@ -138,6 +138,52 @@ describe('WP3 retry', () => {
     assert.equal(error.message, 'Sumber data tidak tersedia.')
     assert.equal(error.message, WP_UNAVAILABLE_MESSAGE)
     assert.equal(error.reason, 'http-500')
+    assert.equal(error.detail, undefined)
+  })
+
+  it('WpUnavailableError membawa detail opsional tanpa mengubah pesan tetap', () => {
+    const error = new WpUnavailableError('network', true, 'ECONNREFUSED')
+    assert.equal(error.message, WP_UNAVAILABLE_MESSAGE)
+    assert.equal(error.detail, 'ECONNREFUSED')
+  })
+
+  describe('networkErrorDetail', () => {
+    const withCause = (code: unknown) => Object.assign(new TypeError('fetch failed'), { cause: { code } })
+    for (const code of ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'UNABLE_TO_VERIFY_LEAF_SIGNATURE', 'CERT_HAS_EXPIRED', 'UND_ERR_CONNECT_TIMEOUT']) {
+      it(`kode valid lolos: ${code}`, () => assert.equal(networkErrorDetail(withCause(code)), code))
+    }
+    it('error.code dipakai bila cause.code tidak valid; cause.code diutamakan', () => {
+      assert.equal(networkErrorDetail(Object.assign(new Error('x'), { code: 'ECONNRESET' })), 'ECONNRESET')
+      assert.equal(networkErrorDetail(Object.assign(new Error('x'), { code: 'ECONNRESET', cause: { code: 'ENOTFOUND' } })), 'ENOTFOUND')
+      assert.equal(networkErrorDetail(Object.assign(new Error('x'), { code: 'ECONNRESET', cause: { code: 'bukan kode' } })), 'ECONNRESET')
+    })
+    const unknowns: [string, unknown][] = [
+      ['pesan bebas', withCause('connect ECONNREFUSED 127.0.0.1:1')],
+      ['URL', withCause('https://cms.example.com/wp-json')],
+      ['huruf kecil', withCause('econnrefused')],
+      ['terlalu panjang', withCause(`E${'A'.repeat(41)}`)],
+      ['terlalu pendek', withCause('EA')],
+      ['diawali angka', withCause('1ABC')],
+      ['bukan string', withCause(1234)],
+      ['objek', withCause({ code: 'ECONNREFUSED' })],
+      ['cause null', Object.assign(new Error('x'), { cause: null })],
+      ['tanpa kode', new TypeError('fetch failed')],
+      ['null', null],
+      ['undefined', undefined],
+      ['string', 'ECONNREFUSED'],
+      ['angka', 42]
+    ]
+    for (const [label, input] of unknowns) {
+      it(`menjadi unknown: ${label}`, () => assert.equal(networkErrorDetail(input), 'unknown'))
+    }
+    it('tidak pernah memuat pesan galat, URL, host, atau path', () => {
+      const error = Object.assign(new TypeError('connect ECONNREFUSED https://rahasia.example.com/wp-json/wp/v2/posts'), {
+        cause: { code: 'ECONNREFUSED', message: 'https://rahasia.example.com', address: '10.0.0.1', port: 443 }
+      })
+      const detail = networkErrorDetail(error)
+      assert.equal(detail, 'ECONNREFUSED')
+      assert.doesNotMatch(detail, /rahasia|example|10\.0|wp-json|https?:/i)
+    })
   })
 })
 
