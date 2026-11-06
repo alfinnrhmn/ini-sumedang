@@ -37,14 +37,14 @@ const decorative = items.every(item => !item.href)
 
 <style scoped>
 .label {
-  height: 18px; /* 88:462 label y 10 ke ikon y 28 */
+  height: 18px;
   font: var(--type-metadata);
   color: var(--color-footer-muted);
 }
 
 .icons {
   display: flex;
-  gap: 12px; /* 60:488..60:506 pitch 38 = 26 + 12 */
+  gap: 12px; /* pitch 38 = 26 + 12 */
 }
 
 .icon {

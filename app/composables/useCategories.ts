@@ -1,12 +1,7 @@
 import type { ArticleCategory, CategoriesResponse } from '~/types/article'
 
-// Daftar kategori WordPress (WP-002): SATU sumber di klien untuk menu, laci, footer, dan keputusan "label kategori ini menaut atau teks biasa"
-// (`categoryLink(slug, categories)`). Datanya dari `/api/categories` (satu permintaan, kunci `categories`, dipakai SiteHeader sejak HOME-06).
-// Dipanggil dari banyak komponen (kartu, hero, kepala artikel, ...) dengan opsi yang SAMA persis:
-// - SSR: pemanggil yang datang saat permintaan masih berjalan ikut menunggunya (`dedupe: 'defer'`; Nuxt mendaftarkan penantian itu ke render
-//   komponen pemanggil), pemanggil sesudahnya memakai hasil yang sudah ada di payload (`getCachedData`), jadi tautan kategori sudah ada di
-//   HTML server tanpa bergantung pada urutan render header/halaman.
-// - Hidrasi dan navigasi klien: data dibaca dari payload, tidak ada permintaan baru.
+// Satu sumber daftar kategori di klien (menu, laci, footer, keputusan label menaut atau teks biasa). Opsi `dedupe: 'defer'` + `getCachedData`
+// harus SAMA di semua pemanggil agar tautan kategori sudah ada di HTML server dan hidrasi/navigasi tidak meminta ulang.
 /** Pengambilan daftar kategori; dapat ditunggu (`await`), dipakai SiteHeader. Komponen lain memakai `useCategories()`. */
 export function useCategoriesFetch() {
   return useFetch<CategoriesResponse>('/api/categories', {

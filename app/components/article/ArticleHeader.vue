@@ -2,13 +2,12 @@
 import type { ArticleDetail } from '~/types/article'
 import { visibleTags } from '~/config/home'
 
-// Kepala artikel (desktop 127:2132, mobile 130:3342): label kategori • tag, judul (h1), ringkasan, identitas + waktu baca.
-// Label kedua = tag tampil pertama artikel (Figma "LAYANAN PUBLIK" [I: subkategori/tag]; tag fungsional `terpopuler` tidak ikut, WP-002); tanpa tag, hanya kategori; tanpa keduanya label tidak dirender.
-// Tanggal terbit [I; PAGE-002 Keputusan 11, tidak ada di node Figma] ditampilkan di baris waktu baca.
+// Kepala artikel: label kategori • tag, judul (h1), ringkasan, identitas + waktu baca. Label kedua = tag tampil pertama (tag fungsional `terpopuler` tidak ikut);
+// tanpa tag hanya kategori, tanpa keduanya label tidak dirender. Tanggal terbit ditampilkan di baris waktu baca.
 const props = defineProps<{ article: ArticleDetail }>()
 
 const category = computed(() => props.article.categories[0]?.name ?? '')
-// PAGE-003, WP-002: kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug>; label kedua (tag) tetap teks biasa.
+// Kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug>; label kedua (tag) tetap teks biasa.
 const categories = useCategories()
 const categoryTo = computed(() => {
   const first = props.article.categories[0]
@@ -49,7 +48,6 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
 </template>
 
 <style scoped>
-/* Mobile 130:3342: kolom gap 16 (label, blok judul, identitas) */
 .head {
   display: flex;
   flex-direction: column;
@@ -57,18 +55,17 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
   min-width: 0;
 }
 
-/* Label 130:3343: Inter SemiBold 11,111/16,667 biru, huruf kapital; titik 5x5 (130:3346) celah 6 */
 .label {
   display: flex;
   align-items: center;
-  gap: 6px; /* 130:3343 */
+  gap: 6px;
   font: var(--type-card-label-mobile);
   text-transform: uppercase;
   color: var(--color-brand);
 }
 
-/* PAGE-003: tautan kategori mewarisi warna dan huruf label; hover bergaris bawah.
-   POLISH-01 D41 (WCAG 2.5.8): area klik >= 24 x 24 px lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+/* Tautan kategori mewarisi warna dan huruf label; hover bergaris bawah.
+   Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
 .category-link {
   position: relative;
 }
@@ -91,13 +88,12 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
 
 .dot {
   flex: none;
-  width: 5px; /* 130:3346 */
+  width: 5px;
   height: 5px;
   border-radius: var(--radius-full);
   background: var(--color-brand);
 }
 
-/* Blok judul + ringkasan 130:3350: jarak 8 (mobile), 16 (desktop 130:2342) */
 .text {
   display: flex;
   flex-direction: column;
@@ -105,7 +101,6 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
   min-width: 0;
 }
 
-/* Judul mobile 130:3352: Merriweather SemiBold 27,648/33,178, tracking -0,2, #1A212E */
 .title {
   font: var(--type-headline-mobile);
   letter-spacing: var(--tracking-headline);
@@ -113,14 +108,13 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
   overflow-wrap: anywhere;
 }
 
-/* Ringkasan 130:3354: Inter Regular 13,333/18,666, #5E6B7D -> token terdekat --color-footer-muted (selisih 8/5/8, kontras 4,97:1) */
+/* Ringkasan: #5E6B7D Figma -> --color-footer-muted (selisih 8/5/8, kontras 4,97:1) */
 .excerpt {
   font: var(--type-caption);
   color: var(--color-footer-muted);
   overflow-wrap: anywhere;
 }
 
-/* Identitas 130:3355: avatar 20, celah 8; nama Inter Medium 11,111/16,667 #1A212E; waktu baca 11,111/16,667 #5E6B7D */
 .meta {
   display: flex;
   align-items: center;
@@ -130,7 +124,7 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
 
 .avatar {
   flex: none;
-  width: 20px; /* 130:3356 */
+  width: 20px;
   height: 20px;
   border-radius: var(--radius-full);
 }
@@ -140,24 +134,23 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
 }
 
 .author {
-  height: 15px; /* 130:3358 */
+  height: 15px;
   font: var(--type-card-author-mobile);
   color: var(--color-article-title);
 }
 
 .sub {
-  height: 14px; /* 130:3359 (baris 16,667 dalam kotak 14: blok identitas 29 = tinggi Figma) */
+  height: 14px; /* baris 16,667 dalam kotak 14: blok identitas 29 = tinggi Figma */
   font: var(--type-card-timestamp);
   color: var(--color-footer-muted);
 }
 
 @media (min-width: 1024px) {
-  /* Desktop 127:2132: label (19) gap 16, blok judul (110) gap 16 ke ringkasan (60), gap 16 identitas; padding bawah 28 */
   .head {
-    padding-bottom: 28px; /* 127:2132 pb 28 */
+    padding-bottom: 28px;
   }
 
-  /* 127:2133: Inter Bold 13/19. Inter 700 belum di-host (hanya 300-600): dirender 600, deviasi dicatat di task */
+  /* Inter Bold 13/19 di Figma; Inter 700 belum di-host (hanya 300-600), dirender 600 */
   .label {
     font: 700 13px/19px var(--font-sans);
   }
@@ -166,31 +159,29 @@ const date = computed(() => formatPublishDate(props.article.publishedAt))
     gap: var(--space-16);
   }
 
-  /* 127:2134: Inter Bold 46/55 #1A212E (700 dirender 600, lihat atas) */
+  /* Inter Bold 46/55 (700 dirender 600) */
   .title {
     font: 700 46px/55px var(--font-sans);
     letter-spacing: 0;
   }
 
-  /* 127:2135: Inter Regular 20/30 */
   .excerpt {
     font: 400 20px/30px var(--font-sans);
   }
 
-  /* 127:2136: avatar 36, celah 14; nama Inter SemiBold 14/19, waktu baca Inter Regular 12/17, jarak 3 */
   .meta {
     gap: 14px;
   }
 
   .avatar {
-    width: 36px; /* 127:2137 */
+    width: 36px;
     height: 36px;
   }
 
   .meta-text {
     display: flex;
     flex-direction: column;
-    gap: 3px; /* 127:2139 */
+    gap: 3px;
   }
 
   .author {

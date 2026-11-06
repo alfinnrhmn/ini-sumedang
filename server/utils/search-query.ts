@@ -1,5 +1,5 @@
 /**
- * Pembantu murni pencarian (PAGE-004). Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji dengan `node:test`.
+ * Pembantu murni pencarian. Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji dengan `node:test`.
  * Normalisasi `q` ada di `app/config/search.ts` (dipakai juga oleh klien); di sini: pemecahan kata dan penilaian kecocokan.
  */
 import { normalizeSearchQuery } from '../../app/config/search.ts'
@@ -8,10 +8,7 @@ import { buildPagination, isPageInRange, sliceForPage } from './category-page.ts
 
 export { normalizeSearchQuery }
 
-/**
- * Kata-kata pencarian dari `q` yang SUDAH ternormalisasi: dipecah pada spasi, huruf kecil, tanpa duplikat (urutan kemunculan).
- * `q` kosong atau tidak valid = tanpa kata (tidak cocok dengan apa pun).
- */
+/** Kata-kata dari `q` yang SUDAH ternormalisasi: dipecah pada spasi, huruf kecil, tanpa duplikat (urutan kemunculan). `q` kosong atau tidak valid = tanpa kata. */
 export function searchTerms(query: string): string[] {
   const normalized = normalizeSearchQuery(query)
   if (normalized === null) return []
@@ -19,10 +16,8 @@ export function searchTerms(query: string): string[] {
 }
 
 /**
- * Nilai kecocokan satu artikel (Keputusan PM 3). Semua kata harus muncul (sebagai potongan teks, tanpa membedakan huruf besar/kecil)
- * di judul ATAU ringkasan; satu kata boleh di judul dan kata lain di ringkasan. Hasil `null` = tidak cocok; selain itu jumlah kata
- * yang muncul di JUDUL (0..jumlah kata): makin banyak kata di judul, makin atas urutannya (pemanggil mengurutkan turun, lalu terbaru).
- * Tanpa kata = `null` (tidak pernah cocok).
+ * Nilai kecocokan satu artikel: semua kata harus muncul (potongan teks, tanpa membedakan huruf besar/kecil) di judul ATAU ringkasan; satu kata boleh di judul dan kata lain di ringkasan.
+ * `null` = tidak cocok; selain itu jumlah kata yang muncul di JUDUL (makin banyak makin atas urutannya; pemanggil mengurutkan turun, lalu terbaru). Tanpa kata = `null`.
  */
 export function searchScore(terms: readonly string[], title: string, excerpt: string): number | null {
   if (terms.length === 0) return null
@@ -36,10 +31,7 @@ export function searchScore(terms: readonly string[], title: string, excerpt: st
   return titleHits
 }
 
-/**
- * Urutan hasil: jumlah kata di judul terbanyak dulu, lalu terbaru (`publishedAt` ISO), lalu `id` terbesar agar urutan selalu pasti.
- * Mengembalikan angka negatif bila `a` harus tampil lebih dulu.
- */
+/** Urutan hasil: jumlah kata di judul terbanyak dulu, lalu terbaru (`publishedAt` ISO), lalu `id` terbesar agar pasti. Negatif bila `a` harus tampil lebih dulu. */
 export function compareSearchHits(
   a: { score: number, publishedAt: string, id: number },
   b: { score: number, publishedAt: string, id: number }
@@ -57,9 +49,8 @@ export interface SearchCandidate {
 }
 
 /**
- * Inti `searchArticles` (murni agar bisa diuji): hasil yang cocok untuk `query` dalam urutan akhir (kata di judul terbanyak dulu, lalu
- * terbaru), dipotong ke halaman `page`. `query` dinormalisasi; tidak valid = tanpa hasil. `page` melewati halaman terakhir = null;
- * halaman 1 tanpa hasil tetap dikembalikan (`items` kosong, `totalPages` 0). Tidak mengubah masukan.
+ * Inti `searchArticles` (murni agar bisa diuji): hasil yang cocok untuk `query` dalam urutan akhir, dipotong ke halaman `page`. `query` dinormalisasi; tidak valid = tanpa hasil.
+ * `page` melewati halaman terakhir = null; halaman 1 tanpa hasil tetap dikembalikan (`items` kosong, `totalPages` 0). Tidak mengubah masukan.
  */
 export function searchPage<T extends SearchCandidate>(
   candidates: readonly T[], query: string, page: number, perPage: number

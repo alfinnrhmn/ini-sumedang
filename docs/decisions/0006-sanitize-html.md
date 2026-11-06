@@ -4,7 +4,7 @@
 |---|---|
 | **Tanggal** | 2 Nov 2026 |
 | **Status** | Dikerjakan FE di SANITIZE-001 berdasarkan persetujuan dependensi pemilik (pra-persetujuan 2 Nov 2026, syarat diverifikasi PM); menunggu tinjauan QA dan persetujuan commit pemilik |
-| **Rujukan** | `docs/tasks/SANITIZE-001.md` (Verifikasi dependensi, Kriteria 1-9), PRD v1.10 §10.1, FR-05, §17, AGENTS.md aturan 3, 6, 8 |
+| **Rujukan** | task SANITIZE-001 (riwayat git), PRD v1.10 §10.1, FR-05, §17, AGENTS.md aturan 3, 6, 8 |
 
 ## Keputusan
 Isi artikel (`body`) dari CMS disanitasi **di server** dengan `sanitize-html` **2.18.1** (dipin eksak, `"sanitize-html": "2.18.1"` tanpa `^`/`~`), lewat satu fungsi `sanitizeArticleHtml(html: unknown): string` (`server/utils/sanitize-article-html.ts`) dengan allowlist di satu berkas (`server/utils/sanitize-config.ts`). Pembungkus titik pemanggilan: `sanitizeBodyHtml` di `server/services/articles.ts` (dipanggil PAGE-002 saat `body` ditambahkan). Satu dependensi runtime baru; tanpa `@types/sanitize-html` dan tanpa Vitest (tidak disetujui; deklarasi tipe lokal `server/utils/types/sanitize-html.d.ts`, uji dengan `node:test` bawaan Node).

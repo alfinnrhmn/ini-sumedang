@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { VisualTopic } from '~/types/article'
 
-/**
- * Satu blok topik Ruang Visual (HOME-04; desktop 101:2708/101:2709/101:2710/101:2726, mobile 116:1541/116:1557/116:1573/116:1589):
- * judul topik (h3, tidak menaut) -> kartu besar -> hingga 3 berita berthumbnail. Komponen sendiri, bukan varian NewsCard
- * (alasan di docs/tasks/HOME-04.md, Bukti). Tiap kartu = satu tautan (judul; PAGE-002).
- */
+/** Satu blok topik Ruang Visual: judul topik (h3, tidak menaut) -> kartu besar -> hingga 3 berita berthumbnail; komponen sendiri, bukan varian NewsCard. Tiap kartu = satu tautan (judul). */
 const props = defineProps<{ entry: VisualTopic }>()
 
 const leadHref = computed(() => articlePath(props.entry.lead))
@@ -67,7 +63,6 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
 </template>
 
 <style scoped>
-/* Jarak judul+kartu besar ke daftar: mobile 16 (116:1541), desktop 32 (101:2708) */
 .topic {
   display: flex;
   flex-direction: column;
@@ -75,10 +70,8 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   min-width: 0;
 }
 
-/* Judul topik 105:468/105:477: Inter Bold 700 32/39, #1A1C21. Tanpa token untuk gaya ini dan tidak ada berkas Inter 700 (tokens.css hanya 300-600),
-   jadi bobot terdekat 600 dan warna token terdekat --color-black-2 (#1D1D1D); deviasi dicatat di task. Dibatasi 2 baris agar nama panjang tidak merusak blok.
-   jarak 10 atas-bawah = padding Frame 285 101:2684 (tinggi 59; Frame 284 116:1543 blok pertama tanpa padding, tinggi 39); dipasang sebagai margin
-   (bukan padding) supaya baris ke-3 yang terpotong klem tidak tampak di area padding. */
+/* Judul topik: Figma Inter Bold 700 32/39 #1A1C21; tanpa token untuk gaya ini dan Inter 700 belum di-host (hanya 300-600), jadi bobot 600 dan warna --color-black-2 (#1D1D1D). Maks. 2 baris agar nama panjang tidak merusak blok.
+   Jarak 10 atas-bawah dipasang sebagai margin (bukan padding) supaya baris ke-3 yang terpotong klem tidak tampak di area padding. */
 .topic-title {
   margin: 10px 0;
   font: 600 32px/39px var(--font-sans);
@@ -91,7 +84,6 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   overflow-wrap: anywhere;
 }
 
-/* Kartu besar 101:2690: foto 358x189,44 (aspect 480/254, radius 8) -> jarak 8 -> judul Inter SemiBold 19,2/26,88 */
 .lead {
   position: relative;
   display: flex;
@@ -126,7 +118,7 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   overflow-wrap: anywhere;
 }
 
-/* Daftar 101:2693: jarak antar baris 8; garis #D5D5D5 = --color-footer-divider-mobile (nilai sama persis) */
+/* Daftar: jarak antar baris 8; garis #D5D5D5 = --color-footer-divider-mobile (nilai sama persis) */
 .items {
   display: flex;
   flex-direction: column;
@@ -136,7 +128,7 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   list-style: none;
 }
 
-/* Baris 101:2694: padding vertikal 16, jarak thumbnail-judul 10 [Figma, di luar skala], tinggi 94 (baris pertama, garis atas+bawah) / 93 */
+/* Baris: jarak thumbnail-judul 10 (Figma, di luar skala); tinggi 94 (baris pertama, garis atas+bawah) / 93 */
 .item {
   position: relative;
   display: flex;
@@ -150,7 +142,7 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   border-top: 1px solid var(--color-footer-divider-mobile);
 }
 
-/* Thumbnail 192:2669: bingkai 80x60 radius 6; gambar 192:2670 setinggi 132,24 % (79,34) menempel ke atas, terpotong bingkai */
+/* Thumbnail: bingkai 80x60 radius 6; gambar setinggi 132,24 % (79,34) menempel ke atas, terpotong bingkai */
 .thumb {
   position: relative;
   flex: none;
@@ -201,7 +193,7 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   border-radius: var(--radius-8);
 }
 
-/* Hover (PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
+/* Hover: judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
 @media (hover: hover) {
   .link:hover {
     text-decoration: underline;

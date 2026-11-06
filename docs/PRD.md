@@ -503,7 +503,7 @@ Bank pemeriksaan ada di `.agents/skills/qa-engineer/SKILL.md`; cakupan QA mengik
 
 ## 15. Status Task
 
-Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Rancangan dan bukti lama ada di riwayat git; status terkini di sini.
+Berkas task di `docs/tasks/` hanya untuk task yang belum selesai atau masih ditinjau pemilik; yang `DONE` dihapus (rancangan dan bukti lama ada di riwayat git). Status terkini di sini.
 
 | ID | Status | Catatan |
 |---|---|---|
@@ -523,11 +523,12 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | SOC-001 | `DONE` (UI) | Widget sosial; angka/URL dari WordPress tetap `DITUNDA` |
 | UX-001 | `DONE` | Hero otomatis, kolom kanan kategori, "Lebih banyak", "Lainnya" lebih besar, kolom kanan menempel |
 | UX-002 | `DONE` | Widget kategori sejajar kartu pertama (perubahan kecil, tanpa berkas task) |
-| PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
-| API-001 | `DONE` | Integrasi WordPress ke Nuxt (klien baca-saja, sumber data layanan; fixture bila `NUXT_WP_BASE_URL` kosong); `docs/tasks/API-001.md` |
-| WP-002 | `DONE` | Kategori, label, dan tag mengikuti WordPress (menu, halaman kategori, section Beranda, tag di Detail); `docs/tasks/WP-002.md` |
-| ADS-001 / ADS-002 | ADS-002 `QA_PASSED` (6 Nov 2026), menunggu commit; ADS-001 oleh pemilik | Iklan diatur lewat ACF WordPress (ADS-001: struktur ACF oleh pemilik; ADS-002: Nuxt membaca post type `iklan` ke slot `AdSlot`); `docs/tasks/ADS-002.md` |
-| HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
+| PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture) |
+| API-001 | `DONE` | Integrasi WordPress ke Nuxt (klien baca-saja, sumber data layanan; fixture bila `NUXT_WP_BASE_URL` kosong) |
+| WP-002 | `DONE` | Kategori, label, dan tag mengikuti WordPress (menu, halaman kategori, section Beranda, tag di Detail) |
+| ADS-001 / ADS-002 | ADS-002 `DONE` (6 Nov 2026); ADS-001 oleh pemilik (struktur ACF dibuat di WordPress Local) | Iklan diatur lewat ACF WordPress (ADS-001: struktur ACF oleh pemilik; ADS-002: Nuxt membaca post type `iklan` ke slot `AdSlot`); `docs/tasks/ADS-002.md` |
+| HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS` |
+| CLEAN-001 | `DONE` | Komentar kode dibersihkan (rujukan proses dibuang, perilaku dan keluaran build identik); berkas task `DONE` dihapus; `docs/tasks/CLEAN-001.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
 | POLISH-01 | `DONE` | Deviasi Figma D1–D56: D26, D33, D36, D41, D42 dikerjakan; sisanya diterima pemilik 4 Nov; `docs/tasks/POLISH-01.md` |
 | DISC-002, POP-001 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |

@@ -3,7 +3,7 @@ import type { Article } from '~/types/article'
 
 const props = defineProps<{
   latest: Article[]
-  /** Kosong: tab Terpopuler tidak dirender (PRD §3.6: tidak diisi "terbaru"). */
+  /** Kosong: tab Terpopuler tidak dirender (tidak diisi "terbaru"). */
   popular: Article[]
   /** Waktu server (ISO) untuk waktu relatif. */
   now: string
@@ -91,7 +91,7 @@ function onKeydown(event: KeyboardEvent) {
   display: flex;
 }
 
-/* Tab 84:1177 / 90:2160: padding 10, teks News/Card/Headline/Desktop 19,2/26,88; warna teks sama untuk kedua tab */
+/* Warna teks sama untuk kedua tab */
 .tab {
   flex: 1 1 0;
   padding: 10px;
@@ -106,7 +106,7 @@ function onKeydown(event: KeyboardEvent) {
   outline-offset: -2px; /* sel tab saling menempel: cincin fokus di dalam sel */
 }
 
-/* Garis dasar 130:2195 (3 px) dan garis aksen 26:275 (3 px, lebar separuh); Figma #D9D9D9 -> --color-gray-5 (keputusan PM 14) */
+/* Garis dasar (3 px) dan garis aksen (3 px, lebar separuh); Figma #D9D9D9 -> --color-gray-5 */
 .track {
   height: 3px;
   background: var(--color-gray-5);
@@ -118,7 +118,7 @@ function onKeydown(event: KeyboardEvent) {
   height: 3px;
   background: var(--color-brand);
   transform: translateX(calc(var(--tab-index) * 100%)); /* bergeser dengan transform, bukan left */
-  transition: transform 0.25s ease; /* [I] durasi tidak ada di Figma */
+  transition: transform 0.25s ease; /* durasi bukan dari Figma */
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -127,7 +127,7 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-/* Daftar 34:354 / 90:2164: celah antar item 22 (482 = 4 x 104 + 3 x 22); jarak tab ke daftar 16 (211 ke 227) */
+/* Daftar: celah antar item 22 (482 = 4 x 104 + 3 x 22); jarak tab ke daftar 16 */
 .panel {
   margin-top: var(--space-16);
 }
@@ -142,7 +142,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 @media (min-width: 1024px) {
-  /* 130:2202: dua tab terpusat, celah 62 (p-10 tiap tab); tab tunggal tetap memenuhi lebar */
+  /* Dua tab terpusat, celah 62 (p-10 tiap tab); tab tunggal tetap memenuhi lebar */
   .tabs--multi .tablist {
     justify-content: center;
     gap: 62px;
@@ -154,7 +154,7 @@ function onKeydown(event: KeyboardEvent) {
 
   .list {
     grid-template-columns: minmax(0, 1fr);
-    margin-inline-start: 5px; /* daftar 34:354 mulai x 928, tab 130:2202 x 923 */
+    margin-inline-start: 5px; /* daftar mulai 5 px lebih ke kanan dari tab (Figma) */
   }
 }
 </style>

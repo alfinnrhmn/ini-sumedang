@@ -2,16 +2,10 @@
 import type { Article, CategoryPageResponse, SidebarResponse } from '~/types/article'
 import { siteOrigin } from '~/config/site'
 
-// Halaman kategori (PAGE-003; tanpa frame Figma, PRD §3.2 G1): daftar berita satu kategori resmi, berhalaman, tanpa hero.
-// E5 (evaluasi pemilik): tata letak Beranda/Detail = kolom kiri 739 (judul h1, kartu 2 kolom, "Lebih banyak") + kolom kanan 357.
-// UX-001 (instruksi pemilik 3 Nov 2026): tab Terbaru | Terpopuler dihapus dari halaman ini; kolom kanan = widget sosial -> Trending (artikel Terpopuler,
-// /api/articles/sidebar `popular`; kosong atau gagal dimuat = tidak dirender) -> papan iklan AdSlot; paginasi diganti tombol "Lebih banyak"
-// (CategoryLoadMore: menambah kartu di bawah daftar tanpa memuat ulang halaman). Dibangun dari komponen yang ada (SectionTitle sebagai h1, NewsCard,
-// ArticleBreadcrumb, AdSlot); keputusan tata letak = butuh peninjauan pemilik (POLISH-01). Data hanya lewat /api/category/<slug>?halaman=N.
-// Slug tak dikenal, halaman tak valid, atau halaman melewati batas = status 404 (halaman error berlayout = task terpisah).
-// Kategori tanpa artikel: halaman 1 menampilkan keadaan kosong netral. Kategori Berita = Beranda (E1): tidak punya halaman, dialihkan 308 ke "/".
+// Daftar berita satu kategori resmi, berhalaman, tanpa hero; data hanya lewat /api/category/<slug>?halaman=N. Slug tak dikenal, halaman tak valid, atau melewati batas = status 404.
+// Kategori tanpa artikel: halaman 1 menampilkan keadaan kosong netral. Kategori Berita = Beranda: tidak punya halaman, dialihkan 308 ke "/".
 
-// E1: slug ditulis literal (makro definePageMeta tidak boleh merujuk variabel setup); server route juga mengalihkan pada muat langsung (SSR).
+// Slug ditulis literal (makro definePageMeta tidak boleh merujuk variabel setup); server route juga mengalihkan pada muat langsung (SSR).
 definePageMeta({
   middleware: (to) => {
     if (to.params.slug === 'berita') return navigateTo('/', { redirectCode: 308 })
@@ -40,7 +34,7 @@ function pageError(statusCode: number) {
 
 if (error.value || !data.value) throw pageError(error.value ? (error.value.statusCode ?? 500) : 404)
 
-// Trending (UX-001): hanya `popular` yang dipakai; data kolom samping dibagikan dengan Beranda lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
+// Trending: hanya `popular` yang dipakai; data kolom samping dibagikan dengan Beranda lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
 const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar', { key: 'articles-sidebar' })
 
 // Gagal memuat pada navigasi berikutnya (mis. halaman sudah tidak ada): tampilkan halaman error yang sama.
@@ -54,7 +48,7 @@ const articles = computed(() => data.value?.articles ?? [])
 const pagination = computed(() => data.value?.pagination)
 const now = computed(() => data.value?.now ?? '')
 
-// "Lebih banyak" (UX-001): `shown` = artikel halaman awal + yang ditambahkan di klien; `loadedPage` = halaman terakhir yang sudah dimuat.
+// "Lebih banyak": `shown` = artikel halaman awal + yang ditambahkan di klien; `loadedPage` = halaman terakhir yang sudah dimuat.
 // Keduanya dibuang (kembali ke data rute) saat kategori atau ?halaman berubah lewat navigasi. Waktu relatif memakai `now` halaman awal.
 const shown = ref<Article[]>([...articles.value])
 const loadedPage = ref(data.value?.pagination.page ?? 1)
@@ -73,12 +67,12 @@ async function onLoaded(payload: { articles: Article[], page: number, added: num
   listEl.value?.children[firstNew]?.querySelector<HTMLElement>('a[href^="/berita/"]')?.focus({ preventScroll: true })
 }
 
-// Kolom kanan menempel pada >= 1024 px (UX-001 Keputusan PM 5)
+// Kolom kanan menempel pada >= 1024 px
 const secondary = ref<HTMLElement | null>(null)
 useStickyColumn(secondary)
 
-// Judul dokumen "<Kategori> - Ini Sumedang" (catatan pemilik; Detail memakai "— IniSumedang", penyelarasan di SEO-001); deskripsi sederhana [I].
-// Canonical = SITE_URL + /kategori/<slug> (+ ?halaman=N bila N > 1); HARD-001: produksi tidak memakai header Host, hanya mode dev memakai origin permintaan.
+// Judul dokumen "<Kategori> - Ini Sumedang" (Detail memakai "— IniSumedang"); deskripsi sederhana.
+// Canonical = SITE_URL + /kategori/<slug> (+ ?halaman=N bila N > 1); produksi tidak memakai header Host, hanya mode dev memakai origin permintaan.
 const origin = siteOrigin(useRequestURL().origin, useRuntimeConfig().public.siteUrl)
 const title = computed(() => `${category.value?.name ?? 'Kategori'} - Ini Sumedang`)
 const description = computed(() => `Berita ${category.value?.name ?? ''} terbaru dari IniSumedang.`)
@@ -95,12 +89,8 @@ useSeoMeta({
 })
 useHead({ link: [{ rel: 'canonical', href: canonical }] })
 
-// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju yang disengaja (klik/Enter pada menu, laci, paginasi, footer, label kartu:
-// kategori ke kategori, halaman ke halaman): tidak pada muat awal (SSR/hidrasi) dan tidak pada Back/Forward browser (popstate), supaya
-// posisi gulir dipulihkan dan fokus tidak dicuri (temuan QA M1). Pembeda = trackHistoryNavigation (app/utils/focus.ts).
-// Instansi baru (slug berubah atau dari halaman lain): setelah mount; Back/Forward ke instansi baru dipulihkan router (savedPosition).
-// Instansi sama (hanya ?halaman berubah): saat data baru tiba; router Nuxt tidak memulihkan gulir bila path sama, jadi Back/Forward
-// antar halaman paginasi memulihkan posisi yang diingat saat halaman itu ditinggalkan (rememberScroll).
+// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju yang disengaja (bukan muat awal SSR/hidrasi, bukan Back/Forward) agar posisi gulir dipulihkan dan fokus tidak dicuri; pembeda = trackHistoryNavigation (app/utils/focus.ts).
+// Instansi sama (hanya ?halaman berubah): router Nuxt tidak memulihkan gulir bila path sama, jadi Back/Forward antar halaman paginasi memulihkan posisi yang diingat (rememberScroll).
 const listHeadingId = useId()
 const nuxtApp = useNuxtApp()
 const router = useRouter()
@@ -157,7 +147,7 @@ watch(data, (value, previous) => {
           @loaded="onLoaded"
         />
       </div>
-      <!-- Kolom kanan (357): widget sosial (SOC-001), Trending (UX-001; kosong = tidak dirender), lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda); urutan sama di mobile -->
+      <!-- Kolom kanan (357): widget sosial, Trending (kosong = tidak dirender), lalu papan iklan (desktop 237 + 368; < 1024: 237 + 78 seperti mobile Beranda); urutan sama di mobile -->
       <div ref="secondary" class="secondary">
         <HomeSocialWidget />
         <HomeTrendingList v-if="sidebar" :articles="sidebar.popular" :now="sidebar.now" />
@@ -175,8 +165,8 @@ watch(data, (value, previous) => {
 </template>
 
 <style scoped>
-/* Tanpa frame [?]: kontainer, jarak atas, dan jarak judul-ke-daftar meminjam Detail (breadcrumb) dan Beranda (daftar kartu).
-   Mobile: header berakhir y 51, breadcrumb y 63 (12), judul 8 di bawahnya; desktop: menu berakhir y 141, breadcrumb y 150 (9), judul 18 di bawahnya. */
+/* Kontainer, jarak atas, dan jarak judul-ke-daftar meminjam Detail (breadcrumb) dan Beranda (daftar kartu).
+   Mobile: breadcrumb 12 di bawah header, judul 8 di bawahnya; desktop: breadcrumb 9 di bawah menu, judul 18 di bawahnya. */
 .category-page {
   width: 100%;
   max-width: calc(var(--container-desktop) + 2 * var(--space-24));
@@ -216,7 +206,7 @@ watch(data, (value, previous) => {
 }
 
 /* Sama dengan daftar kartu Beranda: mobile satu kolom kartu horizontal (354x104, pola Rekomendasi) dan tablet 2 kolom hanya bila
-   kartu tidak lebih sempit dari kartu mobile (auto-fill minmax 354); garis ke kartu pertama 30 (165:1727). */
+   kartu tidak lebih sempit dari kartu mobile (auto-fill minmax 354); garis ke kartu pertama 30. */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--container-mobile), 100%), 1fr));
@@ -236,15 +226,13 @@ watch(data, (value, previous) => {
     padding-top: 9px;
   }
 
-  /* Grid 2 kolom x 2 baris: judul (kolom 1, baris 1), daftar + "Lebih banyak" (kolom 1, baris 2), kolom kanan (kolom 2, baris 2).
-     Kolom kanan sejajar tepi atas gambar kartu pertama tanpa angka tinggi judul: ia mulai di baris 2 (di bawah judul, berapa pun tingginya)
-     dan diberi jarak atas yang sama dengan daftar (--list-gap, 28 = garis judul ke kartu, sama dengan Beranda). Terukur di 1440/1280/1024:
-     atas widget = atas gambar kartu pertama. Sticky terbatas pada area baris 2, jadi kolom tidak pernah naik ke judul atau menimpa footer. */
+  /* Grid 2 x 2: judul (kolom 1, baris 1), daftar + "Lebih banyak" (kolom 1, baris 2), kolom kanan (kolom 2, baris 2) dengan jarak atas --list-gap (28, sama dengan Beranda),
+     sehingga atas widget = atas gambar kartu pertama berapa pun tinggi judul. Sticky terbatas pada area baris 2: kolom tidak pernah naik ke judul atau menimpa footer. */
   .columns {
     --list-gap: 28px;
 
     display: grid;
-    /* Kolom kiri 739 dan kolom kanan 357 dari 1120 (21:4950: daftar x 160 lebar 739, kolom kanan x 923 lebar 357), fluid di bawah 1280 seperti Beranda */
+    /* Kolom kiri 739 dan kolom kanan 357 dari 1120, fluid di bawah 1280 seperti Beranda */
     grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
     grid-template-rows: auto auto;
     justify-content: space-between;
@@ -266,7 +254,7 @@ watch(data, (value, previous) => {
     grid-column: 2;
     grid-row: 2;
     margin-top: var(--list-gap);
-    /* UX-001 Keputusan PM 5: menempel di dalam baris 2 .columns; nilai top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    /* Menempel di dalam baris 2 .columns; nilai top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
     position: sticky;
     top: var(--space-24);
   }
@@ -279,12 +267,12 @@ watch(data, (value, previous) => {
     display: none;
   }
 
-  /* Dua kolom kartu 358 dengan celah 23 = 739 (sama dengan daftar Rekomendasi Beranda 21:4950) */
+  /* Dua kolom kartu 358 dengan celah 23 = 739 (sama dengan daftar Rekomendasi Beranda) */
   .list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 23px; /* 21:4950 jarak horizontal kartu 358 + 23 */
+    column-gap: 23px; /* jarak horizontal kartu 358 + 23 */
     row-gap: 48px; /* sama dengan daftar Beranda */
-    margin-top: var(--list-gap); /* 28: garis 42:374 bawah ke kartu, sama dengan Beranda; juga jarak atas kolom kanan */
+    margin-top: var(--list-gap); /* 28: garis bawah ke kartu, sama dengan Beranda; juga jarak atas kolom kanan */
   }
 }
 </style>

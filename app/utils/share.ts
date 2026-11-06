@@ -1,7 +1,5 @@
 /**
- * URL bagikan Detail Berita (PAGE-002, FR-06). Hanya platform yang ada di Figma dan punya URL bagikan web standar
- * (Facebook, X) ditambah WhatsApp (POLISH-01 D33, keputusan pemilik; tidak ada di Figma); tanpa SDK pihak ketiga. Instagram tidak punya
- * URL bagikan web standar dan tidak dibuat.
+ * URL bagikan Detail Berita: Facebook, X, dan WhatsApp, tanpa SDK pihak ketiga (Instagram tidak punya URL bagikan web standar).
  * Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
  */
 

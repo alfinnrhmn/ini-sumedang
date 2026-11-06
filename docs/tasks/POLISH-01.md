@@ -7,7 +7,7 @@
 | **Owner** | PM (mengumpulkan) → FE → QA (konteks baru) → PM |
 | **Prioritas** | P2 |
 | **Dependensi** | HOME-03 `DONE`; keputusan pemilik atas token/aset baru di tiap butir (aturan 3 AGENTS.md: token dan aset baru butuh persetujuan) |
-| **Rujukan PRD** | v1.10 §4.5 (token), §4.6; `docs/tasks/HOME-03.md` (Catatan, Bukti QA) |
+| **Rujukan PRD** | v1.10 §4.5 (token), §4.6; task HOME-03 (riwayat git) (Catatan, Bukti QA) |
 | **Dibuat** | 31 Okt 2026 (PM, atas catatan pemilik) |
 
 ## Tujuan
@@ -122,7 +122,7 @@ Ukur area klik tiap elemen D41 (≥ 24 px, tampilan identik), WhatsApp (URL, aks
 - QA 4 Nov 2026 (cakupan sedang, ±25 menit, Edge headless): **QA_PASSED**, 0 Critical/High/Medium. Area klik label kartu/chip hero/label kepala Detail/breadcrumb/tautan footer mobile 24–25 px dengan rect terlihat identik baseline (1440/402/320 × 5 halaman + laci); WhatsApp URL/a11y/tanpa overflow sampai 320; sorotan menu/laci di kategori, Detail, Beranda, non-resmi, `/cari` benar dan 1 permintaan per navigasi; tab stop `/kategori/nasional` 27 → 19; `/api/category/berita` 404, 28 `/api/*` lain identik; 642/642 uji, audit tanpa High, `v-html=` 1 baris. Log: `pq-*.log`.
 
 ## Catatan
-- Sumber deviasi D1–D3: Catatan dan Bukti QA `docs/tasks/HOME-03.md` (QA putaran 2, 31 Okt 2026) dan keputusan PM penutup HOME-03. D4–D8: Catatan FE dan Bukti QA `docs/tasks/HOME-04.md` (31 Okt 2026). Item lain yang sudah dicatat di HOME-03 (foto placeholder Figma diganti `figma-1..8.jpg`) bukan deviasi tata letak.
+- Sumber deviasi D1–D3: Catatan dan Bukti QA task HOME-03 (riwayat git) (QA putaran 2, 31 Okt 2026) dan keputusan PM penutup HOME-03. D4–D8: Catatan FE dan Bukti QA task HOME-04 (riwayat git) (31 Okt 2026). Item lain yang sudah dicatat di HOME-03 (foto placeholder Figma diganti `figma-1..8.jpg`) bukan deviasi tata letak.
 - Riwayat: 31 Okt 2026 → BACKLOG → PM (dibuat atas catatan pemilik saat menjalankan HOME-04).
 
 - 4 Nov 2026 → READY (PM).

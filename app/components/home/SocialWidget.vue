@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { SOCIAL_STATS, socialHref, socialLabel } from '~/config/social'
 
-// Widget "Ikuti IniSumedang" (SOC-001; Figma Frame 283: desktop 101:2601 / 127:2810 = 357x200, mobile 100:2447 = 354x200).
-// Menampilkan jumlah pengikut tiap akun IniSumedang; BUKAN fitur follow: tanpa tombol ikuti, form, SDK, atau skrip pihak ketiga.
-// Satu komponen untuk Beranda, Detail, dan kategori. Angka = penampung [I] dari app/config/social.ts. Kotak = teks biasa; bila `url`
-// https terisi menjadi <a rel="noopener noreferrer" target="_blank">. Nama aksesibel satu unit "<Platform>, <nilai> <satuan>" (ikon dekoratif).
-// Judul = h2 (halaman memakai h1; Beranda: h2 judul section; Detail/kategori: h2 sidebar), jadi urutan heading tidak melompat.
-// Gambar ikon `loading="lazy"`: salinan yang jauh di luar layar tidak diunduh lebih awal. Berkas SVG sama dipakai semua salinan (satu permintaan per ikon).
+// Widget "Ikuti IniSumedang": jumlah pengikut tiap akun; BUKAN fitur follow (tanpa tombol ikuti, form, SDK, atau skrip pihak ketiga). Angka = penampung dari app/config/social.ts.
+// Kotak = teks biasa; bila `url` https terisi menjadi <a rel="noopener noreferrer" target="_blank">. Judul = h2 agar urutan heading tidak melompat. Ikon `loading="lazy"`, dekoratif (satu permintaan per ikon).
 const headingId = useId()
 const items = SOCIAL_STATS.map(item => ({
   ...item,
@@ -67,8 +63,8 @@ const items = SOCIAL_STATS.map(item => ({
 </template>
 
 <style scoped>
-/* Figma 101:2601: kotak putih 357x200, garis 1 #E5E7EB (= --color-footer-divider), radius 16, isi (Frame 282 320x165) di tengah.
-   Lebar 100% kolom (maks 357; mobile 354 = lebar kolom frame 402), tinggi tetap 200: tanpa layout shift. */
+/* Kotak putih maks. 357x200, garis 1 #E5E7EB (= --color-footer-divider), radius 16, isi 320 di tengah.
+   Lebar 100% kolom (mobile 354), tinggi tetap 200: tanpa layout shift. */
 .social {
   display: flex;
   align-items: center;
@@ -81,7 +77,7 @@ const items = SOCIAL_STATS.map(item => ({
   background: var(--color-white);
 }
 
-/* < 1024 (mobile dan tablet, PM 1): seperti iklan mobile, selebar kolom; isi tetap 320 di tengah */
+/* < 1024 (mobile dan tablet): seperti iklan mobile, selebar kolom; isi tetap 320 di tengah */
 @media (max-width: 1023.98px) {
   .social {
     max-width: none;
@@ -91,30 +87,27 @@ const items = SOCIAL_STATS.map(item => ({
 .inner {
   display: flex;
   flex-direction: column;
-  gap: var(--space-24); /* 101:2602 */
+  gap: var(--space-24);
   width: min(320px, calc(100% - 2px));
 }
 
-/* Frame 281 223x41: judul 101:2605 (25) + subjudul 101:2607 (16) */
 .head {
   height: 41px;
 }
 
-/* 101:2605 Merriweather SemiBold 19,2/24,96 #2866EB (= News/Heading/Mobile, --color-brand) */
 .title {
   font: var(--type-heading-mobile);
   color: var(--color-brand);
   white-space: nowrap;
 }
 
-/* 101:2607 Inter Medium 11,111/15,555 #667085 (= News/Metadata, --color-footer-muted) */
 .subtitle {
   font: var(--type-metadata);
   color: var(--color-footer-muted);
   white-space: nowrap;
 }
 
-/* Frame 278 320x100: grid 3x2, kotak 104x46, celah 4 horizontal dan 8 vertikal */
+/* Grid 3x2, kotak 104x46, celah 4 horizontal dan 8 vertikal */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -130,7 +123,7 @@ const items = SOCIAL_STATS.map(item => ({
   min-width: 0;
 }
 
-/* Kotak 101:2609: latar #F5F5F5 -> --color-surface #F8F8F8 (selisih 3/3/3), radius 8; isi (ikon + teks) di tengah */
+/* Kotak: latar #F5F5F5 -> --color-surface #F8F8F8 (selisih 3/3/3), radius 8; isi (ikon + teks) di tengah */
 .tile {
   display: flex;
   flex: 1;
@@ -156,8 +149,7 @@ const items = SOCIAL_STATS.map(item => ({
   max-width: none;
 }
 
-/* Kolom teks 101:2613: lebar Figma (50-58), nilai 101:2615 Inter SemiBold 16/22,4 (= News/Card/Headline/Mobile) di blok 23,
-   satuan 101:2617 Inter Medium 11,111/15,555 (= News/Metadata) di blok 16 */
+/* Kolom teks: lebar Figma (50-58); nilai Inter SemiBold 16/22,4 (= News/Card/Headline/Mobile) di blok 23, satuan Inter Medium 11,111/15,555 (= News/Metadata) di blok 16 */
 .text {
   display: flex;
   flex: none;
@@ -168,7 +160,7 @@ const items = SOCIAL_STATS.map(item => ({
   white-space: nowrap;
 }
 
-/* Nilai #1F2937 -> --color-footer-link #172033 (selisih 8/9/4 > 4: deviasi untuk POLISH-01); satuan #667085 = --color-footer-muted */
+/* Nilai #1F2937 -> --color-footer-link #172033 (selisih 8/9/4 > 4: deviasi dari Figma); satuan #667085 = --color-footer-muted */
 .value {
   display: block;
   height: 23px;

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-// Judul blok Berita Terkait. Sidebar desktop (130:2227): baris 40, teks 19,2/26,88 dengan padding 10, garis dasar 3 px dengan aksen biru 96.
-// Blok bawah (130:2943 desktop, 130:3569 mobile): teks langsung di atas garis 3 px dengan aksen biru 130. Garis dasar Figma #D9D9D9 -> --color-gray-5
-// (keputusan PM 14, sama dengan judul section Beranda). Tanpa tautan "Lainnya"/"Lihat Lainnya" (tidak ada tujuan).
+// Judul blok Berita Terkait: di sidebar desktop (baris 40, padding 10, garis dasar 3 px, aksen biru 96) dan di blok bawah (teks langsung di atas garis 3 px, aksen biru 130).
+// Garis dasar #D9D9D9 Figma -> --color-gray-5 (sama dengan judul section Beranda). Tanpa tautan "Lainnya" (tidak ada tujuan).
 defineProps<{
   title: string
   variant: 'sidebar' | 'bottom'
@@ -36,22 +35,22 @@ defineProps<{
 }
 
 .text {
-  font: var(--type-card-headline-desktop); /* 130:2931 / 130:2230 Inter SemiBold 19,2/26,88 (News/Card/Headline/Desktop) */
+  font: var(--type-card-headline-desktop);
   color: var(--color-black);
 }
 
 .heading--bottom {
-  --accent-width: 130px; /* 130:2935 / 130:3578 */
+  --accent-width: 130px;
 }
 
 .heading--sidebar {
-  --accent-width: 96px; /* 130:2236 */
+  --accent-width: 96px;
 }
 
 .heading--sidebar .text {
   display: flex;
   align-items: center;
-  height: 40px; /* 130:2228 */
-  padding-inline: 10px; /* 130:2229 */
+  height: 40px;
+  padding-inline: 10px;
 }
 </style>

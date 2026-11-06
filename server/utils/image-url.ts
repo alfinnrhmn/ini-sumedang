@@ -1,9 +1,6 @@
 /**
- * Validasi URL gambar hero dari data/CMS (HARD-001). Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
- * Hasilnya masuk ke `<img src>` dan `og:image`, jadi hanya dua bentuk yang lolos:
- * - jalur relatif satu `/` (`/fixtures/x.jpg`; bukan `//host`, tanpa `\`);
- * - `https://` dengan host persis di `IMAGE_ALLOWED_HOSTS` (tanpa userinfo dan port).
- * Selain itu `null`: pemanggil merender artikel tanpa gambar, bukan galat.
+ * Validasi URL gambar hero (masuk ke `<img src>` dan `og:image`). Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
+ * Lolos hanya jalur relatif satu `/` (bukan `//host`, tanpa `\`) atau `https://` dengan host persis di `IMAGE_ALLOWED_HOSTS` (tanpa userinfo/port); selain itu `null` (artikel tanpa gambar, bukan galat).
  */
 import { IMAGE_ALLOWED_HOSTS } from './sanitize-config.ts'
 

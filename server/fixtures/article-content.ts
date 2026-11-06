@@ -1,19 +1,15 @@
 /**
- * Isi artikel fixture (PAGE-002; Keputusan PM 12). HANYA untuk pengembangan: setara `content.rendered` dan
- * `excerpt.rendered` WordPress (HTML mentah dari CMS). Tidak pernah dirender langsung: `server/services/articles.ts`
- * menyanitasinya dengan `sanitizeBodyHtml` sebelum keluar dari server.
- * Pembangkit bersifat deterministik (hanya bergantung pada id dan judul), tanpa waktu/acak.
- * Gambar relatif `/fixtures/figma-N.jpg` (JPEG 716x400, sama dengan dimensi di `posts.ts`); WAJIB dihapus bersama
- * `public/fixtures/` sebelum tayang (PRD §13).
+ * Isi artikel fixture (HANYA pengembangan): setara `content.rendered`/`excerpt.rendered` WordPress, disanitasi `sanitizeBodyHtml` sebelum keluar dari server. Deterministik (hanya bergantung pada id dan judul).
+ * Gambar relatif `/fixtures/figma-N.jpg` (716x400, sama dengan `posts.ts`) wajib dihapus bersama `public/fixtures/` sebelum tayang.
  */
 
 const IMG_WIDTH = 716
 const IMG_HEIGHT = 400
-/** Id contoh pemutar YouTube [I] (11 karakter, lolos pola `EMBED_PATH_PATTERN`). */
+/** Id contoh pemutar YouTube (11 karakter, lolos pola `EMBED_PATH_PATTERN`). */
 const SAMPLE_VIDEO_ID = 'M7lc1UVf-VE'
 const FIGMA_ARTICLE_ID = 81
 
-/** Teks Figma 127:2135, 127:2152-127:2159 (dan kotak Baca Juga 130:2366-130:2368): "Pemkab Sumedang Percepat Transformasi Layanan Publik". */
+/** Teks contoh artikel 81 dan kotak "Baca Juga": "Pemkab Sumedang Percepat Transformasi Layanan Publik". */
 const FIGMA_EXCERPT = 'Pemanfaatan teknologi digital membuat layanan administrasi semakin mudah, cepat, dan dekat dengan kebutuhan masyarakat.'
 const FIGMA_BODY = [
   '<p>Pemanfaatan teknologi digital membuat layanan administrasi semakin mudah, cepat, dan dekat dengan kebutuhan masyarakat. Kemudahan akses menjadi bagian penting saat warga mencari informasi dan menyiapkan kebutuhan administrasi.</p>',
@@ -27,7 +23,7 @@ const FIGMA_BODY = [
   '<p>Dengan pendekatan tersebut, teknologi menjadi sarana untuk menghadirkan layanan yang lebih mudah diakses dan lebih relevan bagi masyarakat Sumedang.</p>'
 ].join('\n')
 
-// Kumpulan paragraf netral [I, dikarang untuk fixture] yang dirotasi menurut id agar isi antar artikel berbeda.
+// Kumpulan paragraf netral (dikarang untuk fixture) yang dirotasi menurut id agar isi antar artikel berbeda.
 const PARAGRAPHS = [
   'Informasi ini disusun dari keterangan narasumber dan dokumen resmi yang dapat diakses publik. Redaksi terus memperbarui laporan seiring perkembangan terbaru di lapangan.',
   'Sejumlah warga menyambut baik langkah tersebut dan berharap pelaksanaannya berjalan konsisten. Menurut mereka, kejelasan jadwal dan informasi yang mudah ditemukan sangat membantu kegiatan sehari-hari.',
@@ -60,7 +56,6 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-/** Judul tampil di sini berasal dari fixture; entitas HTML pada `title.rendered` dibiarkan (sudah HTML). */
 function pick<T>(items: T[], seed: number, offset: number): T {
   return items[(seed + offset) % items.length] as T
 }
@@ -71,9 +66,8 @@ function imageFor(id: number): number {
 }
 
 /**
- * Isi default setiap artikel (HTML mentah fixture): 5 paragraf, 2 h2, 1 daftar, 1 blockquote "Baca Juga",
- * 1 gambar relatif 716x400, 1 embed YouTube nocookie. Artikel id 81 memakai teks Figma persis (tanpa gambar/embed
- * tambahan agar sama dengan node 127:2151). `titleHtml` = `title.rendered`.
+ * Isi default setiap artikel (HTML mentah fixture): 5 paragraf, 2 h2, 1 daftar, 1 blockquote "Baca Juga", 1 gambar relatif 716x400, 1 embed YouTube nocookie.
+ * Artikel id 81 memakai teks persis tanpa gambar/embed tambahan. `titleHtml` = `title.rendered`.
  */
 export function buildDefaultBody(id: number, titleHtml: string): string {
   if (id === FIGMA_ARTICLE_ID) return FIGMA_BODY

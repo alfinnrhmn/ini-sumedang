@@ -1,5 +1,5 @@
 // Deklarasi tipe lokal minimal untuk `sanitize-html` 2.18.1 (hanya API yang dipakai penyanitasi).
-// `@types/sanitize-html` tidak disetujui pemilik (docs/decisions/0006-sanitize-html.md).
+// `@types/sanitize-html` sengaja tidak dipasang (tanpa dependensi tambahan).
 declare module 'sanitize-html' {
   export interface Frame {
     tag: string

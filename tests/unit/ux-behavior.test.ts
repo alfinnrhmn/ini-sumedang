@@ -1,8 +1,6 @@
 /**
- * Uji unit UX-001 (perbaikan perilaku, 3 Nov 2026): fungsi murni `stickyTop` (kolom kanan menempel), `mergeArticles` ("Lebih banyak" tanpa duplikat),
- * konfigurasi dan penjadwalan putar otomatis hero (`heroAutoplayStatus`, `heroLiveMode`, `nextHeroSlide`, `HERO_AUTOPLAY_MS`), serta penjaga sumber
- * untuk keputusan yang tidak dapat diuji sebagai fungsi murni (kolom kanan kategori, "Lebih banyak", ukuran "Lainnya", sticky hanya >= 1024).
- * Perilaku nyata di browser diuji terpisah (QA). Pelari: `node:test` (`npm test`).
+ * Uji unit perilaku UX: `stickyTop` (kolom kanan menempel), `mergeArticles` ("Lebih banyak" tanpa duplikat), putar otomatis hero (`heroAutoplayStatus`, `heroLiveMode`, `nextHeroSlide`, `HERO_AUTOPLAY_MS`),
+ * dan penjaga sumber (kolom kanan kategori, "Lebih banyak", ukuran "Lainnya", sticky hanya >= 1024). Perilaku di browser diuji terpisah. Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
@@ -279,7 +277,7 @@ describe('UX4 halaman kategori: kolom kanan dan "Lebih banyak" (penjaga sumber)'
   it('LoadMore: tautan <a> ke ?halaman=N+1 rel=next, dicegat hanya klik tanpa modifier, aria-busy, status role=status, tanpa v-html', () => {
     const component = source('app/components/category/LoadMore.vue')
     assert.match(component, /<a\s+:href="href"\s+rel="next"/)
-    assert.match(component, /categoryPagePath\(props\.slug \?\? '', nextPage\.value\)/) // PAGE-004: slug opsional (digeneralisasi)
+    assert.match(component, /categoryPagePath\(props\.slug \?\? '', nextPage\.value\)/)
     assert.match(component, /event\.button !== 0 \|\| event\.metaKey \|\| event\.ctrlKey \|\| event\.shiftKey \|\| event\.altKey/)
     assert.match(component, /:aria-busy="loading"/)
     assert.match(component, /role="status"/)

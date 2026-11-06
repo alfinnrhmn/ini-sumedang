@@ -1,6 +1,6 @@
 /**
- * Uji unit pembantu murni halaman kategori (PAGE-003): validasi `?halaman=` dan slug, hitung paginasi, bentuk URL kategori,
- * penanda kategori aktif, konsistensi daftar kategori resmi dengan footer. Pelari: `node:test` (`npm test`).
+ * Uji unit pembantu murni halaman kategori: validasi `?halaman=` dan slug, hitung paginasi, bentuk URL kategori, penanda kategori aktif, konsistensi daftar kategori resmi dengan footer.
+ * Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
@@ -9,7 +9,7 @@ import { categoryLink, categoryPagePath, categoryPath, isCategoryRoute } from '.
 import { CATEGORY_PER_PAGE } from '../../app/config/category.ts'
 import { FOOTER_SECTIONS } from '../../app/config/footer.ts'
 
-// Daftar kategori contoh mode fixture (9 kategori, urutan menu) = `buildMenuCategories()`. WP-002: tidak lagi konstanta aplikasi, hanya acuan uji.
+// Daftar kategori contoh mode fixture (9 kategori, urutan menu) = `buildMenuCategories()`; hanya acuan uji, bukan konstanta aplikasi.
 const MENU_SLUGS = ['berita', 'nasional', 'pemerintahan', 'politik', 'hukum', 'sepak-bola', 'otomotif', 'jelajah', 'bisnis-teknologi']
 const MENU_CATEGORIES = MENU_SLUGS.map((slug, index) => ({ id: index + 1, slug, name: slug }))
 
@@ -168,7 +168,7 @@ describe('CP4 bentuk URL kategori', () => {
   })
 
   it('categoryLink: slug yang ada di daftar kategori = path, selain itu null (WP-002)', () => {
-    // E1: kategori Berita = Beranda ("/"), tanpa halaman /kategori/berita
+    // Kategori Berita = Beranda ("/"), tanpa halaman /kategori/berita
     for (const slug of MENU_SLUGS) assert.equal(categoryLink(slug, MENU_CATEGORIES), slug === 'berita' ? '/' : `/kategori/${slug}`)
     assert.equal(categoryLink('ruang-visual', MENU_CATEGORIES), null)
     assert.equal(categoryLink('visual-pemerintahan', MENU_CATEGORIES), null)

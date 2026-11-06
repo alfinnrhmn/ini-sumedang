@@ -1,14 +1,6 @@
 /**
- * Konfigurasi widget sosial "Ikuti IniSumedang" (SOC-001; Figma `Frame 283`: desktop 101:2601 / 127:2810, mobile 100:2447).
- * Satu daftar untuk semua halaman. Fungsi: menampilkan jumlah pengikut tiap akun media sosial IniSumedang (bukan fitur follow pengguna).
- *
- * `value` dan `unit` adalah PENAMPUNG [I]: angka contoh dari Figma (12,4K, 8,7K, ...), bukan angka nyata. Sebelum tayang harus diganti angka
- * nyata (sumber final: opsi WordPress, task SOC-001 bagian WordPress yang ditunda) atau widget disembunyikan (PRD §13).
- * `url` kosong = kotak teks biasa (bukan <a>); hanya `https://` yang membuat kotak menjadi tautan (`socialHref` di bawah).
- *
- * `gap` dan `textWidth` = jarak ikon ke teks dan lebar kolom teks per kotak persis seperti Figma (nilainya berbeda tiap kotak);
- * `iconBox` = ukuran kotak ikon; `iconRect` = posisi/ukuran berkas SVG di dalam kotak bila bukan seluruh kotak (WhatsApp: grup mask).
- * Berisi juga logika murni (`socialHref`, `socialLabel`); tanpa auto-import Nuxt agar bisa diuji dengan `node:test`.
+ * Widget sosial "Ikuti IniSumedang": jumlah pengikut tiap akun IniSumedang (bukan fitur follow). Tanpa auto-import Nuxt agar bisa diuji dengan `node:test`.
+ * `value` dan `unit` hanya PENAMPUNG (angka contoh desain): ganti angka nyata sebelum tayang atau sembunyikan widget. `url` kosong = teks biasa, hanya `https://` menjadi tautan.
  */
 export interface SocialIconRect {
   x: number
@@ -26,7 +18,7 @@ export interface SocialStat {
   iconBox: readonly [number, number]
   /** Posisi/ukuran SVG di dalam kotak ikon; kosong = mengisi seluruh kotak. */
   iconRect?: SocialIconRect
-  /** Nilai tampil, mis. "12,4K" (penampung [I]). */
+  /** Nilai tampil, mis. "12,4K" (penampung). */
   value: string
   /** Satuan tampil ("Pengikut"; YouTube "Subscriber"). */
   unit: string
@@ -38,7 +30,7 @@ export interface SocialStat {
   textWidth: number
 }
 
-/** Urutan Figma: Facebook, Instagram, X, YouTube, TikTok, WhatsApp (grid 3x2). */
+/** Urutan: Facebook, Instagram, X, YouTube, TikTok, WhatsApp (grid 3x2). */
 export const SOCIAL_STATS: SocialStat[] = [
   { name: 'Facebook', icon: '/icons/social-stat-facebook.svg', iconBox: [24, 24], value: '12,4K', unit: 'Pengikut', gap: 10, textWidth: 52 },
   { name: 'Instagram', icon: '/icons/social-stat-instagram.svg', iconBox: [24, 24], value: '8,7K', unit: 'Pengikut', gap: 7, textWidth: 50 },
@@ -49,7 +41,7 @@ export const SOCIAL_STATS: SocialStat[] = [
     name: 'WhatsApp',
     icon: '/icons/social-stat-whatsapp.svg',
     iconBox: [24, 24],
-    iconRect: { x: 2.0832, y: 1.9992, width: 19.916, height: 19.8382 }, // Figma 90:2399: inset 8,33% 8,33% 9,01% 8,68% dari 24x24
+    iconRect: { x: 2.0832, y: 1.9992, width: 19.916, height: 19.8382 }, // inset 8,33% 8,33% 9,01% 8,68% dari 24x24
     value: '2,8K',
     unit: 'Pengikut',
     gap: 10,

@@ -7,25 +7,16 @@ const props = defineProps<{
   now: string
   /** Gambar di atas lipatan: loading eager. */
   eager?: boolean
-  /**
-   * `compact`: kartu daftar kolom samping Beranda, horizontal pada semua lebar
-   * (< 1024: Card Popular News 100:2461, thumbnail 104x80; >= 1024: 34:354, thumbnail 104x104).
-   * Bawaan (tanpa prop) mengikuti lebar layar seperti sebelumnya.
-   */
+  /** `compact`: kartu daftar kolom samping Beranda, horizontal pada semua lebar (thumbnail 104x80 di < 1024, 104x104 di >= 1024); bawaan mengikuti lebar layar. */
   layout?: 'compact'
-  /**
-   * Hanya bersama `layout="compact"`: thumbnail di kanan teks (daftar Berita Terkait Detail, 130:2226: teks 237 + celah 16 +
-   * thumbnail 104). Tanpa prop ini thumbnail di kiri (kolom samping Beranda).
-   */
+  /** Hanya bersama `layout="compact"`: thumbnail di kanan teks (daftar Berita Terkait Detail); tanpa prop ini thumbnail di kiri (kolom samping Beranda). */
   mediaEnd?: boolean
 }>()
 
 const href = computed(() => articlePath(props.article))
 const category = computed(() => props.article.categories[0]?.name ?? '')
-// PAGE-003, WP-002: nama kategori yang ada di daftar kategori WordPress menjadi tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); kategori di luar daftar (mis. uncategorized, anak Ruang Visual) tetap teks.
-// `:aria-current="undefined"` pada tautan: penanda otomatis NuxtLink (rute sama, query diabaikan) tidak dipakai di kartu; hanya menu, laci, dan footer yang menandai kategori aktif.
-// POLISH-01 D36: di /kategori/<slug> label kategori yang sama dengan halaman itu = teks biasa (bukan tautan ke halaman sendiri, tanpa tab stop berlebih);
-// kategori lain tetap tautan. Hanya rute kategori (Beranda = kategori Berita tidak ikut: di sana label tetap tautan).
+// Nama kategori yang ada di daftar kategori WordPress = tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); di luar daftar (mis. uncategorized, anak Ruang Visual) tetap teks.
+// `:aria-current="undefined"`: penanda otomatis NuxtLink tidak dipakai di kartu (hanya menu, laci, footer). Di /kategori/<slug> label yang sama dengan halaman itu = teks biasa; Beranda (kategori Berita) tidak ikut: label tetap tautan.
 const route = useRoute()
 const categories = useCategories()
 const categoryTo = computed(() => {
@@ -76,7 +67,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 </template>
 
 <style scoped>
-/* Varian horizontal (mobile, 159:2933): 354x104 */
+/* Varian horizontal (mobile): 354x104 */
 .card {
   position: relative;
   display: grid;
@@ -103,7 +94,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 .body {
   display: flex;
   flex-direction: column;
-  gap: 4px; /* 159:2933 gap kolom teks */
+  gap: 4px; /* gap kolom teks */
   min-width: 0;
 }
 
@@ -112,16 +103,15 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   color: var(--color-black);
 }
 
-/* PAGE-003: label kategori = tautan terpisah di atas overlay judul (z-index 1 > overlay auto), warna dan dekorasi diwarisi, hover bergaris bawah.
-   Teks label tidak berubah; hanya area teksnya yang menaut (bukan seluruh baris). */
+/* Label kategori = tautan terpisah di atas overlay judul (z-index 1 > overlay auto), warna dan dekorasi diwarisi, hover bergaris bawah;
+   hanya area teks label yang menaut (bukan seluruh baris). */
 .category-link {
   position: relative;
   z-index: 1;
 }
 
-/* POLISH-01 D41 (WCAG 2.5.8): area klik >= 24 x 24 px lewat ::after tak terlihat dari tepi atas label ke bawah (celah 4 px + sedikit ruang atas judul kartu
-   yang sama). Sengaja tidak naik ke atas: label sering menempel di tepi atas kartu dan kartu di atasnya hanya berjarak beberapa px, jadi ke atas
-   area klik akan menimpa kartu lain. Rect label dan tampilan tidak berubah. */
+/* Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat dari tepi atas label ke bawah. Sengaja tidak naik ke atas: label sering menempel di tepi atas kartu
+   dan kartu di atasnya hanya berjarak beberapa px, jadi ke atas area klik akan menimpa kartu lain. Rect label dan tampilan tidak berubah. */
 .category-link::after {
   content: '';
   position: absolute;
@@ -164,7 +154,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   border-radius: var(--radius-10);
 }
 
-/* Hover (tidak digambar di Figma; PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover.
+/* Hover (tidak digambar di Figma): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover.
    Overlay ::after milik tautan, jadi hover di mana pun pada kartu menggarisbawahi judul. */
 @media (hover: hover) {
   .link:hover {
@@ -175,7 +165,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 .meta {
   display: flex;
   align-items: center;
-  gap: 6px; /* 159:2933 avatar-penerbit */
+  gap: 6px; /* avatar-penerbit */
   min-width: 0;
 }
 
@@ -188,7 +178,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 
 .author {
   min-width: 0;
-  font: var(--type-card-timestamp); /* keputusan PM 16: Regular 400 */
+  font: var(--type-card-timestamp);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -196,13 +186,13 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 
 .time {
   flex: none;
-  margin-left: 4px; /* 6 + 4 = gap 10 penerbit-waktu (159:2933) */
+  margin-left: 4px; /* 6 + 4 = gap 10 penerbit-waktu */
   font: var(--type-card-mobile-timestamp);
   white-space: nowrap;
 }
 
-/* layout="compact" mobile (Card Popular News 159:2832): item 358x82 [V metadata 100:2461], thumbnail 104x80, gaya teks = varian horizontal di atas.
-   Judul dibatasi 2 baris di semua lebar (Figma 2 baris): isi teks maks. 80,9 < 82, jadi tinggi item selalu 82 dan kedua tab setinggi sama (tanpa layout shift). */
+/* layout="compact" mobile: item 358x82, thumbnail 104x80, gaya teks = varian horizontal di atas. Judul dibatasi 2 baris di semua lebar:
+   isi teks maks. 80,9 < 82, jadi tinggi item selalu 82 dan kedua tab setinggi sama (tanpa layout shift). */
 .card--compact {
   min-height: 82px;
 }
@@ -216,8 +206,8 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   line-clamp: 2;
 }
 
-/* layout="compact" desktop (34:354): thumbnail 104x104, jarak label-judul-meta 6, judul Regular 400 (News/Caption), label Medium 500 (News/Metadata).
-   Tidak dibuat (tanpa token/aset, deviasi dicatat di task): penerbit Bold 700 dan ikon jam 16 px. */
+/* layout="compact" desktop: thumbnail 104x104, jarak label-judul-meta 6, judul Regular 400 (News/Caption), label Medium 500 (News/Metadata).
+   Tidak dibuat (tanpa token/aset): penerbit Bold 700 dan ikon jam 16 px. */
 @media (min-width: 1024px) {
   .card--compact {
     min-height: 0;
@@ -240,7 +230,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   }
 }
 
-/* Thumbnail di kanan (Detail 130:2226, item 357 = teks 237 + celah 16 + thumbnail 104; celah dari .card) */
+/* Thumbnail di kanan (Detail: item 357 = teks 237 + celah 16 + thumbnail 104; celah dari .card) */
 .card--media-end {
   grid-template-columns: minmax(0, 1fr) 104px;
 }
@@ -249,7 +239,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   order: 2;
 }
 
-/* Varian vertikal (desktop, 57:514): 358 x <=350. Tidak berlaku untuk layout="compact" (kolom samping). */
+/* Varian vertikal (desktop): 358 x <=350. Tidak berlaku untuk layout="compact" (kolom samping). */
 @media (min-width: 1024px) {
   .card:not(.card--compact) {
     grid-template-columns: minmax(0, 1fr);
@@ -272,7 +262,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
     gap: 0;
   }
 
-  /* G19: label kategori tidak tampil di desktop (display:none juga menyembunyikannya dari pembaca layar) */
+  /* label kategori tidak tampil di desktop (display:none juga menyembunyikannya dari pembaca layar) */
   .card:not(.card--compact) .category {
     display: none;
   }
@@ -295,7 +285,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   }
 
   .card:not(.card--compact) .time {
-    margin-left: var(--space-8); /* 8 + 8 = gap 16 penerbit-waktu (57:514) */
+    margin-left: var(--space-8); /* 8 + 8 = gap 16 penerbit-waktu */
     font: var(--type-card-timestamp);
   }
 }

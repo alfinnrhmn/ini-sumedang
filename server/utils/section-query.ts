@@ -1,6 +1,6 @@
 /**
- * Pembantu section kategori Beranda (HOME-02, WP-002). Impor berekstensi `.ts` (tanpa auto-import Nuxt pada tingkat modul) agar bagian murninya
- * bisa diuji dengan `node:test`; `createError` hanya dipanggil di dalam `parseSectionQuery` (auto-import Nitro).
+ * Pembantu section kategori Beranda. Impor berekstensi `.ts` (tanpa auto-import Nuxt di tingkat modul) agar bagian murninya bisa diuji dengan `node:test`;
+ * `createError` hanya dipanggil di dalam `parseSectionQuery` (auto-import Nitro).
  */
 import type { ArticleCategory } from '../../app/types/article'
 import { HOME_SECTIONS, HOME_SECTION_MAX, SECTION_LIMIT_MAX, SECTION_LIMIT_MIN } from '../../app/config/home.ts'
@@ -13,16 +13,11 @@ export interface SectionQuery {
 }
 
 function badRequest() {
-  // Pesan tetap dan tanpa detail internal. Catatan: respons error 400 bawaan Nitro tetap memuat `url`
-  // permintaan (termasuk query mentah dari pengguna); kita tidak menambah input pengguna ke pesan, tetapi
-  // `url` itu bukan hasil kendali kita.
+  // Pesan tetap tanpa detail internal. Respons error 400 bawaan Nitro tetap memuat `url` permintaan (termasuk query mentah pengguna); itu bukan hasil kendali kita.
   return createError({ statusCode: 400, statusMessage: 'Bad Request', message: 'Parameter tidak valid.' })
 }
 
-/**
- * Validasi `category` (hanya slug yang ada di daftar kategori `knownSlugs` = `getCategories()`, pencocokan persis; WP-002) dan `limit`
- * (bilangan bulat 1-12, hanya digit). Nilai lain ditolak dengan 400.
- */
+/** Validasi `category` (hanya slug di `knownSlugs` = `getCategories()`, pencocokan persis) dan `limit` (bilangan bulat 1-12, hanya digit). Nilai lain ditolak dengan 400. */
 export function parseSectionQuery(query: Record<string, unknown>, knownSlugs: readonly string[]): SectionQuery {
   const { category, limit } = query
   if (typeof category !== 'string' || typeof limit !== 'string') throw badRequest()
@@ -42,9 +37,8 @@ export interface HomeSectionPick {
 }
 
 /**
- * Pilih section kategori Beranda (WP-002, Keputusan PM 3). `categories` = daftar kategori situs (urutan menu), `nonEmptySlugs` = slug kategori
- * yang punya >= 1 artikel terbit. Isi dulu menurut urutan `preference` (slug yang ada di daftar dan tak kosong; judul konfigurasi), lalu kategori
- * lain yang tak kosong menurut urutan daftar (judul = nama WordPress; kategori Berita = Beranda dilewati), maksimum `max` section. Murni.
+ * Pilih section kategori Beranda: kategori tak kosong menurut urutan `preference` (judul konfigurasi), lalu kategori lain menurut urutan daftar (judul = nama WordPress; Berita = Beranda dilewati), maksimum `max`.
+ * `categories` = daftar kategori situs (urutan menu), `nonEmptySlugs` = slug yang punya >= 1 artikel terbit. Murni.
  */
 export function pickHomeSections(
   categories: readonly ArticleCategory[],

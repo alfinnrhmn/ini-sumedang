@@ -1,9 +1,9 @@
 /**
- * Basis URL situs (HARD-001). Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
+ * Basis URL situs; murni agar bisa diuji dengan `node:test`.
  * Header `Host` berasal dari klien, jadi tidak boleh menentukan canonical, og:url, og:image, atau URL bagikan.
  */
 
-/** Domain produksi [I: asumsi PM, pemilik mengonfirmasi]. Tanpa garis miring akhir. */
+/** Domain produksi (asumsi, perlu konfirmasi pemilik). Tanpa garis miring akhir. */
 export const SITE_URL = 'https://inisumedang.com'
 
 // Origin `https://host[:port]` (garis miring akhir opsional): host = label huruf/angka/strip dipisah titik. Tanpa path, query, hash, userinfo, spasi.
@@ -21,9 +21,8 @@ export function validSiteUrl(value: unknown): string | null {
 }
 
 /**
- * Basis untuk membangun URL absolut. Produksi: `configuredUrl` yang valid, jika tidak `SITE_URL`; `requestOrigin` (header Host)
- * TIDAK PERNAH dipakai. Hanya mode pengembangan memakai origin permintaan agar uji lokal (localhost:3000) tetap jalan.
- * `dev` bisa diisi eksplisit (uji unit); nilai SSR dan klien sama karena `import.meta.dev` dan runtimeConfig public sama di keduanya.
+ * Basis untuk URL absolut: `configuredUrl` valid, jika tidak `SITE_URL`; `requestOrigin` (header Host) TIDAK PERNAH dipakai di produksi.
+ * Mode pengembangan memakai origin permintaan (localhost:3000); `dev` bisa diisi eksplisit untuk uji unit; SSR dan klien menghasilkan nilai sama.
  */
 export function siteOrigin(requestOrigin: string, configuredUrl?: unknown, dev: boolean = import.meta.dev): string {
   return dev ? requestOrigin : (validSiteUrl(configuredUrl) ?? SITE_URL)

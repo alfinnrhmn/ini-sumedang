@@ -1,10 +1,6 @@
 /**
- * Uji unit pencarian (PAGE-004): normalisasi `q` (`normalizeSearchQuery`, `searchInputValue`), pemecahan kata dan penilaian
- * (`searchTerms`, `searchScore`, `compareSearchHits`), inti `searchArticles` (`searchPage`: urutan, semua kata, kosong, paginasi, kasus tepi),
- * bentuk URL (`searchPath`), dan penjaga sumber untuk keputusan yang tidak dapat diuji sebagai fungsi murni (form tanpa JavaScript, `noindex`,
- * kata kunci tidak dipantulkan, data hanya lewat API, satu `v-html`). `searchArticles` sendiri (fixture di balik layanan) tidak bisa diimpor oleh
- * `node:test` (impor tanpa ekstensi di layanan/fixture); inti logikanya diuji lewat `searchPage`, jalur lengkapnya lewat HTTP di QA.
- * Perilaku di browser diuji terpisah (QA). Pelari: `node:test` (`npm test`).
+ * Uji unit pencarian: normalisasi `q`, pemecahan kata dan penilaian (`searchTerms`, `searchScore`, `compareSearchHits`), inti `searchArticles` (`searchPage`), bentuk URL (`searchPath`),
+ * dan penjaga sumber (form tanpa JavaScript, `noindex`, kata kunci tidak dipantulkan, data hanya lewat API, satu `v-html`). `searchArticles` sendiri tidak bisa diimpor `node:test` (impor tanpa ekstensi di layanan/fixture), jadi diuji lewat `searchPage`. Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

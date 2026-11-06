@@ -1,7 +1,6 @@
 /**
- * Uji unit evaluasi visual pemilik E1-E7 (PAGE-003, 3 Nov 2026): kategori Berita = Beranda (E1), slot iklan (E6), footer satu kolom (E7),
- * konstanta animasi hero (E3), dan penjaga sumber untuk keputusan tampilan yang tidak dapat diuji sebagai fungsi murni
- * ("Lainnya" hanya di empat section kategori, penampung iklan tanpa tautan/skrip, pengalihan 308). Pelari: `node:test` (`npm test`).
+ * Uji unit evaluasi visual: kategori Berita = Beranda, slot iklan, footer satu kolom, konstanta animasi hero, dan penjaga sumber ("Lainnya" hanya di empat section kategori,
+ * penampung iklan tanpa tautan/skrip, pengalihan 308). Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

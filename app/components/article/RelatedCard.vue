@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
 
-// Kartu blok Berita Terkait di bawah artikel: desktop "Card recomendasion desktop" 243x260 (130:2903), mobile "Card news Mobile" 354x318 (130:3620).
-// Satu tautan per kartu (judul; overlay ::after menutup kartu). Gambar dan avatar bukan tautan. Waktu hanya di mobile (desktop 130:2479: hanya penerbit).
+// Kartu blok Berita Terkait di bawah artikel. Satu tautan per kartu (judul; overlay ::after menutup kartu); gambar dan avatar bukan tautan.
+// Waktu hanya di mobile (desktop hanya penerbit).
 const props = defineProps<{
   article: Article
   /** Waktu server (ISO) untuk waktu relatif. */
@@ -41,7 +41,6 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 </template>
 
 <style scoped>
-/* Mobile 130:3620: gambar 210 (radius 8), konten pt 15 / pb 16, gap 12 */
 .card {
   position: relative;
   display: flex;
@@ -51,7 +50,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 }
 
 .media {
-  aspect-ratio: 354 / 210; /* I130:3620;90:2254 */
+  aspect-ratio: 354 / 210;
   background: var(--color-surface);
   border-radius: var(--radius-8);
 }
@@ -66,13 +65,13 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
 .body {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* I130:3620;98:828 */
-  padding: 15px 0 var(--space-16); /* I130:3620;98:828 pt 15 pb 16 */
+  gap: 12px;
+  padding: 15px 0 var(--space-16);
   min-width: 0;
 }
 
 .title {
-  font: var(--type-card-headline-mobile); /* I130:3620;98:830 Inter SemiBold 16/22,4 */
+  font: var(--type-card-headline-mobile);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -103,11 +102,10 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   }
 }
 
-/* Sumber dan waktu I130:3620;98:831: celah 16; avatar 20 + celah 8 + nama Inter Medium 13/19 */
 .meta {
   display: flex;
   align-items: center;
-  gap: 8px; /* I130:3620;98:832 */
+  gap: 8px;
   min-width: 0;
 }
 
@@ -126,7 +124,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   text-overflow: ellipsis;
 }
 
-/* Waktu I130:3620;98:837: Inter Regular 12/18, #727272 -> tak ada token dalam 4 level; --color-footer-muted (selisih 12/2/19, kontras 4,97:1; --color-gray-3 gagal AA 3,84:1) */
+/* Waktu: #727272 Figma tak punya token dalam 4 level; dipakai --color-footer-muted (selisih 12/2/19, kontras 4,97:1; --color-gray-3 gagal AA 3,84:1) */
 .time {
   flex: none;
   margin-left: var(--space-8); /* 8 + 8 = celah 16 penerbit-waktu */
@@ -135,14 +133,13 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   white-space: nowrap;
 }
 
-/* Desktop 130:2903: kolom gap 20, gambar tinggi 150 (243 lebar, tanpa radius), judul 19,2/26,88 maks. 2 baris, penerbit gap 14 */
 @media (min-width: 1024px) {
   .card {
-    gap: 20px; /* 130:2903 */
+    gap: 20px;
   }
 
   .media {
-    aspect-ratio: 243 / 150; /* I130:2903;130:2476 */
+    aspect-ratio: 243 / 150;
     border-radius: 0;
   }
 
@@ -151,7 +148,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   }
 
   .body {
-    gap: var(--space-16); /* I130:2903;130:2477 */
+    gap: var(--space-16);
     padding: 0;
   }
 
@@ -166,15 +163,15 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   }
 
   .meta {
-    gap: 14px; /* I130:2903;130:2479 */
+    gap: 14px;
   }
 
   .avatar {
-    border-radius: var(--radius-10); /* I130:2903;130:2481 rounded 10 (= lingkaran 20) */
+    border-radius: var(--radius-10); /* lingkaran 20 */
   }
 
   .time {
-    display: none; /* 130:2479: desktop hanya penerbit */
+    display: none; /* desktop hanya penerbit */
   }
 }
 </style>
