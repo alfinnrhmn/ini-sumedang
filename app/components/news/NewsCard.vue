@@ -22,16 +22,17 @@ const props = defineProps<{
 
 const href = computed(() => articlePath(props.article))
 const category = computed(() => props.article.categories[0]?.name ?? '')
-// PAGE-003: nama kategori resmi menjadi tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); kategori non-resmi tetap teks.
+// PAGE-003, WP-002: nama kategori yang ada di daftar kategori WordPress menjadi tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); kategori di luar daftar (mis. uncategorized, anak Ruang Visual) tetap teks.
 // `:aria-current="undefined"` pada tautan: penanda otomatis NuxtLink (rute sama, query diabaikan) tidak dipakai di kartu; hanya menu, laci, dan footer yang menandai kategori aktif.
 // POLISH-01 D36: di /kategori/<slug> label kategori yang sama dengan halaman itu = teks biasa (bukan tautan ke halaman sendiri, tanpa tab stop berlebih);
 // kategori lain tetap tautan. Hanya rute kategori (Beranda = kategori Berita tidak ikut: di sana label tetap tautan).
 const route = useRoute()
+const categories = useCategories()
 const categoryTo = computed(() => {
   const first = props.article.categories[0]
   if (!first) return null
   if (route.name === CATEGORY_ROUTE_NAME && route.params.slug === first.slug) return null
-  return categoryLink(first.slug)
+  return categoryLink(first.slug, categories.value)
 })
 const time = computed(() => formatRelativeTime(props.article.publishedAt, props.now))
 </script>

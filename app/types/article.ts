@@ -23,7 +23,7 @@ export interface Article {
   authorLabel: string
 }
 
-/** Tag artikel (grup `wp:term` ke-2); label sekunder di kepala Detail. */
+/** Tag artikel (grup `wp:term` ke-2); yang tampil di UI = `visibleTags()` (label kedua kepala Detail dan baris tag). */
 export type ArticleTag = ArticleCategory
 
 /**
@@ -61,6 +61,20 @@ export interface RecommendedResponse {
 /** Respons daftar artikel satu kategori section (bentuk sama dengan Rekomendasi). */
 export type CategoryArticlesResponse = RecommendedResponse
 
+/** Satu section kategori Beranda (WP-002): `title` = judul konfigurasi (preferensi) atau nama kategori WordPress; `articles` tidak pernah kosong. */
+export interface HomeSection {
+  slug: string
+  title: string
+  articles: Article[]
+}
+
+/** Respons section kategori Beranda: sampai `HOME_SECTION_MAX` section, urutan = urutan tampil; kosong = tidak ada section. */
+export interface HomeSectionsResponse {
+  sections: HomeSection[]
+  /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
+  now: string
+}
+
 /**
  * Satu topik Ruang Visual (HOME-04): kategori anak dari induk `ruang-visual`,
  * 1 kartu besar (`lead`, artikel terbaru topik) dan hingga 3 berita berthumbnail (`items`).
@@ -88,7 +102,7 @@ export interface SidebarResponse {
 /** Respons hero Beranda (HOME-07): artikel terbit terbaru, urutan = urutan slide; kosong = hero tidak dirender. */
 export type HeroResponse = RecommendedResponse
 
-/** Respons kategori menu header dan laci (HOME-06): 9 kategori resmi, urutan = urutan menu. */
+/** Respons kategori menu header, laci, dan footer (HOME-06, WP-002): kategori WordPress (mode fixture: 9 kategori contoh), urutan = urutan menu. */
 export interface CategoriesResponse {
   categories: ArticleCategory[]
 }
@@ -102,7 +116,7 @@ export interface CategoryPagination {
 }
 
 /**
- * Respons `/api/category/<slug>?halaman=N` (PAGE-003): kategori resmi, artikel terbit halaman itu (terbaru dulu, tanpa isi `body`),
+ * Respons `/api/category/<slug>?halaman=N` (PAGE-003): kategori dari daftar kategori, artikel terbit halaman itu (terbaru dulu, tanpa isi `body`),
  * dan paginasi. `articles` kosong hanya pada halaman 1 kategori tanpa artikel (keadaan kosong).
  */
 export interface CategoryPageResponse {

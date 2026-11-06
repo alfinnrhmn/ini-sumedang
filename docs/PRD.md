@@ -224,7 +224,7 @@ Library dan eksplorasi berikut ada di file tetapi **tidak boleh** menjadi task:
 Lebar konten: desktop 1120 pada kanvas 1440 (margin ±160 [I]); mobile 354 pada 402 (margin 24 [I]).
 
 ### 4.4 Kategori resmi dan konsistensi desain
-**Daftar kategori resmi (ditetapkan pemilik):** Berita · Nasional · Pemerintahan · Politik · Hukum · Sepak Bola · Otomotif · Jelajah · Bisnis & Teknologi (9). Ejaan final: "Pemerintahan", "Politik".
+**Daftar kategori resmi (ditetapkan pemilik):** Berita · Nasional · Pemerintahan · Politik · Hukum · Sepak Bola · Otomotif · Jelajah · Bisnis & Teknologi (9). Ejaan final: "Pemerintahan", "Politik". **Sejak WP-002 (5 Nov 2026) sumber daftar menu dan halaman kategori adalah WordPress: semua kategori yang dibuat di sana (kecuali Uncategorized dan Ruang Visual beserta anaknya) tampil; sembilan nama ini hanya daftar awal dan isi fixture.**
 - **Judul section di desain [V]:** Rekomendasi, Nasional, **Ruang Visual**, Sepak Bola, Bisnis dan Teknologi, Otomotif (6; bukan tombol, §3.6). Frame mobile `90:1611` memakai "Berita", "Nasional", "Teknologi" (3 section) [V]; label dan set section mengikuti desktop. "Rekomendasi" dan "Ruang Visual" bukan di antara 9 kategori resmi: Rekomendasi = campuran, Ruang Visual = pengelompokan topik (§3.6).
 - Detail Berita memakai 9 kategori; ejaan di desain: "Politic", "**Otomatif**", "**Jalajah**" — salah ketik; yang dipakai: Politik, Otomotif, Jelajah.
 - **Aturan:** label menu diambil dari nama kategori WordPress, bukan disalin dari Figma. Nama + slug di WordPress harus sama dengan daftar resmi.
@@ -488,9 +488,8 @@ Status: `BACKLOG → READY → IN_PROGRESS → IN_REVIEW → QA_PASSED → DONE`
 **Daftar tunggal WAJIB SEBELUM TAYANG (situs tidak boleh tayang sebelum semuanya selesai; diperbarui 4 Nov 2026 atas keputusan pemilik):**
 1. **Fixture dihapus:** `public/fixtures/` dan `FIXTURE_SET` dibuang dari build produksi; semua konten dari WordPress (gambar fixture berasal dari Figma, hak pakai tidak diperiksa).
 2. **Halaman error/404 berlayout:** menyusul ("coming soon", pemilik 4 Nov); sekarang memakai halaman bawaan Nuxt tanpa header/footer. **SEO-001** (judul/deskripsi/canonical lengkap; samakan format judul Detail `"<judul> — IniSumedang"` dengan Kategori `"<Kategori> - Ini Sumedang"`).
-3. **Satukan daftar kategori resmi** (`OFFICIAL_CATEGORY_SLUGS` di klien menduplikasi `getCategories()` di server): tampilan membaca daftar dari server saja, dikerjakan saat integrasi WordPress (disetujui pemilik 4 Nov).
-4. **Papan iklan** (penampung "Advertisement"; D47): diganti konten CMS (ADS-001/ADS-002: gambar + tautan `https`, tanpa HTML/skrip) saat WordPress tersambung (pemilik 4 Nov); teks penampung tidak boleh tayang.
-5. **Widget sosial** (SOC-001; D49): angka contoh dibiarkan sampai data asli diketahui (pemilik 4 Nov); sebelum tayang diganti angka asli atau widget disembunyikan.
+3. **Papan iklan** (penampung "Advertisement"; D47): diganti konten CMS (ADS-001/ADS-002: gambar + tautan `https`, tanpa HTML/skrip) saat WordPress tersambung (pemilik 4 Nov); teks penampung tidak boleh tayang.
+4. **Widget sosial** (SOC-001; D49): angka contoh dibiarkan sampai data asli diketahui (pemilik 4 Nov); sebelum tayang diganti angka asli atau widget disembunyikan.
 
 **Sudah diputuskan pemilik (4 Nov 2026):** area klik logo header seukuran logo (D25 diterima, tidak wajib); hero putar otomatis tanpa tombol jeda (celah WCAG 2.2.2 diterima, D50); STATIC-001 berupa halaman teks saja; DISC-001 digantikan slice; basis URL kanonis tetap, validasi URL gambar hero, dan CSP `frame-src` selesai di **HARD-001** (`DONE` 4 Nov 2026; dicabut dari daftar wajib). Domain situs diisi lead saat deploy lewat env `NUXT_PUBLIC_SITE_URL` (kosong atau tidak valid = cadangan `https://inisumedang.com` di `app/config/site.ts`); pemilik tidak mengatur domain sekarang.
 
@@ -526,6 +525,7 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | UX-002 | `DONE` | Widget kategori sejajar kartu pertama (perubahan kecil, tanpa berkas task) |
 | PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
 | API-001 | `DONE` | Integrasi WordPress ke Nuxt (klien baca-saja, sumber data layanan; fixture bila `NUXT_WP_BASE_URL` kosong); `docs/tasks/API-001.md` |
+| WP-002 | `DONE` | Kategori, label, dan tag mengikuti WordPress (menu, halaman kategori, section Beranda, tag di Detail); `docs/tasks/WP-002.md` |
 | HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
 | POLISH-01 | `DONE` | Deviasi Figma D1–D56: D26, D33, D36, D41, D42 dikerjakan; sisanya diterima pemilik 4 Nov; `docs/tasks/POLISH-01.md` |

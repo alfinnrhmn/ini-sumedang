@@ -105,9 +105,10 @@ describe('SOC-001 penempatan (penjaga sumber)', () => {
   it('Beranda: salinan desktop di kolom kanan Rekomendasi sebelum iklan; salinan mobile setelah "Bisnis dan Teknologi"', () => {
     const page = source('app/pages/index.vue')
     assert.match(page, /<div ref="sideAds" class="side-ads">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
-    assert.match(page, /const SOCIAL_AFTER_SLUG = 'bisnis-teknologi'/)
-    assert.match(page, /<div v-if="section\.slug === SOCIAL_AFTER_SLUG" class="mobile-social">\s*<HomeSocialWidget \/>/)
-    assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 2)
+    assert.match(page, /const socialIndex = computed\(\(\) => Math\.min\(2, sections\.value\.length - 1\)\)/)
+    assert.match(page, /<div v-if="sectionIndex === socialIndex" class="mobile-social">\s*<HomeSocialWidget \/>/)
+    // Salinan desktop (kolom Rekomendasi), salinan mobile di antara section, dan salinan mobile cadangan bila tanpa section kategori (WP-002)
+    assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 3)
   })
 
   it('Detail: widget paling atas kolom kanan (desktop saja: kolom kanan display none di bawah 1024) sebelum iklan', () => {

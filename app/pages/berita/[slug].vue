@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ArticleDetailResponse } from '~/types/article'
 import { siteOrigin } from '~/config/site'
+import { visibleTags } from '~/config/home'
 
 // Detail Berita (PAGE-002; desktop 130:515, mobile 130:2945). Data hanya lewat /api/article/<slug> (layanan bertipe di server);
 // isi artikel = `bodyHtml` tersanitasi di server. Slug tak ada/draft/private/tak valid -> status 404 (halaman error berlayout = task terpisah).
@@ -45,6 +46,9 @@ useSeoMeta({
 })
 useHead({ link: [{ rel: 'canonical', href: canonical }] })
 
+// Tag yang tampil (WP-002): tanpa tag fungsional `terpopuler`; baris tag di bawah isi, di atas "Bagikan" (tanpa tag tampil: tidak dirender).
+const tags = visibleTags(article.tags)
+
 // Isi hanya spasi dianggap kosong (server sudah mengembalikan '' untuk itu; trim() = lapisan kedua).
 const hasBody = article.bodyHtml.trim() !== ''
 
@@ -84,6 +88,7 @@ useStickyColumn(sidebarCol)
         <p v-else class="empty-body">
           Isi artikel belum tersedia.
         </p>
+        <ArticleTags :tags="tags" />
         <ArticleShare class="share" :url="canonical" :title="article.title" />
       </article>
       <!-- Kolom kanan desktop: widget sosial 357x200 (SOC-001, 127:2810) paling atas, lalu (E6, papan iklan) iklan 357x237 (128:503, y 232) di atas Berita Terkait dan 357x368 (128:508) di bawahnya; mobile 130:2945 tanpa iklan -->

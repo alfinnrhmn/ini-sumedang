@@ -1,7 +1,7 @@
-import type { Article, ArticleCategory, ArticleDetail, ArticleTag, CategoryPageResponse, SearchResponse, VisualTopic } from '../../app/types/article'
-import { OFFICIAL_CATEGORY_SLUGS } from '../../app/config/category'
+import type { Article, ArticleCategory, ArticleDetail, ArticleTag, CategoryPageResponse, HomeSection, SearchResponse, VisualTopic } from '../../app/types/article'
+import { VISUAL_PARENT_SLUG } from '../../app/config/category'
 import { RELATED_BOTTOM_COUNT, RELATED_BOTTOM_MOBILE_COUNT, RELATED_SIDEBAR_COUNT } from '../../app/config/article'
-import { HERO_SLIDE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
+import { HERO_SLIDE_COUNT, HOME_SECTION_ARTICLE_COUNT, POPULAR_TAG_SLUG, POPULAR_WINDOW_DAYS, SIDEBAR_COUNT } from '../../app/config/home'
 import { buildDefaultBody, buildDefaultExcerpt } from '../fixtures/article-content'
 import { buildEdgePosts, buildEdgeVisualCategories, buildFigmaPosts, buildFigmaVisualCategories, buildMenuCategories } from '../fixtures/posts'
 import type { WpPost } from '../fixtures/posts'
@@ -11,13 +11,13 @@ import type { RelatedCandidate } from '../utils/related-ranking'
 import { rankRelated, relatedBlocks } from '../utils/related-ranking'
 import { createArticleSanitizer, sanitizeArticleHtml } from '../utils/sanitize-article-html'
 import { IMAGE_ALLOWED_HOSTS } from '../utils/sanitize-config'
+import { pickHomeSections } from '../utils/section-query'
 import { searchPage } from '../utils/search-query'
 import { WP_UNAVAILABLE_MESSAGE, WpUnavailableError, loadWpCategories, loadWpPosts, validWpBaseUrl } from '../utils/wp-client'
-import { decodeEntities, excerptText, mapPost, pickOfficialCategories, publishedAtOf, wpImageHosts } from '../utils/wp-map'
+import { decodeEntities, excerptText, mapPost, pickWordPressCategories, publishedAtOf, wpImageHosts } from '../utils/wp-map'
 
 const RECOMMENDED_COUNT = 8
-// Ruang Visual (HOME-04): induk, jumlah topik, dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel).
-const VISUAL_PARENT_SLUG = 'ruang-visual'
+// Ruang Visual (HOME-04): jumlah topik dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel). Induk: `VISUAL_PARENT_SLUG` (config).
 const VISUAL_TOPIC_COUNT = 4
 const VISUAL_ITEM_COUNT = 3
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -146,18 +146,33 @@ export async function getVisualTopics(now: Date = new Date()): Promise<VisualTop
 }
 
 /**
- * Kategori menu header dan laci (HOME-06): 9 kategori resmi sesuai urutan menu, dengan nama terdekode
- * ("Bisnis & Teknologi"). Tidak bergantung pada artikel; kategori anak Ruang Visual tidak termasuk.
+ * Daftar kategori situs (menu header, laci, footer, tautan label, halaman kategori, section Beranda), nama terdekode ("Bisnis & Teknologi").
+ * Tidak bergantung pada artikel. Acuannya WordPress (WP-002): semua kategori WordPress kecuali `uncategorized`, `ruang-visual`, dan keturunan
+ * `ruang-visual`, urutan = id naik (`pickWordPressCategories`). Mode fixture (base URL kosong): 9 kategori contoh sesuai urutan menu.
  */
 export async function getCategories(): Promise<ArticleCategory[]> {
   const base = wpBase()
-  // WordPress: 9 kategori resmi yang ADA di WordPress, urutan menu; yang belum ada dilewati (menu menyesuaikan).
-  if (base) return pickOfficialCategories(await fromWordPress(() => loadWpCategories(base)), OFFICIAL_CATEGORY_SLUGS)
+  if (base) return pickWordPressCategories(await fromWordPress(() => loadWpCategories(base)))
   return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
 }
 
 /**
- * Halaman kategori (PAGE-003): hanya 9 kategori resmi dari `getCategories()` (anak Ruang Visual dan slug lain = null),
+ * Section kategori Beranda (HOME-02, WP-002): sampai `HOME_SECTION_MAX` kategori dari `getCategories()` yang punya >= 1 artikel terbit,
+ * dipilih `pickHomeSections` (preferensi `HOME_SECTIONS` dulu, lalu kategori lain menurut urutan daftar); tiap section memuat
+ * `HOME_SECTION_ARTICLE_COUNT` artikel terbaru kategori itu. Tanpa kategori atau tanpa artikel: array kosong.
+ */
+export async function getHomeSections(now: Date = new Date()): Promise<HomeSection[]> {
+  const [categories, published] = await Promise.all([getCategories(), getPublishedArticles(now)])
+  const nonEmpty = new Set(published.flatMap(article => article.categories.map(category => category.slug)))
+  return pickHomeSections(categories, nonEmpty).map(pick => ({
+    slug: pick.slug,
+    title: pick.title,
+    articles: published.filter(article => article.categories.some(category => category.slug === pick.slug)).slice(0, HOME_SECTION_ARTICLE_COUNT)
+  }))
+}
+
+/**
+ * Halaman kategori (PAGE-003, WP-002): hanya kategori dari `getCategories()` (anak Ruang Visual, `uncategorized`, dan slug lain = null),
  * hanya status `publish`, terbaru dulu. `page` melewati halaman terakhir = null; halaman 1 kategori kosong tetap
  * dikembalikan (artikel kosong, `totalPages` 0). Tidak ada `body`/HTML mentah di hasilnya.
  */

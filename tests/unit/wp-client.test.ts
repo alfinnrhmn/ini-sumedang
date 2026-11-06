@@ -7,8 +7,7 @@ import assert from 'node:assert/strict'
 import {
   WP_UNAVAILABLE_MESSAGE, WpUnavailableError, collectPages, createCachedLoader, parseTotalPages, validWpBaseUrl, withRetry
 } from '../../server/utils/wp-client.ts'
-import { excerptText, mapPost, normalizeWpPost, normalizeWpPosts, normalizeWpTerms, pickOfficialCategories, publishedAtOf, wpImageHosts } from '../../server/utils/wp-map.ts'
-import { OFFICIAL_CATEGORY_SLUGS } from '../../app/config/category.ts'
+import { excerptText, mapPost, normalizeWpPost, normalizeWpPosts, normalizeWpTerms, pickWordPressCategories, publishedAtOf, wpImageHosts } from '../../server/utils/wp-map.ts'
 import { WP_CACHE_TTL_MS } from '../../app/config/wp.ts'
 
 describe('WP1 validasi base URL', () => {
@@ -487,16 +486,20 @@ describe('WP6 normalisasi data mentah', () => {
     assert.deepEqual(normalizeWpTerms({ code: 'x' }), [])
   })
 
-  it('kategori resmi: urutan menu, yang belum ada di WordPress dilewati, nama didekode', () => {
+  it('daftar kategori WordPress: semua kecuali uncategorized dan ruang-visual beserta anaknya, urutan id naik, nama didekode', () => {
     const terms = [
       { id: 9, slug: 'hukum', name: 'Hukum' },
       { id: 4, slug: 'berita', name: 'Berita' },
       { id: 7, slug: 'bisnis-teknologi', name: 'Bisnis &amp; Teknologi' },
-      { id: 11, slug: 'uncategorized', name: 'Uncategorized' },
-      { id: 12, slug: 'visual-budaya', name: 'Budaya', parent: 20 }
+      { id: 1, slug: 'uncategorized', name: 'Uncategorized' },
+      { id: 20, slug: 'ruang-visual', name: 'Ruang Visual' },
+      { id: 12, slug: 'visual-budaya', name: 'Budaya', parent: 20 },
+      { id: 13, slug: 'cucu-visual', name: 'Cucu', parent: 12 },
+      { id: 30, slug: 'kategori-baru', name: 'Kategori Baru' }
     ]
-    assert.deepEqual(pickOfficialCategories(terms, OFFICIAL_CATEGORY_SLUGS).map(item => item.slug), ['berita', 'hukum', 'bisnis-teknologi'])
-    assert.equal(pickOfficialCategories(terms, OFFICIAL_CATEGORY_SLUGS)[2]?.name, 'Bisnis & Teknologi')
-    assert.deepEqual(pickOfficialCategories([], OFFICIAL_CATEGORY_SLUGS), [])
+    const list = pickWordPressCategories(terms)
+    assert.deepEqual(list.map(item => item.slug), ['berita', 'bisnis-teknologi', 'hukum', 'kategori-baru'])
+    assert.equal(list[1]?.name, 'Bisnis & Teknologi')
+    assert.deepEqual(pickWordPressCategories([]), [])
   })
 })

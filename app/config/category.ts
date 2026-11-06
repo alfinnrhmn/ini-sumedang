@@ -1,5 +1,6 @@
 /**
- * Konfigurasi halaman kategori (PAGE-003). Satu tempat untuk jumlah per halaman dan daftar slug kategori resmi.
+ * Konfigurasi halaman kategori (PAGE-003). Satu tempat untuk jumlah per halaman dan batas slug. Daftar kategori situs
+ * tidak ada di kode: acuannya WordPress (WP-002; `getCategories()` di server, `/api/categories` untuk klien).
  */
 
 /** Jumlah kartu per halaman kategori (Keputusan PM 2). */
@@ -12,19 +13,8 @@ export const CATEGORY_PAGE_PATTERN = /^[1-9][0-9]{0,3}$/
 export const CATEGORY_SLUG_MAX_LENGTH = 60
 
 /**
- * 9 kategori resmi (PRD §4.4), urutan = urutan menu. Hanya slug ini yang punya halaman `/kategori/<slug>` dan hanya
- * nama kategori ini yang menjadi tautan; kategori lain (mis. anak Ruang Visual, label contoh kolom samping) tetap teks.
- * Slug [I]: final di gerbang WordPress (PRD §13); server memvalidasi terhadap `getCategories()`, daftar ini hanya
- * dipakai sisi aplikasi untuk memutuskan apakah suatu nama kategori ditautkan.
+ * Kategori WordPress yang TIDAK masuk daftar kategori situs (WP-002, Keputusan PM 1): kategori bawaan WordPress dan induk
+ * Ruang Visual beserta anak-anaknya (anak hanya dipakai sebagai topik Ruang Visual, bukan kategori menu/halaman).
  */
-export const OFFICIAL_CATEGORY_SLUGS: readonly string[] = [
-  'berita',
-  'nasional',
-  'pemerintahan',
-  'politik',
-  'hukum',
-  'sepak-bola',
-  'otomotif',
-  'jelajah',
-  'bisnis-teknologi'
-]
+export const WP_DEFAULT_CATEGORY_SLUG = 'uncategorized'
+export const VISUAL_PARENT_SLUG = 'ruang-visual'

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import type { ArticleDetail } from '~/types/article'
+import { visibleTags } from '~/config/home'
 
 // Kepala artikel (desktop 127:2132, mobile 130:3342): label kategori • tag, judul (h1), ringkasan, identitas + waktu baca.
-// Label kedua = tag pertama artikel (Figma "LAYANAN PUBLIK" [I: subkategori/tag]); tanpa tag, hanya kategori; tanpa keduanya label tidak dirender.
+// Label kedua = tag tampil pertama artikel (Figma "LAYANAN PUBLIK" [I: subkategori/tag]; tag fungsional `terpopuler` tidak ikut, WP-002); tanpa tag, hanya kategori; tanpa keduanya label tidak dirender.
 // Tanggal terbit [I; PAGE-002 Keputusan 11, tidak ada di node Figma] ditampilkan di baris waktu baca.
 const props = defineProps<{ article: ArticleDetail }>()
 
 const category = computed(() => props.article.categories[0]?.name ?? '')
-// PAGE-003: kategori resmi = tautan ke /kategori/<slug>; label kedua (tag) tetap teks biasa.
+// PAGE-003, WP-002: kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug>; label kedua (tag) tetap teks biasa.
+const categories = useCategories()
 const categoryTo = computed(() => {
   const first = props.article.categories[0]
-  return first ? categoryLink(first.slug) : null
+  return first ? categoryLink(first.slug, categories.value) : null
 })
-const tag = computed(() => props.article.tags[0]?.name ?? '')
+const tag = computed(() => visibleTags(props.article.tags)[0]?.name ?? '')
 const date = computed(() => formatPublishDate(props.article.publishedAt))
 </script>
 

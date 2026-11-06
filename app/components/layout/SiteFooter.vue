@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { FOOTER_COMPANY, FOOTER_LEGAL, FOOTER_SECTIONS, FOOTER_TAGLINE, FOOTER_YEAR } from '~/config/footer'
+import type { FooterSection } from '~/config/footer'
 
 // Footer (HOME-05). Desktop >= 1024: tiga kolom daftar terbuka (60:486). Di bawah 1024: pola mobile (101:2600) =
 // tiga baris akordeon. Keduanya dirender di HTML server; yang tidak dipakai disembunyikan CSS (display: none).
+// Kolom Kategori (WP-002) mendaftar SEMUA kategori WordPress dari daftar kategori (useCategories), bukan dari FOOTER_SECTIONS; tanpa kategori kolomnya tidak dirender.
 const uid = useId()
 const open = ref<Record<string, boolean>>({})
+
+const categories = useCategories()
+const sections = computed<FooterSection[]>(() => FOOTER_SECTIONS.flatMap((section) => {
+  if (section.id !== 'kategori') return [section]
+  return categories.value.length
+    ? [{ ...section, links: categories.value.map(category => ({ label: category.name, slug: category.slug, to: categoryPath(category.slug) })) }]
+    : []
+}))
 
 function toggle(id: string) {
   open.value[id] = !open.value[id]
@@ -32,12 +42,12 @@ const SEPARATOR = '  •  '
         <LayoutFooterSocial show-label class="social-d" />
       </div>
       <div class="columns">
-        <section v-for="section in FOOTER_SECTIONS" :key="section.id" :class="`col col-${section.id}`">
+        <section v-for="section in sections" :key="section.id" :class="`col col-${section.id}`">
           <h2 class="col-title">
             {{ section.title }}
           </h2>
           <ul class="list">
-            <li v-for="link in section.links" :key="link.label">
+            <li v-for="link in section.links" :key="link.slug ?? link.label">
               <LayoutFooterLabel :link="link" />
             </li>
           </ul>
@@ -65,7 +75,7 @@ const SEPARATOR = '  •  '
         </div>
         <LayoutFooterSocial />
         <ul class="accordion">
-          <li v-for="section in FOOTER_SECTIONS" :key="section.id" class="acc-item">
+          <li v-for="section in sections" :key="section.id" class="acc-item">
             <h2 class="acc-title">
               <button
                 :id="`${uid}-btn-${section.id}`"
@@ -91,7 +101,7 @@ const SEPARATOR = '  •  '
               class="acc-panel"
               :hidden="!open[section.id]"
             >
-              <li v-for="link in section.links" :key="link.label">
+              <li v-for="link in section.links" :key="link.slug ?? link.label">
                 <LayoutFooterLabel :link="link" />
               </li>
             </ul>

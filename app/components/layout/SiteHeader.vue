@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { ArticleDetailResponse, CategoriesResponse } from '~/types/article'
+import type { ArticleDetailResponse } from '~/types/article'
 
 // Header situs (HOME-06). Desktop >= 1024: hamburger + logo (21:5360, 1440 x 94), kolom pencarian (21:5270, PAGE-004) dan menu kategori
 // (21:4951, 1440 x 47) di bawahnya. Di bawah 1024: hamburger + logo di kiri (116:1662, 354 x 26) dan ikon cari (116:1647, PAGE-004) di kanan.
 // Tombol tema (21:4970, 116:1636) tidak dirender (keputusan pemilik; dark mode ditunda); slotnya (30 + celah 8) tetap dicadangkan agar
 // kolom cari dan ikon cari berada di posisi Figma (keputusan PAGE-004 [I], untuk ditinjau pemilik di POLISH-01).
-// Hamburger membuka laci 9 kategori (G20), sama di desktop dan mobile.
+// Hamburger membuka laci semua kategori WordPress (G20, WP-002), sama di desktop dan mobile.
 // Pencarian (Keputusan PM 1): >= 1024 form selalu tampil; < 1024 ikon cari membuka baris input yang menggantikan isi bilah (hamburger + logo
 // disembunyikan, tinggi bilah tetap 51), fokus ke input; tombol tutup dan Esc menutupnya dan mengembalikan fokus ke ikon cari; tanpa overlay.
-const { data } = await useFetch<CategoriesResponse>('/api/categories', { key: 'categories' })
+// Daftar kategori WordPress (WP-002), sumber yang sama dengan tautan label kategori di seluruh situs (useCategories); tanpa kategori menu dan laci tidak dirender.
+const { data } = await useCategoriesFetch()
 const categories = computed(() => data.value?.categories ?? [])
 
 // POLISH-01 D26: di halaman Detail kategori pertama artikel disorot di menu dan laci (tanpa aria-current). Data artikel dibaca dari payload kunci

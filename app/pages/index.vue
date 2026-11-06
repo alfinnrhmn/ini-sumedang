@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { CategoryArticlesResponse, HeroResponse, RecommendedResponse, SidebarResponse, VisualTopicsResponse } from '~/types/article'
-import { HOME_SECTIONS, HOME_SECTION_COUNTS } from '~/config/home'
+import type { HeroResponse, HomeSectionsResponse, RecommendedResponse, SidebarResponse, VisualTopicsResponse } from '~/types/article'
 
 useSeoMeta({ title: 'IniSumedang' })
 
@@ -19,23 +18,17 @@ const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar
 })
 
 // Ruang Visual (HOME-04): 4 topik (kategori anak `ruang-visual`); `topics` kosong = section tidak dirender.
-// Urutan section (HOME-02): Rekomendasi -> Sepak Bola -> Ruang Visual -> Nasional -> Bisnis dan Teknologi -> Otomotif.
-const VISUAL_AFTER_SLUG = 'sepak-bola'
-// Widget sosial mobile (SOC-001): setelah section "Bisnis dan Teknologi".
-const SOCIAL_AFTER_SLUG = 'bisnis-teknologi'
+// Urutan section (HOME-02, WP-002): Rekomendasi -> section kategori ke-1 -> Ruang Visual -> section ke-2, ke-3, ke-4. Section kategori = kategori WordPress
+// yang punya artikel (preferensi HOME_SECTIONS dulu, lalu kategori lain; dipilih di server, /api/articles/home-sections); pada fixture:
+// Sepak Bola, Nasional, Bisnis dan Teknologi, Otomotif. Tanpa section kategori, Ruang Visual dan widget sosial mobile tetap dirender.
 const { data: visual } = await useFetch<VisualTopicsResponse>('/api/articles/visual-topics', {
   key: 'articles-visual-topics'
 })
 
-// Section kategori: satu permintaan per section, jumlah dari HOME_SECTION_COUNTS (satu konfigurasi).
-// useFetch dipanggil sinkron di setup (konteks Nuxt tersedia); hasilnya ditunggu bersama.
-const sectionFetches = HOME_SECTIONS.map(section =>
-  useFetch<CategoryArticlesResponse>('/api/articles/by-category', {
-    key: `articles-category-${section.slug}`,
-    query: { category: section.slug, limit: HOME_SECTION_COUNTS[section.slug] }
-  })
-)
-await Promise.all(sectionFetches)
+// Section kategori (WP-002): satu permintaan; server memilih section dan artikelnya (HOME_SECTION_MAX section x HOME_SECTION_ARTICLE_COUNT kartu).
+const { data: sectionData } = await useFetch<HomeSectionsResponse>('/api/articles/home-sections', {
+  key: 'articles-home-sections'
+})
 
 // Kolom kanan menempel (UX-001 Keputusan PM 5), hanya >= 1024 px: kolom iklan Rekomendasi (widget sosial + 2 iklan, kontainer = grid Rekomendasi) dan
 // iklan section kategori pertama (kontainer = section itu). Tab Terbaru | Terpopuler tidak ditempel: kontainernya (.top) setinggi hero, tanpa ruang gulir.
@@ -47,14 +40,11 @@ function setSectionAd(el: unknown) {
 useStickyColumn(sideAds)
 useStickyColumn(sectionAd)
 
-// Section tanpa artikel (atau gagal dimuat) tidak dirender (v-if di template; Ruang Visual tetap di posisinya).
-const sections = computed(() =>
-  HOME_SECTIONS.map((section, index) => ({
-    ...section,
-    articles: sectionFetches[index]?.data.value?.articles ?? [],
-    now: sectionFetches[index]?.data.value?.now ?? ''
-  }))
-)
+// Section tanpa artikel tidak ada di daftar (server hanya memilih kategori tak kosong); gagal dimuat = tanpa section (Ruang Visual tetap dirender).
+const sections = computed(() => sectionData.value?.sections ?? [])
+const sectionsNow = computed(() => sectionData.value?.now ?? '')
+// Widget sosial mobile (SOC-001): setelah section ke-3, atau setelah section terakhir bila kurang dari 3 (tanpa section: setelah Ruang Visual).
+const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
 </script>
 
 <template>
@@ -100,7 +90,7 @@ const sections = computed(() =>
     </section>
     <template v-for="(section, sectionIndex) in sections" :key="section.slug">
       <!-- Section kategori pertama membawa slot iklan: 357x78 di kolom kanan (desktop 63:627), 354x237 setelah kartu ketiga (mobile 165:1944) -->
-      <section v-if="section.articles.length" class="category-section" :class="{ 'category-section--ad': sectionIndex === 0 }">
+      <section class="category-section" :class="{ 'category-section--ad': sectionIndex === 0 }">
         <HomeSectionTitle
           :title="section.title"
           :more-to="categoryPath(section.slug)"
@@ -109,7 +99,7 @@ const sections = computed(() =>
         <ul class="list">
           <template v-for="(article, index) in section.articles" :key="article.id">
             <li>
-              <NewsCard :article="article" :now="section.now" />
+              <NewsCard :article="article" :now="sectionsNow" />
             </li>
             <li v-if="sectionIndex === 0 && index === 2" class="ad-item ad-item--compact">
               <AdSlot variant="mobile-m" />
@@ -121,15 +111,15 @@ const sections = computed(() =>
         </div>
       </section>
       <!-- Mobile 100:2448 (354x237) dan 100:2536 (354x78): sebelum Ruang Visual -->
-      <div v-if="sectionIndex === 0 && section.articles.length" class="mobile-ads">
+      <div v-if="sectionIndex === 0" class="mobile-ads">
         <AdSlot variant="mobile-m" />
         <AdSlot variant="mobile-s" />
       </div>
-      <!-- Mobile/tablet 100:2447 (354x200): setelah section "Bisnis dan Teknologi" (padanan "Teknologi" 165:1835, jarak 30); desktop memakai salinan di kolom kanan Rekomendasi -->
-      <div v-if="section.slug === SOCIAL_AFTER_SLUG" class="mobile-social">
+      <!-- Mobile/tablet 100:2447 (354x200): setelah section ke-3 ("Bisnis dan Teknologi" pada fixture; padanan "Teknologi" 165:1835, jarak 30); desktop memakai salinan di kolom kanan Rekomendasi -->
+      <div v-if="sectionIndex === socialIndex" class="mobile-social">
         <HomeSocialWidget />
       </div>
-      <template v-if="section.slug === VISUAL_AFTER_SLUG && visual && visual.topics.length">
+      <template v-if="sectionIndex === 0 && visual && visual.topics.length">
         <section class="category-section">
           <HomeSectionTitle title="Ruang Visual" />
           <div class="topics">
@@ -141,6 +131,23 @@ const sections = computed(() =>
           <AdSlot variant="wide-l" />
         </div>
       </template>
+    </template>
+    <!-- Tanpa section kategori (WordPress tanpa kategori berartikel): Ruang Visual dan widget sosial mobile tetap dirender, urutan sama -->
+    <template v-if="!sections.length">
+      <template v-if="visual && visual.topics.length">
+        <section class="category-section">
+          <HomeSectionTitle title="Ruang Visual" />
+          <div class="topics">
+            <HomeVisualTopic v-for="entry in visual.topics" :key="entry.topic.id" :entry="entry" />
+          </div>
+        </section>
+        <div class="wide-ad">
+          <AdSlot variant="wide-l" />
+        </div>
+      </template>
+      <div class="mobile-social">
+        <HomeSocialWidget />
+      </div>
     </template>
   </main>
 </template>

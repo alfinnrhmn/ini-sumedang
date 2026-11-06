@@ -10,7 +10,9 @@ import { HOME_CATEGORY_SLUG, categoryLink, categoryPagePath, categoryPath, isCat
 import { AD_SLOTS } from '../../app/utils/ad-slots.ts'
 import { FOOTER_SECTIONS } from '../../app/config/footer.ts'
 import { HERO_SLIDE_MS, HOME_SECTIONS } from '../../app/config/home.ts'
-import { OFFICIAL_CATEGORY_SLUGS } from '../../app/config/category.ts'
+
+const MENU_SLUGS = ['berita', 'nasional', 'pemerintahan', 'politik', 'hukum', 'sepak-bola', 'otomotif', 'jelajah', 'bisnis-teknologi']
+const MENU_CATEGORIES = MENU_SLUGS.map((slug, index) => ({ id: index + 1, slug }))
 
 const source = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8')
 
@@ -22,9 +24,9 @@ describe('E1 kategori Berita = Beranda', () => {
     assert.equal(categoryPath('bisnis-teknologi'), '/kategori/bisnis-teknologi')
   })
 
-  it('categoryLink("berita") = "/" (berita tetap kategori resmi untuk data)', () => {
-    assert.ok(OFFICIAL_CATEGORY_SLUGS.includes('berita'))
-    assert.equal(categoryLink('berita'), '/')
+  it('categoryLink("berita") = "/" (berita ada di daftar kategori)', () => {
+    assert.ok(MENU_SLUGS.includes('berita'))
+    assert.equal(categoryLink('berita', MENU_CATEGORIES), '/')
   })
 
   it('categoryPagePath("berita", N) selalu "/" (tidak berhalaman); kategori lain tidak berubah', () => {
@@ -34,7 +36,7 @@ describe('E1 kategori Berita = Beranda', () => {
   })
 
   it('tidak ada bentuk URL yang menghasilkan /kategori/berita', () => {
-    for (const slug of OFFICIAL_CATEGORY_SLUGS) {
+    for (const slug of MENU_SLUGS) {
       assert.notEqual(categoryPath(slug), '/kategori/berita')
       assert.notEqual(categoryPagePath(slug, 2), '/kategori/berita?halaman=2')
     }

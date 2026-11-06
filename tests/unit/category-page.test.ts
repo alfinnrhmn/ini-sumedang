@@ -6,8 +6,12 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { buildPagination, isCategoryPageSlug, isPageInRange, isValidCategorySlug, parsePageParam, sliceForPage, totalPagesOf } from '../../server/utils/category-page.ts'
 import { categoryLink, categoryPagePath, categoryPath, isCategoryRoute } from '../../app/utils/routes.ts'
-import { CATEGORY_PER_PAGE, OFFICIAL_CATEGORY_SLUGS } from '../../app/config/category.ts'
+import { CATEGORY_PER_PAGE } from '../../app/config/category.ts'
 import { FOOTER_SECTIONS } from '../../app/config/footer.ts'
+
+// Daftar kategori contoh mode fixture (9 kategori, urutan menu) = `buildMenuCategories()`. WP-002: tidak lagi konstanta aplikasi, hanya acuan uji.
+const MENU_SLUGS = ['berita', 'nasional', 'pemerintahan', 'politik', 'hukum', 'sepak-bola', 'otomotif', 'jelajah', 'bisnis-teknologi']
+const MENU_CATEGORIES = MENU_SLUGS.map((slug, index) => ({ id: index + 1, slug, name: slug }))
 
 describe('CP1 parsePageParam', () => {
   it('tanpa parameter = halaman 1', () => {
@@ -94,7 +98,7 @@ describe('CP2b isCategoryPageSlug (D42)', () => {
   })
 
   it('8 kategori resmi lain tetap valid; slug tidak wajar tetap ditolak', () => {
-    for (const slug of OFFICIAL_CATEGORY_SLUGS.filter(item => item !== 'berita')) assert.equal(isCategoryPageSlug(slug), true)
+    for (const slug of MENU_SLUGS.filter(item => item !== 'berita')) assert.equal(isCategoryPageSlug(slug), true)
     for (const input of ['', 'Hukum', '../x', 'sepak_bola', undefined, ['hukum'], 1]) assert.equal(isCategoryPageSlug(input), false)
   })
 })
@@ -163,14 +167,16 @@ describe('CP4 bentuk URL kategori', () => {
     assert.equal(categoryPath('a?b#c'), '/kategori/a%3Fb%23c')
   })
 
-  it('categoryLink: kategori resmi = path, selain itu null', () => {
+  it('categoryLink: slug yang ada di daftar kategori = path, selain itu null (WP-002)', () => {
     // E1: kategori Berita = Beranda ("/"), tanpa halaman /kategori/berita
-    for (const slug of OFFICIAL_CATEGORY_SLUGS) assert.equal(categoryLink(slug), slug === 'berita' ? '/' : `/kategori/${slug}`)
-    assert.equal(categoryLink('ruang-visual'), null)
-    assert.equal(categoryLink('visual-pemerintahan'), null)
-    assert.equal(categoryLink('teknologi'), null)
-    assert.equal(categoryLink(''), null)
-    assert.equal(categoryLink('Hukum'), null)
+    for (const slug of MENU_SLUGS) assert.equal(categoryLink(slug, MENU_CATEGORIES), slug === 'berita' ? '/' : `/kategori/${slug}`)
+    assert.equal(categoryLink('ruang-visual', MENU_CATEGORIES), null)
+    assert.equal(categoryLink('visual-pemerintahan', MENU_CATEGORIES), null)
+    assert.equal(categoryLink('teknologi', MENU_CATEGORIES), null)
+    assert.equal(categoryLink('', MENU_CATEGORIES), null)
+    assert.equal(categoryLink('Hukum', MENU_CATEGORIES), null)
+    // Daftar kosong (WordPress tanpa kategori / pemuatan gagal): semuanya teks biasa
+    assert.equal(categoryLink('hukum', []), null)
   })
 
   it('categoryPagePath: halaman 1 tanpa parameter, N > 1 dengan ?halaman=N', () => {
@@ -179,10 +185,10 @@ describe('CP4 bentuk URL kategori', () => {
     assert.equal(categoryPagePath('sepak-bola', 12), '/kategori/sepak-bola?halaman=12')
   })
 
-  it('9 kategori resmi, tanpa duplikat, semua slug valid', () => {
-    assert.equal(OFFICIAL_CATEGORY_SLUGS.length, 9)
-    assert.equal(new Set(OFFICIAL_CATEGORY_SLUGS).size, 9)
-    for (const slug of OFFICIAL_CATEGORY_SLUGS) assert.equal(isValidCategorySlug(slug), true)
+  it('9 kategori contoh fixture, tanpa duplikat, semua slug valid', () => {
+    assert.equal(MENU_SLUGS.length, 9)
+    assert.equal(new Set(MENU_SLUGS).size, 9)
+    for (const slug of MENU_SLUGS) assert.equal(isValidCategorySlug(slug), true)
   })
 })
 
@@ -202,9 +208,9 @@ describe('CP5 kategori aktif (isCategoryRoute)', () => {
 describe('CP6 konfigurasi footer', () => {
   const section = FOOTER_SECTIONS.find(item => item.id === 'kategori')
 
-  it('9 item kategori, urutan = daftar resmi, to = categoryPath(slug)', () => {
+  it('9 item kategori contoh (cadangan konfigurasi; SiteFooter mendaftar kategori WordPress dari useCategories), to = categoryPath(slug)', () => {
     assert.ok(section)
-    assert.deepEqual(section.links.map(link => link.slug), [...OFFICIAL_CATEGORY_SLUGS])
+    assert.deepEqual(section.links.map(link => link.slug), [...MENU_SLUGS])
     for (const link of section.links) assert.equal(link.to, categoryPath(link.slug as string))
   })
 

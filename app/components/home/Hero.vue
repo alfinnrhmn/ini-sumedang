@@ -145,12 +145,13 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 // Chip = kategori pertama artikel (nama sudah didekode di server); tanpa kategori chip tidak dirender.
-// PAGE-003: kategori resmi = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul); non-resmi tetap teks.
+// PAGE-003, WP-002: kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul); selain itu teks.
+const categories = useCategories()
 const slides = computed(() =>
   props.articles.map(article => ({
     article,
     category: article.categories[0]?.name ?? '',
-    categoryTo: article.categories[0] ? categoryLink(article.categories[0].slug) : null,
+    categoryTo: article.categories[0] ? categoryLink(article.categories[0].slug, categories.value) : null,
     href: articlePath(article),
     time: formatRelativeTime(article.publishedAt, props.now)
   }))

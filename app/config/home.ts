@@ -1,24 +1,24 @@
 /**
- * Konfigurasi section kategori Beranda (HOME-02). Urutan array = urutan di halaman.
- * Judul section = teks konfigurasi (Figma 84:1437, 57:496, 57:501, 57:505), bukan nama kategori
- * dari data. Slug [I]: final di gerbang WordPress (PRD §13).
+ * Konfigurasi section kategori Beranda (HOME-02, WP-002). `HOME_SECTIONS` adalah urutan PREFERENSI, bukan daftar tetap: section Beranda
+ * dipilih dari kategori WordPress yang ada dan punya artikel terbit (`pickHomeSections` di server). Slug yang cocok dengan preferensi
+ * diisi dulu menurut urutan ini dengan judul konfigurasi (Figma 84:1437, 57:496, 57:501, 57:505); sisa tempat diisi kategori lain
+ * yang tak kosong (judul = nama WordPress).
  */
-export const HOME_SECTIONS = [
+export interface HomeSectionPreference {
+  slug: string
+  title: string
+}
+
+export const HOME_SECTIONS: readonly HomeSectionPreference[] = [
   { slug: 'sepak-bola', title: 'Sepak Bola' },
   { slug: 'nasional', title: 'Nasional' },
   { slug: 'bisnis-teknologi', title: 'Bisnis dan Teknologi' },
   { slug: 'otomotif', title: 'Otomotif' }
-] as const
+]
 
-export type HomeSectionSlug = (typeof HOME_SECTIONS)[number]['slug']
-
-/** Jumlah kartu per section. Default 4 [usulan PM; angka final menunggu pemilik, "4 atau 6"]. */
-export const HOME_SECTION_COUNTS: Record<HomeSectionSlug, number> = {
-  'sepak-bola': 4,
-  'nasional': 4,
-  'bisnis-teknologi': 4,
-  'otomotif': 4
-}
+/** Jumlah section kategori maksimum di Beranda dan jumlah kartu per section. Default 4 dan 4 [usulan PM; angka final menunggu pemilik, "4 atau 6"]. */
+export const HOME_SECTION_MAX = 4
+export const HOME_SECTION_ARTICLE_COUNT = 4
 
 /** Batas `limit` yang diterima API section (bilangan bulat). */
 export const SECTION_LIMIT_MIN = 1
@@ -34,6 +34,14 @@ export const SIDEBAR_COUNT = 4
  */
 export const POPULAR_WINDOW_DAYS = 14
 export const POPULAR_TAG_SLUG = 'terpopuler'
+
+/**
+ * Tag yang tampil di UI (WP-002 Keputusan PM 5): semua tag artikel kecuali tag fungsional `POPULAR_TAG_SLUG`. Urutan terjaga;
+ * tag tampil pertama = label kedua di kepala artikel, semuanya = baris tag di bawah isi Detail.
+ */
+export function visibleTags<T extends { slug: string }>(tags: readonly T[]): T[] {
+  return tags.filter(tag => tag.slug !== POPULAR_TAG_SLUG)
+}
 
 /** Hero Beranda (HOME-07): jumlah slide = jumlah titik di Figma [V 21:4981 dan 90:2137: 4 titik]. */
 export const HERO_SLIDE_COUNT = 4

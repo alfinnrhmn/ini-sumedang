@@ -6,8 +6,10 @@
  * - `mapPost`: `WpPost` -> `Article` (dipakai fixture dan WordPress; satu-satunya tempat aturan tampilan data).
  */
 import type { Article, ArticleCategory } from '../../app/types/article'
+import { VISUAL_PARENT_SLUG, WP_DEFAULT_CATEGORY_SLUG } from '../../app/config/category.ts'
 import type { WpPost, WpTerm } from '../fixtures/posts.ts'
 import { isValidArticleSlug, stripTags } from './article-detail.ts'
+import { isValidCategorySlug } from './category-page.ts'
 import { safeImageUrl } from './image-url.ts'
 import { IMAGE_ALLOWED_HOSTS } from './sanitize-config.ts'
 
@@ -176,10 +178,26 @@ export function normalizeWpTerms(raw: unknown): WpTerm[] {
   })
 }
 
-/** Kategori resmi (urutan `slugs` = urutan menu) yang ADA di `terms`; yang belum ada dilewati (menu menyesuaikan). */
-export function pickOfficialCategories(terms: readonly WpTerm[], slugs: readonly string[]): ArticleCategory[] {
-  return slugs.flatMap((slug) => {
-    const term = terms.find(item => item.slug === slug)
-    return term ? [{ id: term.id, slug: term.slug, name: decodeEntities(term.name) }] : []
-  })
+/**
+ * Daftar kategori situs dari kategori WordPress (WP-002, Keputusan PM 1): SEMUA kategori kecuali `uncategorized`, `ruang-visual`, dan
+ * semua keturunan `ruang-visual` (anak langsung = topik Ruang Visual; keturunan lebih dalam ikut disembunyikan). Urutan = id naik
+ * (urutan pembuatan). Kategori kosong tetap masuk (halaman kategori menampilkan keadaan kosong). Nama didekode. Kategori yang slug-nya
+ * tidak punya halaman (`isValidCategorySlug`: mis. karakter non-ASCII atau lebih dari 60 karakter) dilewati, supaya menu tidak menaut ke 404.
+ */
+export function pickWordPressCategories(terms: readonly WpTerm[]): ArticleCategory[] {
+  const hidden = new Set<number>(terms.filter(term => term.slug === VISUAL_PARENT_SLUG).map(term => term.id))
+  // Keturunan ruang-visual: ulangi sampai tidak ada anak baru (aman terhadap siklus data, tiap id masuk satu kali).
+  for (let grown = true; grown;) {
+    grown = false
+    for (const term of terms) {
+      if (term.parent !== undefined && hidden.has(term.parent) && !hidden.has(term.id)) {
+        hidden.add(term.id)
+        grown = true
+      }
+    }
+  }
+  return terms
+    .filter(term => term.slug !== WP_DEFAULT_CATEGORY_SLUG && !hidden.has(term.id) && isValidCategorySlug(term.slug))
+    .sort((a, b) => a.id - b.id)
+    .map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
 }

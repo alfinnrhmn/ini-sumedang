@@ -1,5 +1,4 @@
 import type { Article } from '../types/article'
-import { OFFICIAL_CATEGORY_SLUGS } from '../config/category.ts'
 
 /**
  * Tujuan tautan artikel (PAGE-002): `/berita/<slug>`. Satu-satunya tempat bentuk URL artikel; kartu, breadcrumb,
@@ -31,11 +30,12 @@ export function categoryPath(slug: string): string {
 }
 
 /**
- * Tujuan tautan untuk nama kategori yang tampil di UI: `categoryPath(slug)` bila `slug` kategori resmi (punya halaman),
- * selain itu `null` (kategori non-resmi, mis. anak Ruang Visual, tetap teks biasa tanpa `<a>`).
+ * Tujuan tautan untuk nama kategori yang tampil di UI (label kartu, hero, Detail, breadcrumb): `categoryPath(slug)` bila `slug` ada di
+ * `categories` (daftar kategori WordPress dari `/api/categories`, lewat `useCategories()`; WP-002), selain itu `null` (kategori di luar
+ * daftar, mis. `uncategorized` atau anak Ruang Visual, tetap teks biasa tanpa `<a>`). Pencocokan persis.
  */
-export function categoryLink(slug: string): string | null {
-  return OFFICIAL_CATEGORY_SLUGS.includes(slug) ? categoryPath(slug) : null
+export function categoryLink(slug: string, categories: readonly { slug: string }[]): string | null {
+  return categories.some(category => category.slug === slug) ? categoryPath(slug) : null
 }
 
 /** Halaman N kategori: halaman 1 = URL kanonis tanpa parameter; N > 1 = `?halaman=N`. Kategori Berita tidak berhalaman (selalu `/`). */
