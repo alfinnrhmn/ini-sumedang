@@ -203,6 +203,15 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
   display: none;
 }
 
+/* ADS-002: pembungkus yang hanya berisi slot tanpa iklan (mode WordPress; AdSlot tidak dirender, hanya komentar Vue) disembunyikan agar tidak
+   meninggalkan celah (margin/gap). Mode fixture selalu berisi penampung, jadi tidak terpengaruh. `.side-ads` berisi widget sosial, tidak pernah kosong. */
+.ad-item:empty,
+.mobile-ads:empty,
+.section-ad:empty,
+.wide-ad:empty {
+  display: none;
+}
+
 /* Mobile: dua iklan sebelum Ruang Visual, jarak 32 (100:2448 berakhir y 3317, 100:2536 y 3349) */
 .mobile-ads {
   display: grid;
@@ -364,6 +373,11 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
 
   .wide-ad + .category-section {
     margin-top: 20px;
+  }
+
+  /* Tanpa iklan lebar: kembali ke jarak section biasa (50) */
+  .wide-ad:empty + .category-section {
+    margin-top: 50px;
   }
 }
 </style>

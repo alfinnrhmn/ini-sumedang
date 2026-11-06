@@ -239,3 +239,12 @@ export function loadWpCategories(baseUrl: string): Promise<WpTerm[]> {
   return cached(`${baseUrl}|categories`, async () =>
     normalizeWpTerms(await fetchAll(baseUrl, `categories?per_page=${WP_PER_PAGE}&_fields=id,slug,name,parent,count`)))
 }
+
+/**
+ * Iklan mentah (`iklan?status=publish&per_page=100&_fields=id,date_gmt,title,acf`, ADS-002), belum dinormalisasi: kelayakan jadwal
+ * (hari ini WIB) dinilai per permintaan oleh `selectAds` (`wp-ads.ts`), bukan dibekukan di cache. Ber-cache. Post type `iklan` belum
+ * ada = 404 = `WpUnavailableError` (pemanggil menganggapnya "tanpa iklan").
+ */
+export function loadWpAds(baseUrl: string): Promise<unknown[]> {
+  return cached(`${baseUrl}|ads`, () => fetchAll(baseUrl, `iklan?status=publish&per_page=${WP_PER_PAGE}&_fields=id,date_gmt,title,acf&acf_format=standard`))
+}
