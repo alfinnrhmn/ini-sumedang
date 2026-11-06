@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { ArticleTag } from '~/types/article'
 
-// Baris tag Detail (WP-002 Keputusan PM 5; tanpa frame Figma, dibangun dari token yang ada): tag artikel WordPress sebagai label TEKS
-// (bukan tautan, tidak ada halaman tag), di bawah isi dan di atas "Bagikan". Pemanggil memberi tag yang tampil saja (`visibleTags`:
-// tanpa tag fungsional `terpopuler`). Tanpa tag baris tidak dirender. Nama tag dirender sebagai teks (di-escape), tidak pernah HTML.
+// Baris tag Detail (tanpa frame Figma, dari token yang ada): tag artikel sebagai label TEKS (bukan tautan, tidak ada halaman tag), di bawah isi dan di atas "Bagikan".
+// Pemanggil memberi tag yang tampil saja (`visibleTags`, tanpa `terpopuler`); tanpa tag baris tidak dirender. Nama tag dirender sebagai teks (di-escape), tidak pernah HTML.
 defineProps<{ tags: ArticleTag[] }>()
 </script>
 
@@ -16,7 +15,7 @@ defineProps<{ tags: ArticleTag[] }>()
 </template>
 
 <style scoped>
-/* Jarak atas 24 dari isi (sama dengan jarak isi ke "Bagikan", 130:3366); "Bagikan" membawa jarak atas 24 sendiri */
+/* Jarak atas 24 dari isi (sama dengan jarak isi ke "Bagikan"); "Bagikan" membawa jarak atas 24 sendiri */
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -26,7 +25,7 @@ defineProps<{ tags: ArticleTag[] }>()
   list-style: none;
 }
 
-/* Label teks kecil: Inter Medium 11,111/15,555 (News/Metadata), abu #667085 (kontras 4,97 : 1), latar dan garis seperti kontrol pencarian */
+/* Label teks kecil (News/Metadata), abu #667085 (kontras 4,97 : 1), latar dan garis seperti kontrol pencarian */
 .tag {
   min-width: 0;
   padding: 4px var(--space-8);

@@ -1,6 +1,6 @@
 /**
- * Penjaga sumber POLISH-01 (D26, D33, D36, D41, D42). Perilaku di browser (ukur area klik, sorotan, tab stop) diuji manual/QA;
- * di sini hanya kontrak yang bisa dibaca dari sumber. Pelari: `node:test` (`npm test`).
+ * Penjaga sumber untuk kontrak tampilan yang bisa dibaca dari sumber; perilaku di browser (area klik, sorotan, tab stop) diuji manual/QA.
+ * Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

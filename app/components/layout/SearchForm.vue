@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { normalizeSearchQuery, searchInputValue } from '~/config/search'
 
-// Kolom cari header (PAGE-004). Desktop >= 1024: input 400 x 54 sesuai Figma 21:5270 (radius 16, latar --color-surface, border --color-border-subtle,
-// ikon 20 x 20 di x 15, teks mulai x 51). Di bawah 1024 form tersembunyi sampai tombol ikon di header (SiteHeader) membukanya (prop `open`): barisnya
-// menggantikan isi bilah (hamburger + logo disembunyikan), fokus otomatis ke input, tombol tutup dan Esc memancarkan `close` (pemanggil mengembalikan
-// fokus ke tombol cari). Keadaan terbuka mobile dan tombol tutup tanpa frame [?]: diturunkan dari token (Keputusan PM 1; deviasi untuk POLISH-01).
-// Dasar = <form role="search" method="get" action="/cari"> dengan <input type="search" name="q" maxlength="100">: berfungsi tanpa JavaScript
-// (pengiriman GET biasa). Dengan JavaScript pengiriman dicegat dan dialihkan lewat router ke /cari?q=<kata kunci ternormalisasi> (tanpa muat ulang).
-// Ikon cari = tombol kirim ("Cari"), posisinya di kiri input tetapi urutan DOM/Tab: input lalu tombol. Tanpa saran otomatis saat mengetik.
-// Nilai awal = `q` bila halaman /cari sedang terbuka (nilai input, tidak pernah HTML), selain itu kosong.
+// Kolom cari header: <form role="search" method="get" action="/cari"> yang berfungsi tanpa JavaScript; dengan JavaScript dialihkan lewat router ke /cari?q=<kata kunci ternormalisasi>. Nilai awal = `q` bila /cari terbuka. Tanpa saran otomatis.
+// Di bawah 1024 form tersembunyi sampai tombol ikon header (prop `open`) membukanya (tanpa frame Figma, diturunkan dari token); fokus ke input, tombol tutup/Esc memancarkan `close`. Ikon cari = tombol kirim di kiri input, urutan DOM/Tab: input lalu tombol.
 const props = defineProps<{
   /** id form; dipakai aria-controls pada tombol cari di header */
   id: string
@@ -119,13 +113,13 @@ function onKeydown(event: KeyboardEvent) {
   flex: 1 1 auto;
   min-width: 0;
   height: var(--space-40);
-  border: 1px solid var(--color-border-subtle); /* Figma 21:5270 rgba(8,8,8,0.05) */
-  border-radius: var(--radius-6); /* mobile turunan tombol 116:1647 (radius 6); desktop 16 di bawah */
-  background: var(--color-surface); /* #F8F8F8 */
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-6); /* mobile: radius 6; desktop 16 di bawah */
+  background: var(--color-surface);
 }
 
-/* Teks Inter Regular 18 / 27, spasi huruf -4 % (Text/L/Regular); padding kiri 50 + border 1 = teks mulai x 51 (21:5273 x 15 + 36).
-   Warna isian --color-text (12,6:1), placeholder = Grey 2 #4F4F4F (21:5273) = --color-gray-2 (8,0:1 di atas #F8F8F8). */
+/* Teks Text/L/Regular; padding kiri 50 + border 1 = teks mulai x 51. Warna isian --color-text (12,6:1),
+   placeholder = Grey 2 #4F4F4F = --color-gray-2 (8,0:1 di atas #F8F8F8). */
 .input {
   display: block;
   width: 100%;
@@ -219,7 +213,7 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-/* Desktop 21:5270: 400 x 54, radius 16; tombol tutup tidak dipakai (hanya untuk baris mobile) */
+/* Desktop: 400 x 54, radius 16; tombol tutup tidak dipakai (hanya untuk baris mobile) */
 @media (min-width: 1024px) {
   .search {
     display: block;

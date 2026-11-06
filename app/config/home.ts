@@ -1,8 +1,6 @@
 /**
- * Konfigurasi section kategori Beranda (HOME-02, WP-002). `HOME_SECTIONS` adalah urutan PREFERENSI, bukan daftar tetap: section Beranda
- * dipilih dari kategori WordPress yang ada dan punya artikel terbit (`pickHomeSections` di server). Slug yang cocok dengan preferensi
- * diisi dulu menurut urutan ini dengan judul konfigurasi (Figma 84:1437, 57:496, 57:501, 57:505); sisa tempat diisi kategori lain
- * yang tak kosong (judul = nama WordPress).
+ * Urutan PREFERENSI section kategori Beranda, bukan daftar tetap: `pickHomeSections` (server) memilih dari kategori WordPress yang punya artikel terbit.
+ * Slug yang cocok diisi dulu menurut urutan ini (judul konfigurasi); sisa tempat diisi kategori lain yang tak kosong (judul = nama WordPress).
  */
 export interface HomeSectionPreference {
   slug: string
@@ -16,7 +14,7 @@ export const HOME_SECTIONS: readonly HomeSectionPreference[] = [
   { slug: 'otomotif', title: 'Otomotif' }
 ]
 
-/** Jumlah section kategori maksimum di Beranda dan jumlah kartu per section. Default 4 dan 4 [usulan PM; angka final menunggu pemilik, "4 atau 6"]. */
+/** Jumlah section kategori maksimum di Beranda dan jumlah kartu per section. */
 export const HOME_SECTION_MAX = 4
 export const HOME_SECTION_ARTICLE_COUNT = 4
 
@@ -24,35 +22,25 @@ export const HOME_SECTION_ARTICLE_COUNT = 4
 export const SECTION_LIMIT_MIN = 1
 export const SECTION_LIMIT_MAX = 12
 
-/** Kolom samping Beranda (HOME-03): jumlah item per tab [V 34:354 dan 4 `Card Popular News` di 90:1611]. */
+/** Kolom samping Beranda: jumlah item per tab. */
 export const SIDEBAR_COUNT = 4
 
-/**
- * Terpopuler = pilihan editor (PRD §3.6): artikel terbit bertag `POPULAR_TAG_SLUG` yang terbit dalam
- * `POPULAR_WINDOW_DAYS` hari terakhir (umur tepat 14 hari masuk, lebih tua tidak). Satu konstanta jendela.
- * Skenario "tidak ada populer" untuk QA di salinan sementara: ubah POPULAR_TAG_SLUG menjadi slug yang tak ada.
- */
+/** Terpopuler = pilihan editor: artikel terbit bertag `POPULAR_TAG_SLUG` dalam `POPULAR_WINDOW_DAYS` hari terakhir (umur tepat 14 hari masuk, lebih tua tidak). */
 export const POPULAR_WINDOW_DAYS = 14
 export const POPULAR_TAG_SLUG = 'terpopuler'
 
-/**
- * Tag yang tampil di UI (WP-002 Keputusan PM 5): semua tag artikel kecuali tag fungsional `POPULAR_TAG_SLUG`. Urutan terjaga;
- * tag tampil pertama = label kedua di kepala artikel, semuanya = baris tag di bawah isi Detail.
- */
+/** Tag yang tampil di UI: semua tag artikel kecuali tag fungsional `POPULAR_TAG_SLUG`, urutan terjaga (tag pertama = label kedua kepala artikel, semuanya = baris tag Detail). */
 export function visibleTags<T extends { slug: string }>(tags: readonly T[]): T[] {
   return tags.filter(tag => tag.slug !== POPULAR_TAG_SLUG)
 }
 
-/** Hero Beranda (HOME-07): jumlah slide = jumlah titik di Figma [V 21:4981 dan 90:2137: 4 titik]. */
+/** Jumlah slide hero (= jumlah titik indikator). */
 export const HERO_SLIDE_COUNT = 4
 
-/** Durasi animasi geser-kiri hero (E3, evaluasi pemilik; rentang 350-450 ms, ease). Satu sumber untuk CSS (variabel) dan cadangan waktu. */
+/** Durasi animasi geser-kiri hero (ms). Satu sumber untuk CSS (variabel) dan cadangan waktu. */
 export const HERO_SLIDE_MS = 400
 
-/**
- * Putar otomatis hero (UX-001, Keputusan PM 1; instruksi pemilik 3 Nov 2026 menggantikan "tanpa putar otomatis" HOME-07).
- * Interval antar slide; animasi geser-kiri memakai `HERO_SLIDE_MS` yang sama dengan perpindahan manual.
- */
+/** Interval putar otomatis hero (ms); animasi geser memakai `HERO_SLIDE_MS` yang sama dengan perpindahan manual. */
 export const HERO_AUTOPLAY_MS = 5000
 
 /** Keadaan putar otomatis: `manual` = tidak berputar (kurang dari 2 slide, reduced-motion, atau belum di klien), `paused` = dijeda, `running` = berputar. */

@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import type { ArticleCategory } from '~/types/article'
 
-// Laci kategori (HOME-06, G20): panel samping dari kiri, sama di desktop dan mobile. Visual = "Usulan visual" di
-// docs/tasks/HOME-06.md (disetujui pemilik 1 Nov 2026). Tertutup = atribut `hidden` (isi tetap ada di HTML server).
-// Terbuka: fokus ke tombol tutup, fokus terkurung di panel, Esc menutup, scroll halaman dikunci.
-// Pemanggil mengembalikan fokus ke tombol hamburger saat `close` dipancarkan. Mengikuti tautan kategori (PAGE-003) memancarkan
-// `navigate` (tujuan = path kategori): pemanggil menutup laci TANPA mengembalikan fokus ke hamburger (fokus pindah ke h1 halaman tujuan).
+// Laci kategori: panel samping dari kiri, sama di desktop dan mobile. Tertutup = atribut `hidden` (isi tetap ada di HTML server); terbuka: fokus ke tombol tutup dan terkurung di panel, Esc menutup, scroll halaman dikunci.
+// Pemanggil mengembalikan fokus ke hamburger saat `close`; `navigate` (tautan kategori diikuti) menutup laci TANPA mengembalikan fokus (fokus pindah ke h1 halaman tujuan).
 const props = defineProps<{
   open: boolean
   /** id elemen dialog; dipakai aria-controls pada tombol hamburger */
   id: string
   categories: ArticleCategory[]
-  /** D26: kategori pertama artikel di halaman Detail (sorotan tanpa aria-current). */
+  /** Kategori pertama artikel di halaman Detail (sorotan tanpa aria-current). */
   activeSlug?: string | null
 }>()
 const emit = defineEmits<{ close: [], navigate: [to: string] }>()
@@ -146,7 +143,7 @@ onBeforeUnmount(() => {
 .overlay {
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, var(--color-black-1) 40%, transparent); /* alfa 40 % = usulan yang disetujui, bukan token baru */
+  background: color-mix(in srgb, var(--color-black-1) 40%, transparent); /* alfa 40 %, bukan token baru */
 }
 
 .panel {
@@ -199,7 +196,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--space-40); /* 40 = tombol hamburger desktop 21:5352 */
+  width: var(--space-40); /* 40 = tombol hamburger desktop */
   height: var(--space-40);
   margin: 0;
   padding: 0;
@@ -220,7 +217,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--color-border);
 }
 
-/* Gaya item meniru teks menu kategori desktop 21:4951: Inter Medium 18, spasi huruf -4 %, warna merek (di atas putih 5,0 : 1) */
+/* Gaya item meniru teks menu kategori desktop: Inter Medium 18, spasi huruf -4 %, warna merek (di atas putih 5,0 : 1) */
 .item {
   display: block;
   padding: var(--space-16) var(--space-24);

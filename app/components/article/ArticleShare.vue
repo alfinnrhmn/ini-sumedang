@@ -1,8 +1,6 @@
 <script setup lang="ts">
-// Bagikan artikel (desktop 127:2160, mobile 130:3392). Facebook, X, WhatsApp (tautan bagikan resmi, tanpa SDK) dan Salin tautan
-// (Clipboard API). WhatsApp tidak ada di Figma (POLISH-01 D33, keputusan pemilik): ubin dan ikon diturunkan dari tombol yang ada.
-// Instagram (tanpa URL bagikan web) tidak dirender.
-// Nama layer Figma tidak cocok dengan ikon (mis. "Tombol Salin tautan" berisi Facebook): ikon dan pernyataan pemilik yang dipakai.
+// Bagikan artikel: Facebook, X, WhatsApp (tautan bagikan resmi, tanpa SDK) dan Salin tautan (Clipboard API); Instagram tidak dirender (tanpa URL bagikan web).
+// WhatsApp tidak ada di Figma: ubin dan ikon diturunkan dari tombol yang ada. Nama layer Figma tidak cocok dengan ikon (mis. "Tombol Salin tautan" berisi Facebook): ikon yang dipakai.
 const props = defineProps<{
   /** URL kanonis artikel (origin permintaan + /berita/<slug>). */
   url: string
@@ -80,45 +78,42 @@ const labelId = useId()
 </template>
 
 <style scoped>
-/* Mobile 130:3392: pemisah 1 px, jarak 16, baris 55 */
 .share {
   display: flex;
   flex-direction: column;
-  gap: var(--space-16); /* 130:3392 */
-  padding-bottom: 15px; /* 127:2160 / 130:3392 tinggi 87 = 1 + 16 + 55 + 15 */
+  gap: var(--space-16);
+  padding-bottom: 15px; /* tinggi 87 = 1 + 16 + 55 + 15 */
 }
 
-/* Pemisah 130:3393 #DEE3EB -> --color-footer-divider (#E5E7EB, selisih 7/4/0) */
+/* Pemisah #DEE3EB -> --color-footer-divider (#E5E7EB, selisih 7/4/0) */
 .rule {
   height: 1px;
   background: var(--color-footer-divider);
 }
 
-/* Baris 130:3394: celah 11 (mobile), 16 (desktop 127:2162), tinggi 55 */
 .row {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 11px; /* 130:3394 */
+  gap: 11px;
   height: 55px;
 }
 
-/* Label 130:3395: Inter SemiBold 14/21 #1A212E, lebar 120 */
 .label {
-  flex: 0 1 120px; /* D33: dengan 4 ubin, baris 340 px > kontainer 272 pada 320; label boleh menyusut (2 baris, baris tetap 55) */
+  flex: 0 1 120px; /* dengan 4 ubin, baris 340 px > kontainer 272 pada 320; label boleh menyusut (2 baris, baris tetap 55) */
   min-width: 0;
   font: 600 14px/21px var(--font-sans);
   color: var(--color-article-title);
 }
 
-/* Tombol 130:3396: 44x40 radius 6 (mobile); latar Figma per tombol dipetakan ke token (selisih di bawah) */
+/* Latar Figma per tombol dipetakan ke token (selisih di komentar masing-masing) */
 .tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 1 44px; /* 130:3396; boleh menyusut (min 32) hanya bila 4 ubin tidak muat (< ±360 px) */
+  flex: 0 1 44px; /* boleh menyusut (min 32) hanya bila 4 ubin tidak muat (< ±360 px) */
   min-width: 32px;
-  height: 40px; /* 130:3400 (tombol pertama 39, lainnya 40) */
+  height: 40px; /* tombol pertama 39, lainnya 40 */
   padding: 0;
   border: 0;
   border-radius: var(--radius-6);
@@ -147,11 +142,11 @@ const labelId = useId()
 
 .icon {
   display: block;
-  width: 24px; /* 130:3397 */
+  width: 24px;
   height: 24px;
 }
 
-/* Ikon salin 130:3411: kotak 24 dengan ikon 18x22 di tengah (berkas desktop 23,33x28,67 diskalakan 18/23,33) */
+/* Ikon salin: kotak 24 dengan ikon 18x22 di tengah (berkas desktop 23,33x28,67 diskalakan 18/23,33) */
 .icon--copy {
   width: 18px;
   height: 22px;
@@ -178,21 +173,21 @@ const labelId = useId()
 
 @media (min-width: 1024px) {
   .row {
-    gap: var(--space-16); /* 127:2162 */
+    gap: var(--space-16);
   }
 
   .tile {
-    flex-basis: 60px; /* 127:2164 */
+    flex-basis: 60px;
     height: 54px;
   }
 
   .icon {
-    width: 32px; /* 130:2371 */
+    width: 32px;
     height: 32px;
   }
 
   .icon--copy {
-    width: 23.333px; /* 130:2392 (berkas) */
+    width: 23.333px; /* ukuran berkas */
     height: 28.667px;
   }
 }

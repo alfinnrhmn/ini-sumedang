@@ -2,9 +2,8 @@
 import { FOOTER_COMPANY, FOOTER_LEGAL, FOOTER_SECTIONS, FOOTER_TAGLINE, FOOTER_YEAR } from '~/config/footer'
 import type { FooterSection } from '~/config/footer'
 
-// Footer (HOME-05). Desktop >= 1024: tiga kolom daftar terbuka (60:486). Di bawah 1024: pola mobile (101:2600) =
-// tiga baris akordeon. Keduanya dirender di HTML server; yang tidak dipakai disembunyikan CSS (display: none).
-// Kolom Kategori (WP-002) mendaftar SEMUA kategori WordPress dari daftar kategori (useCategories), bukan dari FOOTER_SECTIONS; tanpa kategori kolomnya tidak dirender.
+// Footer. Desktop >= 1024: tiga kolom daftar terbuka; di bawah 1024: tiga baris akordeon. Keduanya dirender di HTML server, yang tidak dipakai disembunyikan CSS (display: none).
+// Kolom Kategori mendaftar SEMUA kategori WordPress (useCategories), bukan dari FOOTER_SECTIONS; tanpa kategori kolomnya tidak dirender.
 const uid = useId()
 const open = ref<Record<string, boolean>>({})
 
@@ -26,7 +25,7 @@ const SEPARATOR = '  •  '
 
 <template>
   <footer class="footer">
-    <!-- Desktop 60:486 -->
+    <!-- Desktop -->
     <div class="desktop">
       <div class="top">
         <img
@@ -58,7 +57,7 @@ const SEPARATOR = '  •  '
       </div>
     </div>
 
-    <!-- Mobile 101:2600 -->
+    <!-- Mobile -->
     <div class="mobile">
       <div class="m-inner">
         <div class="m-brand">
@@ -117,7 +116,7 @@ const SEPARATOR = '  •  '
 
 <style scoped>
 .footer {
-  margin-top: var(--space-32); /* mobile: jarak ke konten sebelumnya tidak ada di Figma [?], dipakai skala 32 */
+  margin-top: var(--space-32); /* mobile: jarak ke konten sebelumnya tidak ada di Figma, dipakai skala 32 */
   color: var(--color-footer-link);
 }
 
@@ -142,8 +141,8 @@ ul {
   object-fit: cover;
 }
 
-/* PAGE-003: tautan footer (kategori, Beranda). Hover dan kategori aktif = garis bawah (pola hover kartu/breadcrumb; footer tidak punya
-   gaya hover sebelumnya, tanpa token baru). Aktif hanya untuk tautan kategori: penanda otomatis "Beranda" di Beranda tidak diberi gaya. */
+/* Tautan footer (kategori, Beranda): hover dan kategori aktif = garis bawah (pola hover kartu/breadcrumb, tanpa token baru).
+   Aktif hanya untuk tautan kategori: penanda otomatis "Beranda" di Beranda tidak diberi gaya. */
 @media (hover: hover) {
   .footer a:hover {
     text-decoration: underline;
@@ -154,19 +153,19 @@ ul {
   text-decoration: underline;
 }
 
-/* POLISH-01 D41: area klik tautan footer 24 px (FooterLabel). Daftar kategori desktop menumpuk 9 tautan berjarak 1 baris (18,67 px < 24): area klik dibatasi
-   setinggi satu baris (1lh) supaya tidak saling menimpa; 24 px penuh tidak mungkin tanpa menambah jarak antar item (mengubah tampilan, butuh keputusan pemilik). */
+/* Area klik tautan footer 24 px (FooterLabel). Daftar kategori desktop menumpuk 9 tautan berjarak 1 baris (18,67 px < 24): area klik dibatasi setinggi satu baris (1lh)
+   supaya tidak saling menimpa; 24 px penuh butuh jarak antar item lebih besar (mengubah tampilan). */
 .col-kategori .list a::after {
   height: 1lh;
 }
 
-/* ---------- Mobile 101:2600 (402 x 444) ---------- */
+/* ---------- Mobile ---------- */
 .desktop {
   display: none;
 }
 
 .mobile {
-  border-top: 1px solid var(--color-footer-divider-mobile); /* 101:2600 border-t */
+  border-top: 1px solid var(--color-footer-divider-mobile);
   padding-top: var(--space-8);
   padding-bottom: var(--space-8);
 }
@@ -186,24 +185,24 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px; /* 101:2597 gap 12 */
+  gap: 12px;
   width: 100%;
   text-align: center;
 }
 
 .m-brand .logo {
-  width: 180px; /* logo 60:487 / 100:2547 180 x 36 */
+  width: 180px; /* logo 180 x 36 */
   height: 36px;
-  margin: 10px; /* 101:2595 padding 10 (blok 200 x 56) */
+  margin: 10px; /* padding 10 (blok 200 x 56) */
 }
 
 .m-brand .tagline {
-  max-width: 354px; /* 100:2548 lebar 354 */
+  max-width: 354px;
 }
 
 .accordion {
   width: 100%;
-  max-width: 320px; /* 101:2586 */
+  max-width: 320px;
 }
 
 .acc-item {
@@ -232,7 +231,7 @@ ul {
 .acc-label {
   display: flex;
   align-items: center;
-  min-height: 26px; /* 101:2583 tinggi 26 (baris 43/44/43) */
+  min-height: 26px; /* tinggi 26 (baris 43/44/43) */
 }
 
 .acc-arrow {
@@ -244,7 +243,7 @@ ul {
   transform: rotate(90deg);
 }
 
-/* Isi akordeon tidak digambar di Figma [?]: gaya tautan footer desktop (13,333 / 18,666), jarak antar item 8 */
+/* Isi akordeon tidak digambar di Figma: gaya tautan footer desktop (13,333 / 18,666), jarak antar item 8 */
 .acc-panel {
   display: grid;
   gap: var(--space-8);
@@ -258,9 +257,9 @@ ul {
 }
 
 .legal-m {
-  margin-top: 52px; /* 101:2594 y 387 setelah blok y 9 + 326 */
-  min-height: 49px; /* 101:2594 tinggi 49: garis 1 + jarak 8 + teks 2 baris */
-  border-top: 1px solid var(--color-footer-divider); /* 101:2588, lebar penuh 402 */
+  margin-top: 52px;
+  min-height: 49px; /* garis 1 + jarak 8 + teks 2 baris */
+  border-top: 1px solid var(--color-footer-divider); /* lebar penuh 402 */
   padding: var(--space-8) var(--space-24) 0;
   text-align: center;
 }
@@ -270,10 +269,10 @@ ul {
   margin: 0 auto;
 }
 
-/* ---------- Desktop 60:486 (1119 x 270) ---------- */
+/* ---------- Desktop (1119 x 270) ---------- */
 @media (min-width: 1024px) {
   .footer {
-    margin-top: 163px; /* 187 (kartu terakhir 48:430 berakhir y 6781, footer y 6968) dikurangi padding bawah halaman 24 */
+    margin-top: 163px; /* 187 (kartu terakhir berakhir y 6781, footer y 6968) dikurangi padding bawah halaman 24 */
   }
 
   .mobile {
@@ -291,7 +290,7 @@ ul {
   .top {
     display: flex;
     align-items: flex-start;
-    height: 74px; /* garis 88:463 di y 73 (tinggi 1) */
+    height: 74px; /* garis di y 73 (tinggi 1) */
     border-bottom: 1px solid var(--color-footer-divider);
   }
 
@@ -299,26 +298,26 @@ ul {
     flex: none;
     width: 180px;
     height: 36px;
-    margin-top: 18px; /* 60:487 y 18 */
+    margin-top: 18px;
   }
 
   .tagline {
     flex: 0 1 390px;
-    margin: 23px 0 0 25px; /* 87:463 x 205 (180 + 25), y 23, lebar 390 */
+    margin: 23px 0 0 25px; /* x 205 (180 + 25), y 23, lebar 390 */
   }
 
   .social-d {
     flex: none;
-    margin: 10px 6px 0 auto; /* 88:462 y 10; ikon berakhir x 1113 dari 1119 */
+    margin: 10px 6px 0 auto; /* y 10; ikon berakhir x 1113 dari 1119 */
   }
 
   .columns {
     display: grid;
     grid-template-columns: 230px 265px 1fr; /* kolom di x 0, 230, 495 */
-    align-items: start; /* kolom Navigasi, Kategori, Tentang sejajar atas; hanya Kategori (9 item, satu kolom, E7) yang lebih tinggi */
-    min-height: 152px; /* garis legal 88:468 di y 226; kolom Kategori satu kolom lebih tinggi, jadi footer melebihi 270 (pilihan pemilik E7) */
+    align-items: start; /* kolom Navigasi, Kategori, Tentang sejajar atas; hanya Kategori (9 item, satu kolom) yang lebih tinggi */
+    min-height: 152px; /* garis legal di y 226; kolom Kategori satu kolom lebih tinggi, jadi footer melebihi 270 */
     padding-top: var(--space-24); /* judul kolom y 98 setelah garis y 74 */
-    padding-bottom: 25px; /* jarak item terakhir kolom terpanjang ke garis legal: 60:486 kolom berakhir ±201, garis 88:468 di y 226 (±25); 25 di luar skala [I] */
+    padding-bottom: 25px; /* jarak item terakhir kolom terpanjang ke garis legal (kolom berakhir ±201, garis y 226); 25 di luar skala */
   }
 
   .col-title {
@@ -332,7 +331,7 @@ ul {
   }
 
   .legal-d {
-    min-height: 44px; /* 88:468 y 226 sampai dasar 270 */
+    min-height: 44px; /* y 226 sampai dasar 270 */
     border-top: 1px solid var(--color-footer-divider);
     padding-top: 13px; /* teks legal y 240, garis y 226 + 1 */
   }

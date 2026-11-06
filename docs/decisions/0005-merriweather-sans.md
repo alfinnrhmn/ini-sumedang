@@ -4,7 +4,7 @@
 |---|---|
 | **Tanggal** | 31 Okt 2026 |
 | **Status** | Dikerjakan FE di HOME-07 berdasarkan keputusan pemilik (HOME-07 Catatan butir 1-4); menunggu tinjauan PM/QA |
-| **Rujukan** | `docs/tasks/HOME-07.md` (Keputusan PM 6-7, Catatan pemilik), `docs/decisions/0004-merriweather-rfn.md`, PRD v1.10 §4.5, §10 |
+| **Rujukan** | task HOME-07 (riwayat git), `docs/decisions/0004-merriweather-rfn.md`, PRD v1.10 §4.5, §10 |
 
 ## Fakta [V = diukur/diunduh FE pada 31 Okt 2026]
 - **Pemakaian:** judul hero desktop, node `21:4980`: Merriweather Sans **Regular 400**, 32 px, line-height 1,2, letter-spacing -1,28 px, `capitalize` [V `get_design_context`]. **Hanya satu bobot yang dipakai.** Judul hero mobile `90:2136` memakai **Merriweather SemiBold** (font yang sudah ada), bukan Merriweather Sans [V].

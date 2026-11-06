@@ -6,7 +6,7 @@
 | **Status** | Diterima sementara (dengan pemicu cek ulang) |
 | **Penilai** | PM |
 | **Task** | SET-001 (kriteria 5: "yang ada dinilai tertulis") |
-| **Sumber fakta** | Laporan QA di `docs/tasks/SET-001.md` (diulang independen di salinan bersih, Node v22.23.4, npm 10.9.9) |
+| **Sumber fakta** | Laporan QA task SET-001 (riwayat git) (diulang independen di salinan bersih, Node v22.23.4, npm 10.9.9) |
 
 ## Fakta [V] (dari QA)
 - `npm audit`: **7 low, 0 moderate, 0 high, 0 critical**. `npm audit --audit-level=high` kode 0 (gerbang CI lulus).

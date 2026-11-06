@@ -1,21 +1,12 @@
 /**
- * Fixture berbentuk respons REST WordPress v2 (posts?_embed). Tanggal relatif terhadap `now`.
- * Dua set: `figma` (default; meniru kartu Rekomendasi dan section kategori Sepak Bola, Nasional,
- * Bisnis dan Teknologi, Otomotif di Figma 21:4950, tanpa draft/private) dan `edge` (kasus buruk:
- * judul panjang/pendek, tanpa gambar, gambar tanpa alt, entitas HTML, kategori ber-entitas,
- * kategori 1 artikel, kategori kosong, dan artikel draft/private yang tidak boleh tampil).
- * Gambar di public/fixtures/ berasal dari Figma, hanya untuk pengembangan, WAJIB dihapus
- * sebelum situs tayang (PRD §13).
- * Bentuk `_embedded['wp:term']` meniru WordPress: grup 0 = kategori, grup 1 = tag (HOME-03).
- * Ruang Visual (HOME-04): kategori induk `ruang-visual` dengan kategori anak (`parent`); "paling baru dibuat" = id
- * terbesar (WordPress: `orderby=id&order=desc`). Daftar kategori visual ada di `buildFigmaVisualCategories` /
- * `buildEdgeVisualCategories` (anak tanpa artikel hanya ada di daftar itu).
+ * Fixture berbentuk respons REST WordPress v2 (posts?_embed), tanggal relatif terhadap `now`; `_embedded['wp:term']`: grup 0 = kategori, grup 1 = tag.
+ * Set `figma` (default, tanpa draft/private) dan `edge` (kasus buruk, termasuk draft/private). Gambar di public/fixtures/ hanya untuk pengembangan, hapus sebelum tayang.
  */
 import { EDGE_IFRAME_BODY, EDGE_XSS_BODY } from './article-content'
 
 /** `parent` hanya ada pada kategori anak (seperti `parent` di REST WordPress; tanpa nilai = kategori induk). */
 export interface WpTerm { id: number, slug: string, name: string, parent?: number }
-/** `caption` = keterangan media WordPress (kredit foto, PAGE-002); tanpa caption = tanpa kredit. */
+/** `caption` = keterangan media WordPress (kredit foto); tanpa caption = tanpa kredit. */
 export interface WpMedia { source_url: string, alt_text: string, caption?: { rendered: string }, media_details: { width: number, height: number } }
 export interface WpPost {
   id: number
@@ -23,7 +14,7 @@ export interface WpPost {
   status: string
   date_gmt: string
   title: { rendered: string }
-  /** Isi HTML mentah dari CMS (PAGE-002). Tanpa nilai: isi dibangkitkan `buildDefaultBody`. Kosong ('') = body kosong. */
+  /** Isi HTML mentah dari CMS. Tanpa nilai: dibangkitkan `buildDefaultBody`. Kosong ('') = body kosong. */
   content?: { rendered: string }
   /** Ringkasan HTML mentah ala WordPress. Tanpa nilai: dibangkitkan `buildDefaultExcerpt`. */
   excerpt?: { rendered: string }
@@ -41,15 +32,15 @@ const POLITIK: WpTerm = { id: 6, slug: 'politik', name: 'Politik' }
 const BISNIS: WpTerm = { id: 7, slug: 'bisnis-teknologi', name: 'Bisnis &amp; Teknologi' }
 const OTOMOTIF: WpTerm = { id: 9, slug: 'otomotif', name: 'Otomotif' }
 const SEPAK_BOLA: WpTerm = { id: 5, slug: 'sepak-bola', name: 'Sepak Bola' }
-// Kategori label item kolom samping Figma 34:354 (bukan section Beranda; slug [I], final di gerbang WordPress).
+// Kategori label item kolom samping (bukan section Beranda); slug contoh.
 const TEKNOLOGI: WpTerm = { id: 10, slug: 'teknologi', name: 'Teknologi' }
 const EKONOMI: WpTerm = { id: 11, slug: 'ekonomi', name: 'Ekonomi' }
 const SELEBRITI: WpTerm = { id: 12, slug: 'selebriti', name: 'Selebriti' }
-// Hukum dan Jelajah (HOME-06): kategori resmi menu. Hukum dipakai paginasi halaman kategori (PAGE-003); Jelajah kosong di set `figma`.
+// Hukum dan Jelajah: kategori resmi menu. Hukum dipakai uji paginasi halaman kategori; Jelajah kosong di set `figma`.
 const HUKUM: WpTerm = { id: 8, slug: 'hukum', name: 'Hukum' }
 const JELAJAH: WpTerm = { id: 13, slug: 'jelajah', name: 'Jelajah' }
 
-/** Judul 23 artikel Hukum set `figma` [I] (PAGE-003): 3 halaman pada 10 per halaman, halaman terakhir parsial (3). */
+/** Judul 23 artikel Hukum set `figma`: 3 halaman pada 10 per halaman, halaman terakhir parsial (3). */
 const HUKUM_TITLES = [
   'Pengadilan Negeri Sumedang Mulai Terapkan Layanan Sidang Elektronik',
   'Warga Diajak Pahami Hak dan Kewajiban dalam Transaksi Jual Beli Tanah',
@@ -76,12 +67,11 @@ const HUKUM_TITLES = [
   'Warga Antusias Ikuti Sosialisasi Hukum Pertanahan di Balai Desa'
 ]
 
-// Tag editor (PRD §3.6): `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
+// Tag editor: `terpopuler` = pilihan editor; `headline` = tag lain (tidak boleh dianggap populer).
 const TERPOPULER: WpTerm = { id: 31, slug: 'terpopuler', name: 'Terpopuler' }
 const HEADLINE: WpTerm = { id: 32, slug: 'headline', name: 'Headline' }
 
-// Tag topik Detail Berita (PAGE-002; slug dan id [I], final di gerbang WordPress). Hanya mempengaruhi urutan Berita Terkait
-// (tidak dipakai Beranda; `terpopuler` tetap satu-satunya tag yang dibaca kolom samping).
+// Tag topik Detail Berita: hanya mempengaruhi urutan Berita Terkait (tidak dipakai Beranda; `terpopuler` tetap satu-satunya tag yang dibaca kolom samping).
 const LAYANAN_PUBLIK: WpTerm = { id: 33, slug: 'layanan-publik', name: 'Layanan Publik' }
 const TRANSFORMASI_DIGITAL: WpTerm = { id: 34, slug: 'transformasi-digital', name: 'Transformasi Digital' }
 const INFRASTRUKTUR: WpTerm = { id: 35, slug: 'infrastruktur', name: 'Infrastruktur' }
@@ -101,10 +91,10 @@ const FIGMA_TOPIC_TAGS: Record<number, WpTerm[]> = {
   65: [LAYANAN_PUBLIK]
 }
 
-// Ruang Visual (HOME-04). Induk id 20; anak id 24-29 (set `figma`) dan 35-41 (set `edge`). Slug anak [I]: final di gerbang WordPress.
+// Ruang Visual: induk id 20; anak id 24-29 (set `figma`) dan 35-41 (set `edge`); slug anak contoh.
 const RUANG_VISUAL: WpTerm = { id: 20, slug: 'ruang-visual', name: 'Ruang Visual' }
 const visualChild = (id: number, slug: string, name: string): WpTerm => ({ id, slug, name, parent: RUANG_VISUAL.id })
-// Set `figma`: id terbesar = tampil pertama = urutan blok di Figma 21:4950 (nama dari teks aktual node 105:468, 105:477, 101:2713, 101:2729).
+// Set `figma`: id terbesar = tampil pertama (urutan blok).
 const V_PEMERINTAHAN = visualChild(28, 'visual-pemerintahan', 'Pemerintahan')
 const V_EKONOMI = visualChild(27, 'visual-ekonomi-inovasi', 'Ekonomi &amp; Inovasi')
 const V_WISATA = visualChild(26, 'visual-wisata', 'Wisata')
@@ -120,11 +110,11 @@ const E_DUA = visualChild(37, 'edge-dua-artikel', 'Dua Artikel')
 const E_ENTITAS = visualChild(36, 'edge-seni-budaya', 'Seni &amp; Budaya &#8211; Tradisi')
 const E_LAMA = visualChild(35, 'edge-lama', 'Topik Lama') // anak ke-5: tidak tampil
 
-// Dimensi nyata semua berkas public/fixtures/figma-*.jpg (JPEG 716x400, diukur dengan System.Drawing).
+// Dimensi nyata semua berkas public/fixtures/figma-*.jpg (JPEG 716x400).
 const IMG_WIDTH = 716
 const IMG_HEIGHT = 400
 
-/** Kredit foto default seluruh fixture (Figma 127:2145: "Foto: IniSumedang"). */
+/** Kredit foto default seluruh fixture ("Foto: IniSumedang"). */
 const PHOTO_CREDIT = 'Foto: IniSumedang'
 
 function img(n: number, alt: string, credit: string | null = PHOTO_CREDIT): WpMedia {
@@ -155,11 +145,8 @@ function makePost(
 }
 
 /**
- * Set default: 8 kartu Rekomendasi dari Figma 21:4950 (teks aktual; kategori dari 9 kategori resmi)
- * ditambah artikel section kategori (id 21 ke atas). Semua artikel section lebih lama dari kartu
- * Rekomendasi (> 360 menit) agar 8 kartu Rekomendasi tidak berubah. Semua berstatus `publish`.
- * Judul bertanda [F] diambil dari kartu Figma; bertanda [I] dikarang untuk mengisi >= 6 per
- * kategori (bukan dari Figma). Gambar memakai ulang figma-1..8.jpg (bukan gambar kartu Figma asli).
+ * Set default: 8 kartu Rekomendasi (kategori dari 9 kategori resmi) ditambah artikel section kategori (id 21 ke atas), semuanya `publish`
+ * dan lebih lama dari kartu Rekomendasi (> 360 menit) agar 8 kartu itu tidak berubah. Gambar memakai ulang figma-1..8.jpg.
  */
 export function buildFigmaPosts(now: Date): WpPost[] {
   const p = (id: number, minutes: number, title: string, term: WpTerm, image: number) =>
@@ -179,7 +166,6 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(7, 300, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah dalam Rapat Kerja', POLITIK, 7),
     p(8, 360, 'Pengamat Soroti Peran Generasi Muda dalam Meningkatkan Partisipasi Politik', POLITIK, 8),
 
-    // Sepak Bola (84:1437): [F] 48:385, 48:400; sisanya [I]
     p(21, 9 * HOUR, 'Persib Bandung Fokus Tingkatkan Performa Tim Menjelang Pertandingan Berikutnya', SEPAK_BOLA, 1),
     p(22, 10 * HOUR, 'Talenta Muda Jawa Barat Didorong Berkembang Lewat Kompetisi Sepak Bola Daerah', SEPAK_BOLA, 2),
     p(23, 1 * DAY + 3 * HOUR, 'Tim Sepak Bola Sumedang Matangkan Strategi Jelang Laga Uji Coba', SEPAK_BOLA, 3),
@@ -187,7 +173,6 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(25, 3 * DAY + 2 * HOUR, 'Lapangan Sepak Bola Desa Direnovasi untuk Mendukung Pembinaan Pemain Muda', SEPAK_BOLA, 5),
     p(26, 4 * DAY + 6 * HOUR, 'Suporter Sumedang Ajak Penonton Menjaga Ketertiban Selama Pertandingan', SEPAK_BOLA, 6),
 
-    // Nasional (57:496): [F] 48:355, 48:370; sisanya [I]
     p(31, 7 * HOUR, 'Aparat Kepolisian Tingkatkan Edukasi Kesadaran Hukum kepada Masyarakat', NASIONAL, 7),
     p(32, 8 * HOUR, 'Pakar Hukum Tekankan Pentingnya Perlindungan Data Pribadi di Era Digital', NASIONAL, 8),
     p(33, 1 * DAY + 6 * HOUR, 'Pemerintah Pusat Percepat Penyaluran Bantuan Sosial ke Daerah', NASIONAL, 1),
@@ -195,7 +180,6 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(35, 3 * DAY + 7 * HOUR, 'Program Ketahanan Pangan Nasional Libatkan Petani Muda', NASIONAL, 3),
     p(36, 4 * DAY + 1 * HOUR, 'Otoritas Perkuat Pengawasan Layanan Keuangan Digital bagi Masyarakat', NASIONAL, 4),
 
-    // Bisnis dan Teknologi (57:501): [F] 48:460, 48:475; sisanya [I]
     p(41, 1 * DAY, 'Pesona Kuliner Tradisional Sumedang yang Tetap Digemari Berbagai Generasi', BISNIS, 5),
     p(42, 2 * DAY, 'Pelaku UMKM Sumedang Mulai Manfaatkan AI untuk Mengembangkan Bisnis Digital', BISNIS, 6),
     p(43, 3 * DAY + 4 * HOUR, 'Pelaku Usaha Kecil Sumedang Mulai Beralih ke Pembayaran Nontunai', BISNIS, 7),
@@ -203,7 +187,6 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(45, 5 * DAY + 5 * HOUR, 'Pelatihan Literasi Digital Bantu Pedagang Pasar Berjualan Daring', BISNIS, 1),
     p(46, 6 * DAY + 2 * HOUR, 'Jaringan Internet Cepat Menjangkau Lebih Banyak Desa di Sumedang', BISNIS, 2),
 
-    // Otomotif (57:505): [F] 48:430; sisanya [I]
     p(51, 12 * HOUR, 'Tips Merawat Kendaraan agar Tetap Prima Saat Memasuki Musim Hujan', OTOMOTIF, 3),
     p(52, 1 * DAY + 8 * HOUR, 'Penjualan Kendaraan Listrik Meningkat di Kalangan Warga Perkotaan', OTOMOTIF, 4),
     p(53, 2 * DAY + 7 * HOUR, 'Bengkel Lokal Siapkan Layanan Servis Berkala Menjelang Musim Mudik', OTOMOTIF, 5),
@@ -211,26 +194,23 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(55, 4 * DAY + 4 * HOUR, 'Komunitas Otomotif Sumedang Gelar Bakti Sosial dan Kopdar Bulanan', OTOMOTIF, 7),
     p(56, 5 * DAY + 8 * HOUR, 'Dealer Resmi Hadirkan Pilihan Kendaraan Irit Bahan Bakar', OTOMOTIF, 8),
 
-    // Terpopuler (tag `terpopuler`; HOME-03). Semua lebih lama dari 8 kartu Rekomendasi (> 360 menit) dan
-    // bukan kategori section, sehingga Rekomendasi dan section HOME-02 tidak berubah.
-    // 61-64: judul item daftar Figma 34:354 [F] (item 2 dan 4 sama di Figma); label kategori dari Figma.
+    // Terpopuler (tag `terpopuler`): semua lebih lama dari 8 kartu Rekomendasi (> 360 menit) dan bukan kategori section, jadi Rekomendasi dan section Beranda tidak berubah.
     pop(61, 13 * HOUR, 'Russian warship: Moskva sinks in Black Sea', TEKNOLOGI, 1),
     pop(62, 20 * HOUR, 'Ukraine\'s President Zelensky to BBC: Blood money being paid...', EKONOMI, 2),
     pop(63, 1 * DAY + 4 * HOUR, 'Her train broke down. Her phone died. And then she met her..', SELEBRITI, 3),
     pop(64, 1 * DAY + 10 * HOUR, 'Ukraine\'s President Zelensky to BBC: Blood money being paid...', EKONOMI, 4),
-    // 65-68 [I]: melengkapi >= 8 artikel populer dalam 14 hari.
+    // 65-68: melengkapi >= 8 artikel populer dalam 14 hari.
     pop(65, 3 * DAY + 1 * HOUR, 'Warga Sumedang Antusias Ikuti Pelatihan Keamanan Digital', BERITA, 5),
     pop(66, 5 * DAY + 3 * HOUR, 'Harga Komoditas Pangan Stabil Menjelang Akhir Pekan', EKONOMI, 6),
     pop(67, 8 * DAY + 2 * HOUR, 'Festival Musik Daerah Hadirkan Penampil dari Berbagai Kota', SELEBRITI, 7),
     pop(68, 11 * DAY + 5 * HOUR, 'Aplikasi Layanan Publik Baru Diperkenalkan kepada Warga', TEKNOLOGI, 8),
-    // Batas jendela [I]: umur 14 hari (tepat dan 1 jam lebih muda) masuk; umur 15 hari (tepat dan 1 jam lebih tua) tidak.
+    // Batas jendela: umur 14 hari (tepat dan 1 jam lebih muda) masuk; umur 15 hari (tepat dan 1 jam lebih tua) tidak.
     pop(69, 14 * DAY, 'Pasar Rakyat Kembali Ramai Dikunjungi Pembeli dari Luar Kota', BERITA, 1),
     pop(70, 14 * DAY - 1 * HOUR, 'Pemuda Desa Rintis Usaha Kerajinan Bambu Bernilai Ekspor', EKONOMI, 2),
     pop(71, 15 * DAY, 'Kajian Ketahanan Pangan Daerah Dipaparkan di Balai Kabupaten', BERITA, 3),
     pop(72, 15 * DAY + 1 * HOUR, 'Peringatan Hari Jadi Kota Digelar Sederhana di Alun-Alun', BERITA, 4),
 
-    // Ruang Visual (HOME-04; 101:2708, 101:2709, 101:2710, 101:2726). Teks [F] dari node: judul kartu besar dan 3 judul item
-    // (item sama di Figma). Semua > 360 menit supaya 8 kartu Rekomendasi dan kolom samping tidak berubah; tanpa tag.
+    // Ruang Visual: semua > 360 menit supaya 8 kartu Rekomendasi dan kolom samping tidak berubah; tanpa tag.
     // Tanggal sengaja tidak mengikuti urutan topik: urutan topik = kategori paling baru dibuat (id), bukan artikel terbaru.
     p(81, 2 * DAY + 4 * HOUR, 'Pemkab Sumedang Percepat Transformasi Layanan Publik', V_PEMERINTAHAN, 1),
     p(82, 2 * DAY + 6 * HOUR, 'DPRD Sumedang Bahas Prioritas Pembangunan Daerah', V_PEMERINTAHAN, 2),
@@ -248,16 +228,14 @@ export function buildFigmaPosts(now: Date): WpPost[] {
     p(94, 17 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 6),
     p(95, 19 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 7),
     p(96, 21 * HOUR, 'Generasi Muda Sumedang Kembangkan Inovasi Teknologi', V_OLAHRAGA, 8),
-    // [I] anak ke-5 (lebih lama): ada artikel, tetapi tidak termasuk 4 topik terbaru
+    // Anak ke-5 (lebih lama): ada artikel, tetapi tidak termasuk 4 topik terbaru
     p(97, 3 * DAY + 2 * HOUR, 'Pagelaran Seni Tradisional Sumedang Kembali Digelar', V_BUDAYA, 1),
     p(98, 3 * DAY + 5 * HOUR, 'Pengrajin Lokal Perkenalkan Kerajinan Khas Sumedang', V_BUDAYA, 2),
 
-    // Hukum (PAGE-003 K: paginasi halaman kategori). 23 artikel [I, dikarang untuk fixture] = 3 halaman (10 + 10 + 3) pada
-    // 10 per halaman. Semua LEBIH LAMA dari 15 hari (jauh di bawah semua artikel Beranda, kolom samping, dan Ruang Visual) dan tanpa tag,
-    // sehingga 8 kartu Rekomendasi, hero, kolom samping, section HOME-02, dan Ruang Visual tidak berubah. Gambar memakai ulang figma-1..8.
+    // Hukum: 23 artikel = 3 halaman (10 + 10 + 3) pada 10 per halaman, semuanya LEBIH LAMA dari 15 hari dan tanpa tag agar bagian Beranda lain tidak berubah. Gambar memakai ulang figma-1..8.
     ...HUKUM_TITLES.map((title, index) => p(120 + index, (16 + index) * DAY + (index % 5) * 3 * HOUR, title, HUKUM, (index % 8) + 1))
   ]
-  // Tag topik (PAGE-002): hanya menambah grup tag; tidak mengubah kategori, judul, tanggal, atau tag `terpopuler`.
+  // Tag topik: hanya menambah grup tag; tidak mengubah kategori, judul, tanggal, atau tag `terpopuler`.
   return posts.map((post) => {
     const extra = FIGMA_TOPIC_TAGS[post.id]
     if (!extra) return post
@@ -272,15 +250,8 @@ export function buildFigmaVisualCategories(): WpTerm[] {
 }
 
 /**
- * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Detail Berita (PAGE-002): id 301-308 = artikel khusus lama
- * (XSS dasar, iframe bukan YouTube, isi kosong, judul sangat panjang tanpa gambar, tanpa kategori/gambar/kredit,
- * gambar tanpa alt/kredit, draft, private). Per kategori section:
- * Sepak Bola = tepat 1 artikel terbit (id 5); Otomotif = kosong (hanya 1 artikel `private`, id 103);
- * Nasional = banyak (+ draft/private id 101, 102); Bisnis dan Teknologi = 2 (ber-entitas).
- * Kolom samping (HOME-03): Terbaru = id 1-4 (judul sangat panjang, judul pendek, entitas, tanpa gambar).
- * Terpopuler (tag `terpopuler`) tepat 4 yang valid: id 2 (judul pendek), 4 (tanpa gambar), 5 (gambar tanpa alt)
- * dan id 114 (umur tepat 14 hari, urutan terakhir). Tidak tampil: draft/private bertag (111, 112),
- * umur 15 hari (11, 115) dan 20 hari (12); id 1 dan 3 hanya bertag `headline` (bukan populer).
+ * Set `edge` (FIXTURE_SET=edge): kasus buruk untuk QA. Id 301-309 = artikel khusus Detail (XSS, iframe bukan YouTube, isi kosong/spasi, judul panjang, tanpa kategori/gambar/kredit, draft, private); Sepak Bola = 1 artikel terbit,
+ * Otomotif = kosong (hanya private), Terpopuler = tepat 4 valid (id 2, 4, 5, 114; batas umur 14 hari); id 1 dan 3 hanya bertag `headline` (bukan populer); draft/private bertag dan umur 15+ hari tidak tampil.
  */
 export function buildEdgePosts(now: Date): WpPost[] {
   const post = (
@@ -316,7 +287,7 @@ export function buildEdgePosts(now: Date): WpPost[] {
     post(114, 'publish', 14 * DAY, 'Pameran Produk UMKM Pekan Ini Berlangsung Tepat Dua Pekan Lalu', BERITA, img(5, 'Stan pameran UMKM'), [TERPOPULER]),
     post(115, 'publish', 15 * DAY + 60, 'Pelatihan Pemandu Wisata Lebih dari Dua Pekan Lalu', BERITA, img(6, 'Peserta pelatihan pemandu'), [TERPOPULER]),
 
-    // Ruang Visual (HOME-04). Semua lebih lama dari 20 hari agar Rekomendasi, kolom samping, dan section tidak berubah.
+    // Ruang Visual: semua lebih lama dari 20 hari agar Rekomendasi, kolom samping, dan section tidak berubah.
     // E_PANJANG (nama topik sangat panjang): kartu besar berjudul sangat panjang, item berjudul pendek, entitas, tanpa gambar, gambar tanpa alt.
     post(201, 'publish', 22 * DAY, 'Pemerintah Kabupaten Sumedang Resmikan Program Penataan Kawasan Pusat Kota Secara Bertahap Melibatkan Warga, Pelaku Usaha, dan Komunitas Pemuda untuk Meningkatkan Kenyamanan Ruang Publik', E_PANJANG, img(1, 'Penataan kawasan pusat kota')),
     post(202, 'publish', 22 * DAY + 60, 'Banjir surut', E_PANJANG, img(2, 'Genangan air surut')),
@@ -340,8 +311,7 @@ export function buildEdgePosts(now: Date): WpPost[] {
     // E_LAMA: anak ke-5 (lebih lama), ada artikel tetapi tidak termasuk 4 topik terbaru
     post(216, 'publish', 26 * DAY, 'Artikel di Topik Lama yang Tidak Tampil di Beranda', E_LAMA, img(2, 'Topik lama')),
 
-    // Detail Berita (PAGE-002): artikel khusus LAMA (>= 27 hari, lebih tua dari semua artikel Beranda edge) tanpa kategori section
-    // dan tanpa tag `terpopuler`, sehingga Beranda edge tidak berubah. Dibuka langsung lewat slug (`/berita/<slug>`).
+    // Artikel khusus Detail: LAMA (>= 27 hari, lebih tua dari semua artikel Beranda edge) tanpa kategori section dan tanpa tag `terpopuler`, agar Beranda edge tidak berubah. Dibuka langsung lewat slug (`/berita/<slug>`).
     detail(301, 'edge-xss-dasar', 27 * DAY, 'Uji Payload XSS Dasar pada Isi Artikel', BERITA, img(1, 'Gambar uji payload'), { content: { rendered: EDGE_XSS_BODY } }),
     detail(302, 'edge-iframe-bukan-youtube', 27 * DAY + 60, 'Uji Iframe Bukan YouTube dan YouTube Palsu', BERITA, img(2, 'Gambar uji iframe'), { content: { rendered: EDGE_IFRAME_BODY } }),
     detail(303, 'edge-isi-kosong', 27 * DAY + 120, 'Artikel dengan Isi Kosong Tetap Menampilkan Judul dan Foto', BERITA, img(3, 'Foto artikel tanpa isi'), { content: { rendered: '' } }),
@@ -352,10 +322,10 @@ export function buildEdgePosts(now: Date): WpPost[] {
     detail(306, 'edge-gambar-tanpa-alt-kredit', 28 * DAY + 120, 'Gambar Tanpa Teks Alternatif dan Tanpa Kredit Foto', BERITA, img(4, '', null), {}),
     detail(307, 'edge-draft', 29 * DAY, 'Draft yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Draft'), {}, 'draft'),
     detail(308, 'edge-private', 29 * DAY + 60, 'Artikel privat yang tidak boleh dapat dibuka lewat slug', BERITA, img(1, 'Privat'), {}, 'private'),
-    // Isi hanya spasi/tag kosong (L-1): server mengembalikan bodyHtml '' sehingga pesan netral tampil, bukan div kosong.
+    // Isi hanya spasi/tag kosong: server mengembalikan bodyHtml '' sehingga pesan netral tampil, bukan div kosong.
     detail(309, 'edge-isi-spasi', 29 * DAY + 120, 'Artikel dengan Isi Hanya Spasi Menampilkan Pesan Netral', BERITA, img(2, 'Foto artikel isi spasi'), { content: { rendered: '  <p> </p>\n<p>&nbsp;</p>\n<p><br></p>  ' } }),
 
-    // Halaman kategori (PAGE-003). Semua LEBIH LAMA dari artikel edge lain (>= 31 hari), tanpa tag, sehingga Beranda edge tidak berubah.
+    // Halaman kategori: semua LEBIH LAMA dari artikel edge lain (>= 31 hari), tanpa tag, agar Beranda edge tidak berubah.
     // Hukum: tepat 10 artikel terbit (= 1 halaman penuh; halaman=2 harus 404) + draft dan private terbaru yang tidak boleh tampil.
     ...Array.from({ length: 10 }, (_, index) => post(311 + index, 'publish', (31 + index) * DAY, `Berita Hukum Edge ${index + 1}`, HUKUM, img((index % 8) + 1, `Hukum edge ${index + 1}`))),
     post(321, 'draft', 3, 'Draft Hukum yang tidak boleh tampil di halaman kategori', HUKUM, img(1, 'Draft')),
@@ -371,9 +341,7 @@ export function buildEdgeVisualCategories(): WpTerm[] {
   return [RUANG_VISUAL, E_LAMA, E_ENTITAS, E_DUA, E_SATU, E_PANJANG, E_HANYA_DRAFT, E_KOSONG]
 }
 
-// Kategori menu header dan laci (HOME-06): 9 kategori resmi (PRD §4.4), urutan menu Figma 21:4951.
-// Hukum dan Jelajah: id dan slug [I], final di gerbang WordPress (deklarasi ada di atas, dekat kategori lain).
-// Bukan bagian dari 8 kartu Rekomendasi atau section Beranda; kategori anak Ruang Visual tidak termasuk.
+// Kategori menu header dan laci: 9 kategori resmi, urutan menu. Bukan bagian dari 8 kartu Rekomendasi atau section Beranda; kategori anak Ruang Visual tidak termasuk.
 
 /** 9 kategori resmi untuk menu (sama di set `figma` dan `edge`). */
 export function buildMenuCategories(): WpTerm[] {

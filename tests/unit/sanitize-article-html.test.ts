@@ -1,6 +1,6 @@
 /**
- * Uji unit penyanitasi HTML artikel (SANITIZE-001; SN1-SN8). Pelari: `node:test` bawaan Node (tanpa Vitest).
- * Jalankan: `npm test`. Memuat berkas `.ts` langsung (Node 22.23+), maka impor memakai ekstensi `.ts`.
+ * Uji unit penyanitasi HTML artikel. Pelari: `node:test` bawaan Node (tanpa Vitest). Jalankan: `npm test`.
+ * Memuat berkas `.ts` langsung (Node 22.23+), maka impor memakai ekstensi `.ts`.
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
@@ -381,7 +381,7 @@ describe('SN6 masukan kosong, besar, dan bersarang dalam', () => {
   })
 
   // Angka di dua uji berikut SENGAJA literal (bukan impor konstanta): uji yang diturunkan dari konstanta tetap hijau
-  // saat batas dinaikkan sembarangan. Mengubah batas di sanitize-config.ts = ubah angka di sini (keputusan PM/pemilik [I]).
+  // Mengubah batas di sanitize-config.ts = ubah angka di sini.
   it('batas sarang literal 50: tepat 50 tingkat utuh; 51 tingkat membuang tag tingkat ke-51 (teks tetap)', () => {
     const nest = (depth: number): string => '<blockquote>'.repeat(depth) + 'dalam' + '</blockquote>'.repeat(depth)
     const count = (output: string, tag: string): number => output.split(tag).length - 1
@@ -466,7 +466,7 @@ describe('SN7/SN8 direktif HTML mentah Vue hanya di ArticleBody.vue dan penyanit
     .filter(path => /\.(vue|ts|js|mjs|mts|css)$/.test(path))
     .map(path => [path, readFileSync(path, 'utf8')])
 
-  // PAGE-002 (Keputusan PM 5): satu-satunya pemakaian direktif ada di komponen isi artikel (masukan = keluaran penyanitasi server).
+  // Satu-satunya pemakaian direktif ada di komponen isi artikel (masukan = keluaran penyanitasi server).
   it('app/ dan server/ memuat direktif HTML mentah Vue hanya di ArticleBody.vue, tepat satu kali sebagai atribut', () => {
     const directive = 'v-' + 'html'
     const all = [...sources('app'), ...sources('server')]
@@ -477,9 +477,8 @@ describe('SN7/SN8 direktif HTML mentah Vue hanya di ArticleBody.vue dan penyanit
     assert.equal(occurrences, 1)
   })
 
-  // PAGE-002 L-6: pindai sumber (komentar dibuang lebih dulu agar dokumentasi tidak memicu false positive) untuk semua sink
-  // HTML mentah, bukan hanya atribut `v-html=`: variasi spasi/huruf, binding `:innerHTML`/`v-bind:innerHTML`, `domProps`, API DOM.
-  // Batas: pengikatan dinamis (`v-bind="obj"` dengan kunci dari variabel) tidak terdeteksi statis; ditutup oleh review + gerbang git grep.
+  // Pindai sumber (komentar dibuang lebih dulu agar dokumentasi tidak memicu false positive) untuk semua sink HTML mentah, bukan hanya atribut `v-html=`: variasi spasi/huruf, binding `:innerHTML`/`v-bind:innerHTML`, `domProps`, API DOM.
+  // Batas: pengikatan dinamis (`v-bind="obj"` dengan kunci dari variabel) tidak terdeteksi statis; ditutup oleh review.
   const stripComments = (text: string): string => text
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\/\*[\s\S]*?\*\//g, '')

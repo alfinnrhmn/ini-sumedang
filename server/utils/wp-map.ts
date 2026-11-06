@@ -1,9 +1,6 @@
 /**
- * Pemetaan data artikel (API-001). Murni (tanpa auto-import Nuxt, impor berekstensi `.ts`) agar bisa diuji dengan `node:test`.
- * Dua pekerjaan:
- * - `normalizeWpPost` / `normalizeWpTerms`: respons REST WordPress (tak tepercaya, bentuk apa pun) -> tipe `WpPost` / `WpTerm`
- *   yang sama dengan fixture. Data yang tidak berbentuk benar dibuang (post: `null`), bukan dilempar.
- * - `mapPost`: `WpPost` -> `Article` (dipakai fixture dan WordPress; satu-satunya tempat aturan tampilan data).
+ * Pemetaan data artikel. Murni (tanpa auto-import Nuxt, impor berekstensi `.ts`) agar bisa diuji dengan `node:test`. `normalizeWpPost`/`normalizeWpTerms`: respons REST WordPress (tak tepercaya) -> `WpPost`/`WpTerm`
+ * (data tak berbentuk benar dibuang, bukan dilempar); `mapPost`: `WpPost` -> `Article` (dipakai fixture dan WordPress; satu-satunya tempat aturan tampilan data).
  */
 import type { Article, ArticleCategory } from '../../app/types/article'
 import { VISUAL_PARENT_SLUG, WP_DEFAULT_CATEGORY_SLUG } from '../../app/config/category.ts'
@@ -41,8 +38,8 @@ export function publishedAtOf(post: Pick<WpPost, 'date_gmt'>): string {
 }
 
 /**
- * `WpPost` -> `Article`. `imageHosts` = host https tambahan untuk gambar hero (host media WordPress dari base URL; kosong untuk
- * fixture). URL gambar tak aman (skema berbahaya, host di luar daftar) = artikel tanpa gambar, bukan galat.
+ * `WpPost` -> `Article`. `imageHosts` = host https tambahan untuk gambar hero (host media WordPress dari base URL; kosong untuk fixture).
+ * URL gambar tak aman (skema berbahaya, host di luar daftar) = artikel tanpa gambar, bukan galat.
  */
 export function mapPost(post: WpPost, imageHosts: readonly string[] = []): Article {
   const media = post._embedded['wp:featuredmedia']?.[0]
@@ -120,7 +117,7 @@ function embeddedMedia(embedded: Record<string, unknown>, title: string): NonNul
   const alt = typeof media.alt_text === 'string' ? media.alt_text.trim() : ''
   return [{
     source_url: media.source_url,
-    // alt kosong -> judul artikel (Keputusan PM 4).
+    // alt kosong -> judul artikel.
     alt_text: alt === '' ? title : alt,
     caption: { rendered: renderedOf(media.caption) },
     media_details: { width, height }
@@ -128,9 +125,8 @@ function embeddedMedia(embedded: Record<string, unknown>, title: string): NonNul
 }
 
 /**
- * Satu item `posts?_embed` WordPress -> `WpPost`, atau `null` bila bukan post yang layak tampil (bentuk salah, id/slug/tanggal/judul
- * tak valid). Perbedaan dari data mentah: judul dan nama kategori/tag tanpa tag HTML; `content`/`excerpt` selalu terisi (string, bisa kosong) agar tidak
- * jatuh ke isi bawaan fixture; kredit foto = `caption`; nama pengguna WordPress TIDAK dibawa (penulis tetap `IniSumedang`).
+ * Satu item `posts?_embed` WordPress -> `WpPost`, atau `null` bila bukan post yang layak tampil (bentuk salah, id/slug/tanggal/judul tak valid). Judul dan nama kategori/tag tanpa tag HTML; `content`/`excerpt` selalu terisi (agar tidak jatuh ke isi bawaan fixture);
+ * kredit foto = `caption`; nama pengguna WordPress TIDAK dibawa (penulis tetap `IniSumedang`).
  */
 export function normalizeWpPost(raw: unknown): WpPost | null {
   if (!isRecord(raw)) return null
@@ -179,10 +175,8 @@ export function normalizeWpTerms(raw: unknown): WpTerm[] {
 }
 
 /**
- * Daftar kategori situs dari kategori WordPress (WP-002, Keputusan PM 1): SEMUA kategori kecuali `uncategorized`, `ruang-visual`, dan
- * semua keturunan `ruang-visual` (anak langsung = topik Ruang Visual; keturunan lebih dalam ikut disembunyikan). Urutan = id naik
- * (urutan pembuatan). Kategori kosong tetap masuk (halaman kategori menampilkan keadaan kosong). Nama didekode. Kategori yang slug-nya
- * tidak punya halaman (`isValidCategorySlug`: mis. karakter non-ASCII atau lebih dari 60 karakter) dilewati, supaya menu tidak menaut ke 404.
+ * Daftar kategori situs dari kategori WordPress: SEMUA kategori kecuali `uncategorized`, `ruang-visual`, dan semua keturunan `ruang-visual` (anak langsung = topik Ruang Visual), urutan id naik. Kategori kosong tetap masuk; nama didekode.
+ * Kategori yang slug-nya tidak punya halaman (`isValidCategorySlug`: mis. non-ASCII atau lebih dari 60 karakter) dilewati, supaya menu tidak menaut ke 404.
  */
 export function pickWordPressCategories(terms: readonly WpTerm[]): ArticleCategory[] {
   const hidden = new Set<number>(terms.filter(term => term.slug === VISUAL_PARENT_SLUG).map(term => term.id))

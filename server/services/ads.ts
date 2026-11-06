@@ -10,10 +10,8 @@ const ADS_MAX_WAIT_MS = 2500
 let lastLoaded: unknown[] = []
 
 /**
- * Iklan per slot (ADS-002). Tanpa base URL WordPress yang valid = mode fixture (`source: 'fixture'`, tanpa iklan; `AdSlot` menampilkan
- * penampung). Mode WordPress: iklan layak (gambar host WordPress, tautan https, aktif, jadwal WIB) satu per slot. Gagal apa pun
- * (WordPress mati/lambat, post type `iklan` belum ada, JSON rusak) = `ads: {}` TANPA galat, supaya halaman tidak ikut gagal; alasannya
- * sudah dicatat klien WordPress (hanya kode singkat, tanpa URL).
+ * Iklan per slot. Tanpa base URL WordPress yang valid = mode fixture (`source: 'fixture'`, tanpa iklan; `AdSlot` menampilkan penampung). Mode WordPress: satu iklan layak per slot.
+ * Gagal apa pun (WordPress mati/lambat, post type `iklan` belum ada, JSON rusak) = `ads: {}` TANPA galat agar halaman tidak ikut gagal; alasannya sudah dicatat klien WordPress (hanya kode singkat, tanpa URL).
  */
 export async function getAds(now: Date = new Date()): Promise<AdsResponse> {
   const base = validWpBaseUrl(useRuntimeConfig().wpBaseUrl)

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
 
-// Bagian "Trending" kolom kanan halaman kategori (UX-001 Keputusan PM 2). BUKAN halaman Trending: hanya daftar kecil di kolom kanan.
-// Isi = artikel Terpopuler (pilihan editor, `sidebar.popular`, data yang sama dengan tab Terpopuler Beranda; tanpa API baru).
-// Kosong = tidak dirender (tidak diisi "terbaru", PRD §3.6). Komponen visual BARU tanpa frame Figma: judul = HomeSectionTitle (h2, garis aksen),
-// daftar = NewsCard layout="compact" seperti kolom samping Beranda; jarak dan gaya hanya dari token/pola yang sudah ada (deviasi untuk POLISH-01).
+// Bagian "Trending" kolom kanan halaman kategori (BUKAN halaman Trending): artikel Terpopuler (`sidebar.popular`, data sama dengan tab Terpopuler Beranda; tanpa API baru).
+// Kosong = tidak dirender. Tanpa frame Figma: judul = HomeSectionTitle (h2, garis aksen), daftar = NewsCard layout="compact" seperti kolom samping Beranda.
 defineProps<{
   articles: Article[]
   /** Waktu server (ISO) untuk waktu relatif. */
@@ -24,7 +22,7 @@ defineProps<{
 </template>
 
 <style scoped>
-/* Daftar seperti SidebarTabs (34:354 / 90:2164): celah antar item 22, jarak judul ke daftar 16; < 1024 kartu kolom 354 boleh berdampingan di tablet */
+/* Daftar seperti SidebarTabs: celah antar item 22, jarak judul ke daftar 16; < 1024 kartu kolom 354 boleh berdampingan di tablet */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--container-mobile), 100%), 1fr));
@@ -37,7 +35,7 @@ defineProps<{
 @media (min-width: 1024px) {
   .list {
     grid-template-columns: minmax(0, 1fr);
-    margin-inline-start: 5px; /* daftar 34:354 mulai x 928, kolom kanan x 923 */
+    margin-inline-start: 5px; /* daftar mulai 5 px lebih ke kanan dari kolom (Figma) */
   }
 }
 </style>

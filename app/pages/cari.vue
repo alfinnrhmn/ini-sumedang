@@ -3,13 +3,8 @@ import type { Article, SearchResponse, SidebarResponse } from '~/types/article'
 import { CATEGORY_PAGE_PATTERN } from '~/config/category'
 import { normalizeSearchQuery, SEARCH_EMPTY_MESSAGE, SEARCH_INVALID_MESSAGE } from '~/config/search'
 
-// Halaman hasil pencarian (PAGE-004; tanpa frame Figma, PRD §3.2 G1): tata letak sama dengan halaman kategori (PAGE-003, UX-001/UX-002) —
-// breadcrumb Beranda > Pencarian, judul h1 "Hasil pencarian", jumlah hasil, kartu 2 kolom, tombol "Lebih banyak" (CategoryLoadMore, digeneralisasi),
-// kolom kanan widget sosial -> Trending -> iklan (menempel >= 1024). Dibangun dari komponen yang ada; keputusan tata letak = peninjauan pemilik (POLISH-01).
-// Data hanya lewat /api/search?q=&halaman=N. `q` divalidasi di sini dengan fungsi yang sama dengan server (normalizeSearchQuery): kosong atau tidak
-// valid = halaman tetap 200 dengan pesan netral (tanpa permintaan API, tanpa memantulkan masukan); `halaman` tak valid atau di luar batas = 404
-// (pola kategori). Kata kunci hanya tampil sebagai teks (interpolasi Vue, tanpa HTML mentah), dan TIDAK dimasukkan ke <title>/meta.
-// noindex; tanpa cookie. Input di header terisi `q` (SearchForm).
+// `q` divalidasi dengan fungsi yang sama dengan server (normalizeSearchQuery): kosong/tidak valid = halaman tetap 200 dengan pesan netral (tanpa permintaan API, masukan tidak dipantulkan); `halaman` tak valid/di luar batas = 404.
+// Kata kunci hanya tampil sebagai teks (interpolasi Vue, tanpa HTML mentah) dan TIDAK dimasukkan ke <title>/meta; halaman noindex.
 
 const route = useRoute()
 // Parameter `q` dan `halaman` diteruskan apa adanya (string; array untuk ganda; null untuk tanpa nilai): validasi memutuskan.
@@ -46,7 +41,7 @@ const { data, error } = await useAsyncData<SearchResponse | null>(
 
 if (error.value) throw pageError(error.value.statusCode ?? 500)
 
-// Trending (UX-001): hanya `popular`; data dibagikan dengan Beranda/kategori lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
+// Trending: hanya `popular`; data dibagikan dengan Beranda/kategori lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
 const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar', { key: 'articles-sidebar' })
 
 // Gagal memuat pada navigasi berikutnya (mis. halaman sudah tidak ada) atau rute tak valid: tampilkan halaman error yang sama.
@@ -89,20 +84,18 @@ async function onLoaded(payload: { articles: Article[], page: number, added: num
   listEl.value?.children[firstNew]?.querySelector<HTMLElement>('a[href^="/berita/"]')?.focus({ preventScroll: true })
 }
 
-// Kolom kanan menempel pada >= 1024 px (UX-001 Keputusan PM 5)
+// Kolom kanan menempel pada >= 1024 px
 const secondary = ref<HTMLElement | null>(null)
 useStickyColumn(secondary)
 
-// Judul dokumen konstan (kata kunci tidak dipantulkan ke <title>/meta, Keputusan PM 2); noindex (Keputusan PM 4).
+// Judul dokumen konstan (kata kunci tidak dipantulkan ke <title>/meta); noindex.
 useSeoMeta({
   title: 'Hasil pencarian - Ini Sumedang',
   robots: 'noindex'
 })
 
-// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju yang disengaja (kirim kata kunci, "Lebih banyak" tidak termasuk): tidak pada muat
-// awal (SSR/hidrasi) dan tidak pada Back/Forward browser (popstate). Pola sama dengan halaman kategori (app/utils/focus.ts).
-// Instansi baru (dari halaman lain): setelah mount. Instansi sama (hanya ?q / ?halaman berubah): saat data baru tiba atau, untuk kata kunci tak valid
-// (tanpa data), saat rute berubah; Back/Forward antar hasil memulihkan posisi gulir yang diingat (rememberScroll).
+// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju yang disengaja (bukan muat awal SSR/hidrasi, bukan Back/Forward); pola sama dengan halaman kategori (app/utils/focus.ts).
+// Instansi sama (hanya ?q / ?halaman berubah): saat data baru tiba atau, untuk kata kunci tak valid (tanpa data), saat rute berubah; Back/Forward memulihkan gulir yang diingat.
 const listHeadingId = useId()
 const nuxtApp = useNuxtApp()
 const router = useRouter()
@@ -176,7 +169,7 @@ watch(() => route.fullPath, () => {
           />
         </template>
       </div>
-      <!-- Kolom kanan (357): widget sosial (SOC-001), Trending (UX-001; kosong = tidak dirender), lalu papan iklan; urutan sama di mobile -->
+      <!-- Kolom kanan (357): widget sosial, Trending (kosong = tidak dirender), lalu papan iklan; urutan sama di mobile -->
       <div ref="secondary" class="secondary">
         <HomeSocialWidget />
         <HomeTrendingList v-if="sidebar" :articles="sidebar.popular" :now="sidebar.now" />
@@ -194,7 +187,7 @@ watch(() => route.fullPath, () => {
 </template>
 
 <style scoped>
-/* Sama dengan halaman kategori (PAGE-003; tanpa frame [?]): kontainer, jarak atas, dan jarak judul-ke-daftar meminjam Detail (breadcrumb) dan Beranda. */
+/* Sama dengan halaman kategori (tanpa frame): kontainer, jarak atas, dan jarak judul-ke-daftar meminjam Detail (breadcrumb) dan Beranda. */
 .search-page {
   width: 100%;
   max-width: calc(var(--container-desktop) + 2 * var(--space-24));
@@ -240,7 +233,7 @@ watch(() => route.fullPath, () => {
   white-space: nowrap;
 }
 
-/* Mobile satu kolom kartu horizontal (354x104), tablet 2 kolom hanya bila kartu tidak lebih sempit dari kartu mobile; garis ke kartu pertama 30 (165:1727) */
+/* Mobile satu kolom kartu horizontal (354x104), tablet 2 kolom hanya bila kartu tidak lebih sempit dari kartu mobile; garis ke kartu pertama 30 */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--container-mobile), 100%), 1fr));
@@ -266,7 +259,7 @@ watch(() => route.fullPath, () => {
     --list-gap: 28px;
 
     display: grid;
-    /* Kolom kiri 739 dan kolom kanan 357 dari 1120 (21:4950), fluid di bawah 1280 seperti Beranda */
+    /* Kolom kiri 739 dan kolom kanan 357 dari 1120, fluid di bawah 1280 seperti Beranda */
     grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
     grid-template-rows: auto auto;
     justify-content: space-between;
@@ -305,7 +298,7 @@ watch(() => route.fullPath, () => {
     display: none;
   }
 
-  /* Dua kolom kartu 358 dengan celah 23 = 739 (sama dengan daftar Rekomendasi Beranda 21:4950) */
+  /* Dua kolom kartu 358 dengan celah 23 = 739 (sama dengan daftar Rekomendasi Beranda) */
   .list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 23px;

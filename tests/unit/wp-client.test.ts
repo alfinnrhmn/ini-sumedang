@@ -1,6 +1,6 @@
 /**
- * Uji unit API-001 (klien baca WordPress): validasi base URL, penggabungan halaman, retry, cache/stale/single-flight,
- * dan pemetaan data WordPress -> artikel. Murni (tanpa jaringan). Pelari: `node:test` (`npm test`).
+ * Uji unit klien baca WordPress: validasi base URL, penggabungan halaman, retry, cache/stale/single-flight, dan pemetaan data WordPress -> artikel.
+ * Murni (tanpa jaringan). Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

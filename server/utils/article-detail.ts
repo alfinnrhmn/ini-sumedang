@@ -1,6 +1,6 @@
 /**
- * Pembantu murni Detail Berita (PAGE-002). Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji
- * dengan `node:test`. Logika penyanitasi HTML TIDAK ada di sini (lihat `sanitize-article-html.ts`).
+ * Pembantu murni Detail Berita. Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji dengan `node:test`.
+ * Logika penyanitasi HTML TIDAK ada di sini (lihat `sanitize-article-html.ts`).
  */
 import { ARTICLE_SLUG_MAX_LENGTH, READING_WORDS_PER_MINUTE } from '../../app/config/article.ts'
 
@@ -16,10 +16,7 @@ export function stripTags(html: string): string {
   return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
 
-/**
- * Apakah HTML yang sudah disanitasi punya isi yang terlihat: teks selain spasi (spasi biasa, `&nbsp;`, karakter lebar nol),
- * atau gambar, atau embed. Hanya spasi/tag kosong (`<p> </p>`, `<br>`, `<hr>`) = false. Bukan penyanitasi.
- */
+/** Apakah HTML yang sudah disanitasi punya isi terlihat (teks selain spasi/`&nbsp;`/karakter lebar nol, gambar, atau embed)? Hanya spasi/tag kosong (`<p> </p>`, `<br>`, `<hr>`) = false. Bukan penyanitasi. */
 export function hasVisibleContent(sanitizedHtml: string): boolean {
   if (/<(img|iframe)\b/i.test(sanitizedHtml)) return true
   const text = sanitizedHtml
@@ -35,7 +32,7 @@ export function countWords(sanitizedHtml: string): number {
   return text === '' ? 0 : text.split(/\s+/).length
 }
 
-/** Waktu baca (menit): ceil(kata / 200), minimal 1 [I]. */
+/** Waktu baca (menit): ceil(kata / 200), minimal 1. */
 export function readingMinutes(sanitizedHtml: string): number {
   return Math.max(1, Math.ceil(countWords(sanitizedHtml) / READING_WORDS_PER_MINUTE))
 }

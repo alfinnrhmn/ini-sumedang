@@ -1,15 +1,8 @@
 <script setup lang="ts">
 import type { Article, CategoryPageResponse, SearchResponse } from '~/types/article'
 
-// Tombol "Lebih banyak" halaman kategori (UX-001 Keputusan PM 3; menggantikan Pagination). Komponen visual BARU tanpa frame Figma: gaya hanya dari token
-// (isi --color-brand, teks putih; kontras 5,0:1; deviasi untuk POLISH-01).
-// Bentuk = tautan <a href="/kategori/<slug>?halaman=N+1" rel="next"> (N = halaman terakhir yang sudah dimuat): tanpa JavaScript tetap navigasi biasa
-// (SSR/SEO). Dengan JavaScript klik tanpa modifier dicegat dan halaman berikutnya diambil dari /api/category/<slug>?halaman=N+1 lalu ditambahkan
-// di bawah daftar yang ada (penggabungan tanpa duplikat: mergeArticles). URL tidak berubah. Satu permintaan pada satu waktu.
-// Status: memuat = aria-busy + aria-disabled + teks "Memuat…"; gagal = pesan netral (tombol tetap bisa dicoba ulang). Pengumuman "N berita ditambahkan"
-// lewat region role="status" yang selalu ada (tombol bisa hilang di halaman terakhir). Fokus dipindahkan ke tautan judul kartu baru pertama oleh halaman.
-// PAGE-004 (digeneralisasi): sumber daftar ditentukan salah satu prop. `slug` = halaman kategori (/kategori/<slug>, /api/category/<slug>);
-// `query` = hasil pencarian (/cari?q=..., /api/search?q=...). Perilaku, gaya, dan aksesibilitas sama; halaman kategori tidak berubah.
+// Tombol "Lebih banyak" (kategori dan pencarian), tanpa frame Figma: tautan <a rel="next" href="...?halaman=N+1"> yang tanpa JavaScript tetap navigasi biasa (SSR/SEO); dengan JavaScript
+// klik tanpa modifier dicegat dan halaman berikutnya digabung tanpa duplikat (mergeArticles), URL tetap. Pengumuman lewat role="status" yang selalu ada; fokus ke kartu baru diatur halaman.
 const props = defineProps<{
   /** Slug kategori (halaman kategori). Kosongkan bila memakai `query`. */
   slug?: string
@@ -51,7 +44,6 @@ async function onClick(event: MouseEvent) {
     const response = props.query !== undefined
       ? await $fetch<SearchResponse>('/api/search', { query: { q: props.query, halaman: page } })
       : await $fetch<CategoryPageResponse>(`/api/category/${encodeURIComponent(props.slug ?? '')}`, { query: { halaman: page } })
-    // Pengguna berpindah kategori / kata kunci / halaman selama permintaan berjalan: hasil usang dibuang
     if (sourceKey.value !== key || nextPage.value !== page) return
     const merged = mergeArticles(props.articles, response.articles)
     const added = merged.length - props.articles.length
@@ -96,11 +88,11 @@ async function onClick(event: MouseEvent) {
   flex-direction: column;
   align-items: center;
   gap: var(--space-16);
-  margin-top: var(--space-40); /* jarak ke daftar kartu terakhir (sama dengan paginasi sebelumnya) */
+  margin-top: var(--space-40); /* jarak ke daftar kartu terakhir */
 }
 
-/* Tombol terisi primary di tengah kolom. Teks putih di atas --color-brand = 5,0:1 (>= 4,5:1). Tinggi >= 44 (target sentuh). Hover = garis bawah
-   (seperti tautan kartu, tanpa warna baru); fokus = cincin global 2 px + jarak 2 px = 4 px. */
+/* Tombol terisi di tengah kolom. Teks putih di atas --color-brand = 5,0:1 (>= 4,5:1); tinggi >= 44 (target sentuh). Hover = garis bawah (tanpa warna baru);
+   fokus = cincin global 2 px + jarak 2 px = 4 px. */
 .button {
   display: inline-flex;
   align-items: center;

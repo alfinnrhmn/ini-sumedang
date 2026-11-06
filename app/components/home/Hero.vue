@@ -9,11 +9,8 @@ const props = defineProps<{
   now: string
 }>()
 
-// Carousel (HOME-07 keputusan PM 1, tanpa tombol prev/next dan geser sentuh); UX-001 Keputusan PM 1 menambah putar otomatis (di bawah).
-// Empat titik = tombol; roving tabindex; panah kiri/kanan (berputar), Home, End memindahkan fokus dan slide.
-// E3 (evaluasi pemilik): perpindahan slide = geser ke kiri (slide lama keluar ke kiri, slide baru masuk dari kanan, HERO_SLIDE_MS ease),
-// tanpa pergeseran tata letak (slide bertumpuk absolut di kotak tetap). Selama animasi slide lama tetap dirender tetapi `inert` +
-// `aria-hidden` (tidak fokus, tidak terbaca); setelah selesai kembali `hidden`. `prefers-reduced-motion: reduce` = berpindah instan.
+// Carousel tanpa tombol prev/next dan geser sentuh: titik = tombol dengan roving tabindex; panah kiri/kanan (berputar), Home, End memindahkan fokus dan slide. Pindah slide = geser ke kiri (HERO_SLIDE_MS ease) tanpa pergeseran tata letak
+// (slide bertumpuk absolut di kotak tetap); slide lama tetap dirender `inert` + `aria-hidden` sampai animasi selesai lalu `hidden`; `prefers-reduced-motion: reduce` = instan.
 const selected = ref(0)
 const active = computed(() => Math.min(selected.value, props.articles.length - 1))
 const leaving = ref<number | null>(null)
@@ -46,12 +43,8 @@ function onSlideAnimationEnd(event: AnimationEvent) {
   if (event.target === event.currentTarget) settle()
 }
 
-// UX-001 Keputusan PM 1: putar otomatis tiap HERO_AUTOPLAY_MS, hanya di klien setelah mount (SSR/hidrasi tidak berubah, tanpa layout shift).
-// Dijeda saat pointer di atas hero, fokus keyboard di dalam hero, atau tab tersembunyi; `prefers-reduced-motion: reduce` = tanpa putar.
-// Fokus dihitung hanya bila `:focus-visible` (keyboard): titik yang baru diklik mouse/sentuh tetap fokus tetapi tidak boleh menjeda
-// selamanya setelah pointer meninggalkan hero. Pilihan titik / panah keyboard memulai ulang timer dari 0 (`restartAutoplay`).
-// Keputusan logika (status, slide berikutnya, aria-live) ada di app/config/home.ts agar bisa diuji murni. Satu timer (setTimeout) yang
-// dipasang ulang tiap status/slide berubah, dibersihkan saat unmount.
+// Putar otomatis tiap HERO_AUTOPLAY_MS, hanya di klien setelah mount (SSR/hidrasi tidak berubah). Dijeda saat pointer di atas hero, fokus keyboard (`:focus-visible`; titik yang baru diklik tidak menjeda) di dalam hero, atau tab tersembunyi; reduced-motion = tanpa putar.
+// Satu timer setTimeout dipasang ulang tiap status/slide berubah, dibersihkan saat unmount; pilihan titik/panah memulai ulang dari 0 (`restartAutoplay`). Logika keputusan ada di app/config/home.ts agar bisa diuji murni.
 const root = ref<HTMLElement | null>(null)
 const mounted = ref(false)
 const reducedMotion = ref(false)
@@ -144,8 +137,7 @@ function onKeydown(event: KeyboardEvent) {
   dotEls[next]?.focus()
 }
 
-// Chip = kategori pertama artikel (nama sudah didekode di server); tanpa kategori chip tidak dirender.
-// PAGE-003, WP-002: kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul); selain itu teks.
+// Chip = kategori pertama artikel (nama sudah didekode di server), tanpa kategori tidak dirender; kategori dari daftar WordPress = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul), selain itu teks.
 const categories = useCategories()
 const slides = computed(() =>
   props.articles.map(article => ({
@@ -232,11 +224,11 @@ const slides = computed(() =>
 </template>
 
 <style scoped>
-/* Hero mobile 90:2130: 354x238 (lebar mengikuti kolom), radius 16. Tinggi tetap supaya berpindah slide tidak menggeser tata letak. */
+/* Tinggi tetap supaya berpindah slide tidak menggeser tata letak. */
 .hero {
   position: relative;
   width: 100%;
-  height: 238px; /* 90:2130 */
+  height: 238px;
   border-radius: var(--radius-16);
   color: var(--color-white);
 }
@@ -244,7 +236,7 @@ const slides = computed(() =>
 .slides {
   position: absolute;
   inset: 0;
-  overflow: hidden; /* E3: slide yang bergeser tidak keluar dari kotak hero */
+  overflow: hidden; /* slide yang bergeser tidak keluar dari kotak hero */
   border-radius: var(--radius-16);
 }
 
@@ -254,10 +246,10 @@ const slides = computed(() =>
   display: grid;
   align-content: end;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto auto 8px; /* baris terakhir = ruang titik 90:2137 (56x8) */
-  grid-template-areas: 'chip' 'title' 'meta' 'dots'; /* E3: penulis + waktu di bawah judul, kiri (sebelumnya kolom kanan 90:2142) */
-  row-gap: var(--space-16); /* 90:2150 gap 16 (chip, judul, meta, titik) */
-  padding: 20px 20px 20px 30px; /* 90:2130 py 20, px 30; kanan 20 = 354 - 30 - 304 (kontainer 90:2150 lebar 304) */
+  grid-template-rows: auto auto auto 8px; /* baris terakhir = ruang titik (56x8) */
+  grid-template-areas: 'chip' 'title' 'meta' 'dots'; /* penulis + waktu di bawah judul, kiri */
+  row-gap: var(--space-16);
+  padding: 20px 20px 20px 30px; /* kanan 20 = 354 - 30 - 304 (kontainer lebar 304) */
   overflow: hidden;
   border-radius: var(--radius-16);
   background: var(--color-black-2); /* pengganti bila artikel tanpa gambar: teks putih tetap terbaca */
@@ -267,7 +259,7 @@ const slides = computed(() =>
   display: none;
 }
 
-/* E3: animasi geser-kiri. Slide baru masuk dari kanan, slide lama keluar ke kiri, bersamaan (bersebelahan, tanpa tumpang tindih). */
+/* Animasi geser-kiri: slide baru masuk dari kanan, slide lama keluar ke kiri, bersamaan (bersebelahan, tanpa tumpang tindih). */
 .slide--enter {
   animation: hero-slide-in var(--hero-slide-ms) ease both;
 }
@@ -303,11 +295,8 @@ const slides = computed(() =>
   }
 }
 
-/* Foto memenuhi kotak (object-fit: cover). Lapisan gelap [I]: Figma 21:4974/90:2130 tidak punya gradien atau overlay
-   (foto asli dipakai apa adanya, rasio piksel hasil render/foto = 1,00); ditambahkan agar teks putih dan chip (putih 20%) terbaca
-   di foto CMS yang lebih terang. Kontras dihitung (WCAG, persentil 95 luminansi piksel di bawah tiap elemen, 8 foto fixture, 1440 dan 402):
-   semua teks >= 4,9:1 (terendah chip mobile figma-5 4,92:1), titik >= 15:1; tanpa lapisan ini chip turun ke 1,2:1.
-   Stop 20% dinaikkan 60% -> 65% (sebelumnya chip mobile figma-5 4,43:1, di bawah AA 4,5:1). Deviasi untuk POLISH-01. */
+/* Foto memenuhi kotak (object-fit: cover). Lapisan gelap ditambahkan (Figma tanpa overlay) agar teks putih dan chip (putih 20%) terbaca di foto CMS yang lebih terang.
+   Kontras teks >= 4,9:1 (WCAG, 8 foto fixture, 1440 dan 402); tanpa lapisan ini chip turun ke 1,2:1; stop 20% = 65% menjaga chip mobile di atas AA 4,5:1. */
 .photo {
   position: absolute;
   inset: 0;
@@ -335,8 +324,8 @@ const slides = computed(() =>
   z-index: 1;
 }
 
-/* PAGE-002: judul = satu-satunya tautan slide (satu titik tab). Tautan memakai overlay ::after seluruh slide sebagai area klik, jadi
-   judul tidak boleh menjadi blok penampung (position: static; z-index berlaku karena judul adalah item grid). Foto bukan tautan. */
+/* Judul = satu-satunya tautan slide (satu titik tab). Tautan memakai overlay ::after seluruh slide sebagai area klik, jadi judul tidak boleh menjadi blok penampung
+   (position: static; z-index berlaku karena judul adalah item grid). Foto bukan tautan. */
 .slide > .title {
   position: static;
   z-index: 1;
@@ -358,24 +347,24 @@ const slides = computed(() =>
   outline-offset: 2px;
 }
 
-/* Hover (PAGE-002 Keputusan PM 2): judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
+/* Hover: judul bergaris bawah, tanpa ubah warna; hanya perangkat dengan hover */
 @media (hover: hover) {
   .link:hover {
     text-decoration: underline;
   }
 }
 
-/* Chip 90:2134: tinggi 18, radius 4, latar putih 20%. Figma: lebar tetap 117 dengan px 15, teks (97,56) terpusat dan melewati padding,
-   jadi jarak tepi teks sebenarnya ~9,7; dipakai padding 10 dengan lebar mengikuti teks (selisih lebar 0,56 untuk label contoh) [I] */
+/* Chip: tinggi 18, radius 4, latar putih 20%. Figma: lebar tetap 117 dengan px 15, teks terpusat melewati padding (jarak tepi sebenarnya ~9,7);
+   dipakai padding 10 dengan lebar mengikuti teks (selisih lebar 0,56 untuk label contoh). */
 .chip {
   grid-area: chip;
   justify-self: start;
   display: flex;
   align-items: center;
   max-width: 100%;
-  height: 18px; /* 90:2134 */
+  height: 18px;
   padding-inline: 10px; /* lihat catatan chip di atas */
-  border-radius: 4px; /* 90:2134 */
+  border-radius: 4px;
   background: color-mix(in srgb, var(--color-white) 20%, transparent);
   font: var(--type-card-label-mobile);
   white-space: nowrap;
@@ -383,13 +372,13 @@ const slides = computed(() =>
   text-overflow: ellipsis;
 }
 
-/* PAGE-003: chip tautan di atas overlay judul (z-index 2 > judul 1); hover bergaris bawah; fokus putih seperti titik (--color-focus tak terlihat di foto gelap) */
+/* Chip tautan di atas overlay judul (z-index 2 > judul 1); hover bergaris bawah; fokus putih seperti titik (--color-focus tak terlihat di foto gelap) */
 .slide > .chip {
   z-index: 2;
 }
 
-/* POLISH-01 D41 (WCAG 2.5.8): chip tautan (mobile 18 px) punya area klik >= 24 x 24 px lewat ::after tak terlihat berpusat pada chip; overflow chip tautan
-   dibuat visible agar ::after tidak terpotong (nama kategori resmi pendek, jadi tidak ada teks yang meluber). Tampilan chip tidak berubah. */
+/* Area klik chip tautan (mobile 18 px) >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada chip; overflow chip tautan dibuat visible agar ::after tidak terpotong
+   (nama kategori resmi pendek, jadi tidak ada teks yang meluber). Tampilan chip tidak berubah. */
 a.chip {
   overflow: visible;
 }
@@ -415,25 +404,24 @@ a.chip::after {
   }
 }
 
-/* Judul mobile 90:2136: Merriweather SemiBold 19,2/24,96, lebar 186 (kolom judul) */
 .title {
   grid-area: title;
   align-self: end;
   font: var(--type-heading-mobile);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* 90:2136: 3 baris */
+  -webkit-line-clamp: 3;
   line-clamp: 3;
   overflow: hidden;
   overflow-wrap: anywhere;
 }
 
-/* Penerbit dan waktu (90:2142): E3 (evaluasi pemilik) dipindah dari kolom kanan ke kiri, sejajar tepi kiri judul, di bawah judul */
+/* Penerbit dan waktu: di bawah judul, sejajar tepi kiri judul */
 .meta {
   grid-area: meta;
   align-self: end;
   justify-self: start;
-  pointer-events: none; /* klik di atas penerbit/waktu tembus ke tautan slide (PAGE-002) */
+  pointer-events: none; /* klik di atas penerbit/waktu tembus ke tautan slide */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -446,21 +434,21 @@ a.chip::after {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: var(--space-8); /* 90:2143 */
+  gap: var(--space-8);
   max-width: 100%;
   min-width: 0;
 }
 
 .avatar {
   flex: none;
-  width: 12px; /* 90:2144 */
+  width: 12px;
   height: 12px;
   border-radius: var(--radius-full);
 }
 
 .author {
   min-width: 0;
-  font: var(--type-caption); /* 90:2145 Inter Regular 13,333/18,666 */
+  font: var(--type-caption);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -468,15 +456,15 @@ a.chip::after {
 }
 
 .time {
-  font: var(--type-card-label-mobile); /* 90:2147 Inter SemiBold 11,111/16,667 */
+  font: var(--type-card-label-mobile);
   white-space: nowrap;
 }
 
-/* Titik 90:2137: 56x8, titik 8, celah 8, cincin 1; aktif terisi putih. Dipasang di kiri-bawah, sejajar dasar kontainer teks. */
+/* Titik: 56x8, titik 8, celah 8, cincin 1; aktif terisi putih. Dipasang di kiri-bawah, sejajar dasar kontainer teks. */
 .dots {
   position: absolute;
-  left: 30px; /* 90:2130 px 30 */
-  bottom: 20px; /* 90:2130 py 20 */
+  left: 30px;
+  bottom: 20px;
   z-index: 2;
   display: flex;
   gap: var(--space-8);
@@ -484,7 +472,7 @@ a.chip::after {
 
 .dot {
   position: relative;
-  width: 8px; /* 90:2137 */
+  width: 8px;
   height: 8px;
   padding: 0;
   border: 1px solid var(--color-white);
@@ -510,84 +498,84 @@ a.chip::after {
   outline-offset: 2px;
 }
 
-/* Mobile 402 sampai tablet: lebar judul 186 (90:2136) dipertahankan; penulis + waktu (E3) memakai seluruh lebar di bawah judul */
+/* Mobile 402 sampai tablet: lebar judul 186 dipertahankan; penulis + waktu memakai seluruh lebar di bawah judul */
 @media (min-width: 402px) {
   .slide {
-    grid-template-columns: minmax(0, 186px) 110px; /* 90:2136 lebar judul 186 */
+    grid-template-columns: minmax(0, 186px) 110px;
     grid-template-areas: 'chip chip' 'title .' 'meta meta' 'dots dots';
   }
 }
 
-/* Tablet 600 sampai 1023: turunan hero mobile [I], judul mengisi sisa lebar */
+/* Tablet 600 sampai 1023: turunan hero mobile, judul mengisi sisa lebar */
 @media (min-width: 600px) {
   .slide {
     grid-template-columns: minmax(0, 1fr) 110px;
   }
 }
 
-/* Hero desktop 21:4974: 739x531, kolom kiri (chip, judul, penulis + waktu, titik) 379 */
+/* Hero desktop: 739x531, kolom kiri (chip, judul, penulis + waktu, titik) 379 */
 @media (min-width: 1024px) {
   .hero {
-    height: 531px; /* 21:4974 */
+    height: 531px;
   }
 
   .slide {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto auto 12px; /* baris terakhir = ruang titik 21:4981 (72x12) */
+    grid-template-rows: auto auto auto 12px; /* baris terakhir = ruang titik (72x12) */
     grid-template-areas: 'chip' 'title' 'meta' 'dots';
-    row-gap: var(--space-32); /* 21:4976 gap 32 (chip, judul, titik) */
-    padding: 0 39px 50px 30px; /* 21:4974 pb 50, px 30; kanan 39 = 739 - 30 - 670 (kontainer 21:4975 lebar 670) */
+    row-gap: var(--space-32);
+    padding: 0 39px 50px 30px; /* kanan 39 = 739 - 30 - 670 (kontainer lebar 670) */
   }
 
   .chip {
     height: auto;
-    padding: 5px 15px; /* 21:4978 */
+    padding: 5px 15px;
     border-radius: var(--radius-8);
     font: var(--type-text-l-medium);
     letter-spacing: var(--tracking-text-l);
   }
 
   .title {
-    max-width: 379px; /* 21:4976 lebar kolom kiri */
+    max-width: 379px; /* lebar kolom kiri */
     font: var(--type-hero-headline-desktop);
     letter-spacing: var(--tracking-hero-headline);
-    text-transform: capitalize; /* 21:4980 */
+    text-transform: capitalize;
     -webkit-line-clamp: 4;
     line-clamp: 4;
   }
 
-  /* Keputusan pemilik 4 Nov 2026: blok penerbit + waktu desktop diperkecil (Figma 21:4986 avatar 50, nama 23,04, waktu 18 terlalu besar) agar
-     compact dan profesional: avatar 32, nama 16, waktu 13,333, celah dan jarak diperkecil sebanding (~0,64). Mobile/tablet tidak berubah. */
+  /* Blok penerbit + waktu desktop sengaja lebih kecil dari Figma (avatar 50, nama 23,04, waktu 18) agar ringkas: avatar 32, nama 16, waktu 13,333,
+     celah dan jarak ~0,64x. Mobile/tablet tidak berubah. */
   .meta {
-    max-width: 270px; /* 21:4986 */
+    max-width: 270px;
     margin-top: -16px; /* jarak judul ke penulis tetap 16 (row-gap 32 - 16): garis dasar judul sudah memberi ruang tambahan */
     margin-bottom: -12px; /* jarak penulis ke titik 32 -> 20 (32 x 0,64), tanpa mengubah row-gap chip-judul */
-    gap: 4px; /* waktu rapat di bawah penerbit (sebelumnya 8) */
+    gap: 4px; /* waktu rapat di bawah penerbit */
   }
 
   .publisher {
-    gap: 10px; /* sebelumnya 16 (21:4987) x 0,64 */
+    gap: 10px; /* 16 x 0,64 */
   }
 
   .avatar {
-    width: 32px; /* sebelumnya 50 (21:4988) */
+    width: 32px; /* Figma 50 */
     height: 32px;
   }
 
   .author {
-    font: 600 16px/24px var(--font-serif); /* literal: tidak ada token Merriweather SemiBold 16 px; sebelumnya --type-heading-desktop 23,04 (21:4989) */
+    font: 600 16px/24px var(--font-serif); /* literal: tidak ada token Merriweather SemiBold 16 px */
   }
 
   .time {
-    font: var(--type-caption); /* Inter Regular 13,333/18,666; sebelumnya --type-text-l-regular 18/27 (21:4993) */
+    font: var(--type-caption);
   }
 
   .dots {
-    bottom: 50px; /* 21:4974 pb 50 */
+    bottom: 50px;
   }
 
   .dot {
-    width: 12px; /* 21:4981 */
+    width: 12px;
     height: 12px;
   }
 }

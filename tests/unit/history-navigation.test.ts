@@ -1,7 +1,6 @@
 /**
- * Uji unit pembeda navigasi riwayat (Back/Forward) dari navigasi maju (PAGE-003, perbaikan temuan QA M1) dan ingatan gulir antar
- * halaman paginasi; juga uji penjaga sumber untuk L1 (:hover menu/laci hanya di `@media (hover: hover)`) dan pemakaian pelacak
- * di halaman kategori. Pelari: `node:test` (`npm test`).
+ * Uji unit pembeda navigasi riwayat (Back/Forward) dari navigasi maju dan ingatan gulir antar halaman paginasi; juga penjaga sumber agar `:hover` menu/laci hanya di `@media (hover: hover)`
+ * dan pelacak dipakai di halaman kategori. Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

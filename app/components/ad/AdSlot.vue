@@ -2,13 +2,8 @@
 import { AD_SLOTS } from '~/utils/ad-slots'
 import type { AdSlotName } from '~/utils/ad-slots'
 
-// Slot iklan (E6 + ADS-002). Isi mengikuti `/api/ads` (satu permintaan dibagikan semua slot, lihat useAds):
-// - source `fixture` (tanpa WordPress): penampung STATIS yang meniru slot "Advertisement" di Figma (mis. 57:589), tanpa tautan/gambar/skrip,
-//   bukan tab stop; teks "Advertisement" dekoratif bagi pembaca layar (landmark `aside` berlabel "Iklan" cukup).
-// - source `wordpress`: ada iklan untuk slot ini -> SATU tautan bergambar (`rel="sponsored noopener noreferrer"`, tab stop satu-satunya) + label
-//   kecil "Iklan"; tidak ada iklan atau data gagal dimuat -> TIDAK dirender (tanpa kotak kosong).
-// Gambar dan tautan sudah divalidasi di server (host WordPress, https); alt dirender sebagai teks. Tidak ada HTML/skrip dari CMS.
-// Tinggi tetap sesuai Figma (lihat app/utils/ad-slots.ts), jadi tidak ada layout shift; gambar `object-fit: cover` di kotak itu.
+// Slot iklan dari `/api/ads` (satu permintaan dibagikan semua slot): fixture = penampung statis non-interaktif; WordPress = satu tautan bergambar (rel="sponsored noopener noreferrer") + label "Iklan", tanpa iklan tidak dirender.
+// Gambar/tautan sudah divalidasi di server (host WordPress, https), alt sebagai teks, tanpa HTML/skrip CMS. Tinggi tetap (app/utils/ad-slots.ts) = tanpa layout shift.
 const props = defineProps<{ variant: AdSlotName }>()
 
 const spec = computed(() => AD_SLOTS[props.variant])
@@ -34,8 +29,7 @@ const ad = computed(() => (ads.value?.source === 'wordpress' ? ads.value.ads[pro
 </template>
 
 <style scoped>
-/* Figma 57:591: kotak #D9D9D9 radius 10, teks 57:593 Merriweather SemiBold 23,04/29,952 hitam di tengah.
-   #D9D9D9 dipetakan ke --color-footer-divider-mobile (#D5D5D5, selisih 4/4/4 <= 4). */
+/* Penampung: #D9D9D9 Figma dipetakan ke --color-footer-divider-mobile (#D5D5D5, selisih 4/4/4 <= 4). */
 .ad {
   display: flex;
   align-items: center;
@@ -50,12 +44,12 @@ const ad = computed(() => (ads.value?.source === 'wordpress' ? ads.value.ads[pro
 }
 
 .text {
-  font: var(--type-heading-desktop); /* 57:593 News/Heading/Desktop */
+  font: var(--type-heading-desktop);
   white-space: nowrap;
 }
 
-/* Iklan nyata: kotak yang sama (lebar, tinggi, radius). Aside tidak memotong (overflow terlihat) supaya cincin fokus tautan tidak terpotong;
-   pemotongan gambar oleh tautan (radius + overflow hidden). Label "Iklan" melayang di sudut, tidak mengubah tata letak. */
+/* Iklan nyata: kotak sama. Aside tidak memotong (overflow terlihat) agar cincin fokus tautan tidak terpotong; gambar dipotong oleh tautan (radius + overflow hidden).
+   Label "Iklan" melayang di sudut, tidak mengubah tata letak. */
 .ad--live {
   position: relative;
   display: block;

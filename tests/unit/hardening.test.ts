@@ -1,6 +1,6 @@
 /**
- * Uji unit HARD-001: basis URL tetap (`siteOrigin`), validasi URL gambar hero (`safeImageUrl`), dan turunan
- * header CSP `frame-src` dari `EMBED_ALLOWED_HOSTS` (`embedFrameSrcPolicy`). Pelari: `node:test` (`npm test`).
+ * Uji unit hardening: basis URL tetap (`siteOrigin`), validasi URL gambar hero (`safeImageUrl`), dan turunan header CSP `frame-src` dari `EMBED_ALLOWED_HOSTS` (`embedFrameSrcPolicy`).
+ * Pelari: `node:test` (`npm test`).
  */
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'

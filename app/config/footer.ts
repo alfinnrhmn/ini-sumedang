@@ -1,7 +1,6 @@
 /**
- * Konfigurasi footer (HOME-05). Satu daftar untuk footer desktop (60:486) dan mobile (101:2600).
- * `to: null` = teks biasa (bukan <a>, tanpa href, tidak dapat difokus); `to` terisi (path internal "/…") = tautan.
- * Label kategori dari daftar resmi (PRD §4.4), bukan teks Figma (ada salah ketik di desain); `to` kategori = `categoryPath(slug)` (PAGE-003).
+ * Konfigurasi footer, satu daftar untuk desktop dan mobile. `to: null` = teks biasa (bukan <a>, tanpa href, tidak dapat difokus); terisi = tautan internal.
+ * Label kategori dari daftar resmi, bukan teks desain (ada salah ketik di desain); `to` kategori = `categoryPath(slug)`.
  */
 import { categoryPath } from '../utils/routes.ts'
 
@@ -78,7 +77,7 @@ export const FOOTER_LEGAL: FooterLink[] = [
   { label: 'Ketentuan Penggunaan', to: null }
 ]
 
-/** Urutan Figma 60:486: Facebook, X, WordPress, Instagram, YouTube, TikTok. URL akun belum ada (keputusan pemilik). */
+/** Urutan: Facebook, X, WordPress, Instagram, YouTube, TikTok. URL akun belum ada. */
 export const FOOTER_SOCIALS: FooterSocial[] = [
   { name: 'Facebook', icon: '/icons/social-facebook.svg' },
   { name: 'X', icon: '/icons/social-x.svg' },

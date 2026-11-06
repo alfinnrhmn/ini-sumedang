@@ -1,9 +1,6 @@
 <script setup lang="ts">
-// `tag="h1"` (PAGE-003, judul halaman kategori): tampilan identik, hanya elemennya `h1` dan dapat menerima fokus program (tabindex -1)
-// agar halaman memindahkan fokus ke judul setelah navigasi. Bawaan `h2` (Beranda) tidak berubah.
-// `moreTo` (E4, evaluasi pemilik): tautan "Lainnya" + panah di kanan judul (68:1145 desktop, 165:1720 mobile) menuju halaman kategori;
-// tautan terpisah dari judul (judul tetap non-interaktif), satu tab stop; `moreLabel` = nama aksesibel lengkap (mis. "Lainnya: Otomotif").
-// Tanpa `moreTo` tampilan identik dengan sebelumnya.
+// `tag="h1"` (judul halaman kategori): tampilan identik, elemennya `h1` dan dapat menerima fokus program (tabindex -1) agar halaman memindahkan fokus ke judul setelah navigasi.
+// `moreTo`: tautan "Lainnya" + panah di kanan judul menuju halaman kategori; terpisah dari judul (judul tetap non-interaktif), satu tab stop; `moreLabel` = nama aksesibel lengkap.
 withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, moreLabel?: string }>(), { tag: 'h2', moreTo: undefined, moreLabel: undefined })
 </script>
 
@@ -24,7 +21,7 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
 </template>
 
 <style scoped>
-/* Garis pemisah 42:374 (3 px). Figma #D9D9D9 tidak ada di token; dipakai --color-gray-5 (keputusan PM 14). */
+/* Garis pemisah (3 px). Figma #D9D9D9 tidak ada di token; dipakai --color-gray-5. */
 .section-title {
   border-bottom: 3px solid var(--color-gray-5);
 }
@@ -33,15 +30,12 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
   position: relative;
   display: inline-block;
   vertical-align: top; /* hilangkan celah baseline di bawah inline-block */
-  font: var(--type-heading-mobile); /* mobile 165:1727: garis langsung di bawah teks, tanpa jarak */
+  font: var(--type-heading-mobile); /* mobile: garis langsung di bawah teks, tanpa jarak */
   color: var(--color-black);
 }
 
-/* E4: "Lainnya" di kanan judul, rata kanan (tepi kanan = tepi kanan garis). Figma 165:1720 (mobile) memakai Inter Medium 11,111 dengan panah 13 dan
-   68:1145 (desktop) Inter Regular 10; UX-001 Keputusan PM 4 (instruksi pemilik 3 Nov 2026) memperbesarnya: mobile teks dan panah 14, desktop 16
-   (judul 19,2 dan 23,04, jadi tetap lebih kecil dari judul). Deviasi dari Figma, dicatat untuk POLISH-01. Kotak tautan setinggi baris judul
-   (24,96 mobile; 29,95 desktop) dan diratakan tengah, sehingga sejajar vertikal dengan teks judul; tinggi >= 24, area sentuh diperluas 6 px ke segala sisi.
-   Warna #525252 -> --color-gray-2 (#4F4F4F, selisih 3/3/3; kontras 8,6:1). Judul diberi max-width agar tidak pernah tumpang-tindih dengan tautan (lihat .heading). */
+/* "Lainnya" di kanan judul, rata kanan (tepi kanan = tepi kanan garis). Sengaja lebih besar dari Figma (mobile teks dan panah 14, desktop 16), tetap lebih kecil dari judul. Kotak tautan setinggi baris judul
+   dan diratakan tengah agar sejajar teks judul; tinggi >= 24, area sentuh +6 px ke segala sisi. #525252 -> --color-gray-2 (selisih 3/3/3; kontras 8,6:1). Judul diberi max-width agar tidak tumpang-tindih dengan tautan (lihat .heading). */
 .section-title--more {
   position: relative;
 }
@@ -54,13 +48,13 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
   align-items: center;
   gap: 4px; /* celah teks-panah (Figma 3 pada 11 px; proporsional) */
   height: 24.96px; /* = line-height --type-heading-mobile */
-  font: 500 14px/normal var(--font-sans); /* UX-001 Keputusan PM 4 */
+  font: 500 14px/normal var(--font-sans);
   color: var(--color-gray-2);
   white-space: nowrap;
 }
 
-/* Tautan di luar alur: judul diberi batas lebar (lebar tautan "Lainnya" 14 px = teks + celah + panah ~ 70, ditambah 4) agar tidak pernah menimpa
-   tautan; judul terpanjang ("Bisnis dan Teknologi", 197 px) muat sampai 320 px (container 272 - 74 = 198), di bawah itu judul membungkus, tidak tumpang-tindih. */
+/* Tautan di luar alur: judul diberi batas lebar (tautan "Lainnya" 14 px ~ 70, ditambah 4) agar tidak menimpa tautan; judul terpanjang ("Bisnis dan Teknologi", 197 px) muat sampai 320 px,
+   di bawah itu judul membungkus, tidak tumpang-tindih. */
 .section-title--more .heading {
   max-width: calc(100% - 74px);
 }
@@ -88,7 +82,7 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
   outline: none;
 }
 
-/* Garis aksen 42:375 (3 px) menimpa garis pemisah; lebar mengikuti teks */
+/* Garis aksen (3 px) menimpa garis pemisah; lebar mengikuti teks */
 .heading::after {
   content: '';
   position: absolute;
@@ -100,7 +94,7 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
 }
 
 @media (min-width: 1024px) {
-  /* Desktop (68:1145: tepi kanan = tepi kanan garis x 899): UX-001 teks dan panah 16, Inter Regular; kotak setinggi baris judul desktop (29,95) */
+  /* Desktop: tepi kanan = tepi kanan garis; teks dan panah 16, Inter Regular; kotak setinggi baris judul desktop (29,95) */
   .more {
     height: 29.95px; /* = line-height --type-heading-desktop */
     font: 400 16px/normal var(--font-sans);
@@ -113,8 +107,8 @@ withDefaults(defineProps<{ title: string, tag?: 'h1' | 'h2', moreTo?: string, mo
 
   .heading {
     font: var(--type-heading-desktop);
-    padding-bottom: 5px; /* 42:376 (y 782+30) ke garis 42:374 (y 817) */
-    padding-right: 14px; /* 42:375 lebar 166 = teks 152 + 14 */
+    padding-bottom: 5px;
+    padding-right: 14px; /* lebar aksen 166 = teks 152 + 14 */
   }
 }
 </style>
