@@ -99,12 +99,13 @@ describe('E6 slot iklan (AdSlot)', () => {
     }
   })
 
-  it('penampung statis: aside berlabel "Iklan", tanpa tautan, skrip, gambar, HTML mentah, atau tab stop', () => {
+  it('penampung fixture statis: aside berlabel "Iklan", tanpa tautan, skrip, gambar, HTML mentah, atau tab stop (mode WordPress: ads-002.test.ts)', () => {
     const component = source('app/components/ad/AdSlot.vue')
     const template = component.slice(component.indexOf('<template>'), component.indexOf('</template>'))
-    assert.match(template, /<aside[^>]*aria-label="Iklan"/)
+    const placeholder = template.slice(template.indexOf('<aside'), template.indexOf('</aside>'))
+    assert.match(placeholder, /<aside v-if="ads\?\.source === 'fixture'" class="ad" aria-label="Iklan"/)
     for (const forbidden of ['<a ', '<a>', 'NuxtLink', '<script', '<img', '<iframe', 'v-html', 'href', 'tabindex', '<button']) {
-      assert.equal(template.includes(forbidden), false, forbidden)
+      assert.equal(placeholder.includes(forbidden), false, forbidden)
     }
     assert.equal(/v-html=/.test(component), false)
   })

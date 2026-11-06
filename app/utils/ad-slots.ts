@@ -1,7 +1,7 @@
 /**
- * Daftar slot iklan (E6, evaluasi pemilik): penampung statis `AdSlot` meniru slot "Advertisement" di 4 frame final Figma
- * (file tCjg6zC8qsZ4jhQpXvb0gK). Satu tempat untuk nama slot, ukuran (px), dan node Figma sumbernya. Murni (tanpa auto-import Nuxt)
- * agar bisa diuji dengan `node:test`. Isi nyata (gambar + tautan https dari CMS) = task ADS-002, di luar scope.
+ * Daftar slot iklan (E6, evaluasi pemilik): `AdSlot` meniru slot "Advertisement" di 4 frame final Figma (file tCjg6zC8qsZ4jhQpXvb0gK).
+ * Satu tempat untuk nama slot, ukuran (px), dan node Figma sumbernya. Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
+ * Nama slot juga nilai field `slot` (Select) iklan di ACF WordPress dan dipakai server untuk memvalidasinya (ADS-002).
  *
  * `width` = lebar maksimum Figma; di kolom yang lebih sempit slot menyusut (`width: 100%`), `height` selalu tetap (tanpa layout shift).
  * `width: null` = selalu selebar wadah (slot mobile 354 = lebar kolom frame 402).

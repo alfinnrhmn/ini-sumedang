@@ -526,10 +526,11 @@ Satu berkas per task di `docs/tasks/` (kecuali yang disebut tanpa berkas). Ranca
 | PAGE-004 | `DONE` | Pencarian (kolom header + `/cari`, fixture); `docs/tasks/PAGE-004.md` |
 | API-001 | `DONE` | Integrasi WordPress ke Nuxt (klien baca-saja, sumber data layanan; fixture bila `NUXT_WP_BASE_URL` kosong); `docs/tasks/API-001.md` |
 | WP-002 | `DONE` | Kategori, label, dan tag mengikuti WordPress (menu, halaman kategori, section Beranda, tag di Detail); `docs/tasks/WP-002.md` |
+| ADS-001 / ADS-002 | ADS-002 `QA_PASSED` (6 Nov 2026), menunggu commit; ADS-001 oleh pemilik | Iklan diatur lewat ACF WordPress (ADS-001: struktur ACF oleh pemilik; ADS-002: Nuxt membaca post type `iklan` ke slot `AdSlot`); `docs/tasks/ADS-002.md` |
 | HARD-001 | `DONE` | Basis URL kanonis tetap, validasi URL gambar hero, CSP `frame-src` = `EMBED_ALLOWED_HOSTS`; `docs/tasks/HARD-001.md` |
 | STATIC-001 | `BACKLOG` | Lima halaman statis footer, **teks saja** (pemilik 4 Nov); menunggu isi dari pemilik |
 | POLISH-01 | `DONE` | Deviasi Figma D1–D56: D26, D33, D36, D41, D42 dikerjakan; sisanya diterima pemilik 4 Nov; `docs/tasks/POLISH-01.md` |
-| DISC-002, POP-001, ADS-001, ADS-002 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
+| DISC-002, POP-001 | `DITUNDA` | WordPress ditunda (G21); subset DISC-002 = gerbang G-WP (§13) |
 | MOCK-001, LAY-001, CARD-001, PAGE-001, DISC-001 | `DITUNDA` | Digantikan slice vertikal HOME-01..07 |
 | DISC-003, SEC-001, SEO-001, RESP-001, REL-001 | belum dibuka | DISC-003 = pertanyaan terbuka ke pemilik; SEO-001 (redirect URL lama) dan SEC-001 (CSP penuh, uji XSS konten) sebagian bergantung data WordPress [I]; PM menilai saat dibuka |
 
