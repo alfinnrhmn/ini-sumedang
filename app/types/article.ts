@@ -26,10 +26,7 @@ export interface Article {
 /** Tag artikel (grup `wp:term` ke-2); yang tampil di UI = `visibleTags()` (label kedua kepala Detail dan baris tag). */
 export type ArticleTag = ArticleCategory
 
-/**
- * Detail berita: `Article` + isi. `bodyHtml` SUDAH disanitasi di server (`sanitizeBodyHtml`), tidak pernah HTML mentah dari CMS;
- * kosong = isi tidak tersedia atau ditolak penyanitasi.
- */
+/** Detail berita: `Article` + isi. `bodyHtml` SUDAH disanitasi di server (`sanitizeBodyHtml`); kosong = tak ada. */
 export interface ArticleDetail extends Article {
   /** Ringkasan teks polos (tanpa HTML). */
   excerpt: string
@@ -41,7 +38,7 @@ export interface ArticleDetail extends Article {
   readingMinutes: number
 }
 
-/** Respons `/api/article/<slug>`: Berita Terkait = satu daftar berperingkat. >= 1024 px: `sidebar` 4 teratas + `bottom` 3 berikutnya; < 1024 px: `bottomMobile` 3 teratas; CSS menampilkan salah satu. */
+/** Respons `/api/article/<slug>`: Berita Terkait satu daftar berperingkat; CSS memilih sidebar+bottom/bottomMobile. */
 export interface ArticleDetailResponse {
   article: ArticleDetail
   related: { sidebar: Article[], bottom: Article[], bottomMobile: Article[] }
@@ -58,21 +55,21 @@ export interface RecommendedResponse {
 /** Respons daftar artikel satu kategori section (bentuk sama dengan Rekomendasi). */
 export type CategoryArticlesResponse = RecommendedResponse
 
-/** Satu section kategori Beranda: `title` = judul konfigurasi (preferensi) atau nama kategori WordPress; `articles` tidak pernah kosong. */
+/** Satu section kategori Beranda: `title` = judul konfigurasi atau nama kategori WordPress; `articles` tak kosong. */
 export interface HomeSection {
   slug: string
   title: string
   articles: Article[]
 }
 
-/** Respons section kategori Beranda: sampai `HOME_SECTION_MAX` section, urutan = urutan tampil; kosong = tidak ada section. */
+/** Respons section kategori Beranda: sampai `HOME_SECTION_MAX` section, urutan tampil; kosong = tidak ada section. */
 export interface HomeSectionsResponse {
   sections: HomeSection[]
   /** Waktu server (ISO) untuk waktu relatif sama di SSR dan hidrasi. */
   now: string
 }
 
-/** Satu topik Ruang Visual: kategori anak dari induk `ruang-visual`, 1 kartu besar (`lead`, terbaru) dan hingga 3 berita berthumbnail (`items`, kosong bila hanya 1 artikel). */
+/** Satu topik Ruang Visual: kategori anak `ruang-visual`; `lead` = terbaru, `items` hingga 3 berita lain. */
 export interface VisualTopic {
   topic: ArticleCategory
   lead: Article
@@ -95,7 +92,7 @@ export interface SidebarResponse {
 /** Respons hero Beranda: artikel terbit terbaru, urutan = urutan slide; kosong = hero tidak dirender. */
 export type HeroResponse = RecommendedResponse
 
-/** Respons kategori menu header, laci, dan footer: kategori WordPress (mode fixture: 9 kategori contoh), urutan = urutan menu. */
+/** Respons kategori menu header, laci, dan footer: kategori WordPress (fixture: 9 contoh), urutan menu. */
 export interface CategoriesResponse {
   categories: ArticleCategory[]
 }
@@ -108,7 +105,7 @@ export interface CategoryPagination {
   totalPages: number
 }
 
-/** Respons `/api/category/<slug>?halaman=N`: kategori, artikel terbit halaman itu (terbaru dulu, tanpa `body`), dan paginasi; `articles` kosong hanya pada halaman 1 kategori tanpa artikel. */
+/** Respons `/api/category/<slug>?halaman=N`: kategori, artikel terbit halaman itu (tanpa `body`), paginasi. */
 export interface CategoryPageResponse {
   category: ArticleCategory
   articles: Article[]
@@ -117,7 +114,7 @@ export interface CategoryPageResponse {
   now: string
 }
 
-/** Respons `/api/search?q=&halaman=N`: `query` ternormalisasi (dirender hanya sebagai teks), artikel terbit halaman itu (kata di judul dulu, lalu terbaru; tanpa `body`), dan paginasi; `articles` kosong hanya pada halaman 1 tanpa hasil. */
+/** Respons `/api/search?q=&halaman=N`: `query` ternormalisasi (hanya teks), artikel terbit halaman itu, paginasi. */
 export interface SearchResponse {
   query: string
   articles: Article[]

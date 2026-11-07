@@ -2,8 +2,8 @@
 import { AD_SLOTS } from '~/utils/ad-slots'
 import type { AdSlotName } from '~/utils/ad-slots'
 
-// Slot iklan dari `/api/ads` (satu permintaan dibagikan semua slot): fixture = penampung statis non-interaktif; WordPress = satu tautan bergambar (rel="sponsored noopener noreferrer") + label "Iklan", tanpa iklan tidak dirender.
-// Gambar/tautan sudah divalidasi di server (host WordPress, https), alt sebagai teks, tanpa HTML/skrip CMS. Tinggi tetap (app/utils/ad-slots.ts) = tanpa layout shift.
+// Slot iklan dari /api/ads (satu permintaan untuk semua slot): fixture = penampung statis, WordPress = tautan gambar.
+// Divalidasi di server (host WordPress, https), tanpa HTML/skrip CMS; tinggi tetap; tanpa iklan = tidak dirender.
 const props = defineProps<{ variant: AdSlotName }>()
 
 const spec = computed(() => AD_SLOTS[props.variant])
@@ -48,8 +48,8 @@ const ad = computed(() => (ads.value?.source === 'wordpress' ? ads.value.ads[pro
   white-space: nowrap;
 }
 
-/* Iklan nyata: kotak sama. Aside tidak memotong (overflow terlihat) agar cincin fokus tautan tidak terpotong; gambar dipotong oleh tautan (radius + overflow hidden).
-   Label "Iklan" melayang di sudut, tidak mengubah tata letak. */
+/* Iklan nyata: kotak sama. Aside tidak memotong (overflow terlihat) agar cincin fokus tautan utuh;
+   gambar dipotong oleh tautan (radius + overflow hidden). Label "Iklan" melayang di sudut, tata letak tetap. */
 .ad--live {
   position: relative;
   display: block;

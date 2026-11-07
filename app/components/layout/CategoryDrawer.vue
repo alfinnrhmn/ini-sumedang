@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ArticleCategory } from '~/types/article'
 
-// Laci kategori: panel samping dari kiri, sama di desktop dan mobile. Tertutup = atribut `hidden` (isi tetap ada di HTML server); terbuka: fokus ke tombol tutup dan terkurung di panel, Esc menutup, scroll halaman dikunci.
-// Pemanggil mengembalikan fokus ke hamburger saat `close`; `navigate` (tautan kategori diikuti) menutup laci TANPA mengembalikan fokus (fokus pindah ke h1 halaman tujuan).
+// Laci kategori (panel kiri). Tertutup = hidden (isi tetap di HTML server); terbuka: fokus ke tombol tutup, terkurung,
+// Esc menutup, scroll dikunci. close: pemanggil mengembalikan fokus ke hamburger; navigate: tidak (fokus ke h1 tujuan).
 const props = defineProps<{
   open: boolean
   /** id elemen dialog; dipakai aria-controls pada tombol hamburger */
@@ -31,7 +31,7 @@ function unlockScroll() {
   root.style.paddingRight = ''
 }
 
-// Klik biasa (tombol utama, tanpa pengubah) pada tautan kategori = navigasi. Ctrl/Cmd/Shift/Alt-klik (tab/jendela baru) tidak menutup laci.
+// Klik biasa pada tautan kategori = navigasi; Ctrl/Cmd/Shift/Alt-klik (tab/jendela baru) tidak menutup laci.
 // Didelegasikan ke <li> agar tidak bergantung pada cara NuxtLink meneruskan onClick.
 function onItemClick(event: MouseEvent, slug: string) {
   if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
@@ -217,7 +217,7 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--color-border);
 }
 
-/* Gaya item meniru teks menu kategori desktop: Inter Medium 18, spasi huruf -4 %, warna merek (di atas putih 5,0 : 1) */
+/* Gaya item meniru menu kategori desktop: Inter Medium 18, spasi huruf -4 %, warna merek (di atas putih 5,0 : 1) */
 .item {
   display: block;
   padding: var(--space-16) var(--space-24);
@@ -226,7 +226,7 @@ onBeforeUnmount(() => {
   color: var(--color-brand);
 }
 
-/* Aktif (aria-current) selalu berlaku; :hover hanya pada perangkat yang mendukung hover agar latar tidak menempel setelah ketuk di layar sentuh. */
+/* Aktif (aria-current) selalu berlaku; :hover hanya di perangkat berhover agar latar tidak menempel setelah ketuk. */
 a.item[aria-current="page"],
 a.item[data-active] {
   background: var(--color-surface);

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ArticleTag } from '~/types/article'
 
-// Baris tag Detail (tanpa frame Figma, dari token yang ada): tag artikel sebagai label TEKS (bukan tautan, tidak ada halaman tag), di bawah isi dan di atas "Bagikan".
-// Pemanggil memberi tag yang tampil saja (`visibleTags`, tanpa `terpopuler`); tanpa tag baris tidak dirender. Nama tag dirender sebagai teks (di-escape), tidak pernah HTML.
+// Baris tag Detail (tanpa frame Figma): tag sebagai label TEKS (bukan tautan; tidak ada halaman tag), di bawah isi.
+// Pemanggil memberi tag tampil saja (visibleTags, tanpa terpopuler); tanpa tag tidak dirender. Nama tag di-escape.
 defineProps<{ tags: ArticleTag[] }>()
 </script>
 

@@ -1,7 +1,5 @@
-/**
- * Uji unit pembantu murni Detail Berita: validasi slug, waktu baca, peringkat Berita Terkait, URL bagikan, tanggal terbit, bentuk URL artikel.
- * Pelari: `node:test` (`npm test`). Impor berekstensi `.ts` (Node 22.23+).
- */
+// Uji unit pembantu Detail Berita: slug, waktu baca, peringkat Berita Terkait, URL bagikan, tanggal terbit, URL.
+// Pelari: `node:test` (`npm test`). Impor berekstensi `.ts` (Node 22.23+).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { countWords, hasVisibleContent, isValidArticleSlug, readingMinutes, stripTags } from '../../server/utils/article-detail.ts'

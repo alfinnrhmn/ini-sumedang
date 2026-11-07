@@ -3,7 +3,7 @@ import type { ArticleDetailResponse } from '~/types/article'
 import { siteOrigin } from '~/config/site'
 import { visibleTags } from '~/config/home'
 
-// Data hanya lewat /api/article/<slug>; `bodyHtml` sudah tersanitasi di server. Slug tak ada/draft/private/tak valid -> status 404.
+// Data lewat /api/article/<slug>; `bodyHtml` sudah tersanitasi di server. Slug tak ada/draft/private/tak valid: 404.
 const route = useRoute()
 const slug = String(route.params.slug)
 
@@ -26,8 +26,8 @@ const detail = data.value
 const article = detail.article
 const now = detail.now
 
-// URL kanonis = SITE_URL + /berita/<slug> (produksi tidak memakai header Host; hanya mode dev memakai origin permintaan).
-// Dipakai untuk canonical, og:url, og:image (jalur relatif), tautan bagikan, dan salin tautan. URL gambar sudah divalidasi di server.
+// URL kanonis = SITE_URL + /berita/<slug> (produksi tak memakai header Host; hanya dev memakai origin permintaan).
+// Dipakai untuk canonical, og:url, og:image, tautan bagikan, dan salin tautan. URL gambar sudah divalidasi di server.
 const origin = siteOrigin(useRequestURL().origin, useRuntimeConfig().public.siteUrl)
 const canonical = `${origin}${articlePath(article)}`
 const image = article.heroImage
@@ -45,14 +45,14 @@ useSeoMeta({
 })
 useHead({ link: [{ rel: 'canonical', href: canonical }] })
 
-// Tag yang tampil: tanpa tag fungsional `terpopuler`; baris tag di bawah isi, di atas "Bagikan" (tanpa tag tampil: tidak dirender).
+// Tag tampil: tanpa tag fungsional `terpopuler`; baris tag di bawah isi, di atas "Bagikan" (kosong: tidak dirender).
 const tags = visibleTags(article.tags)
 
 // Isi hanya spasi dianggap kosong (server sudah mengembalikan '' untuk itu; trim() = lapisan kedua).
 const hasBody = article.bodyHtml.trim() !== ''
 
-// Berita Terkait: < 1024 px blok bawah "compact" = peringkat 1-3 (tanpa sidebar); >= 1024 px sidebar = 1-4 dan blok bawah "wide" = 5-7.
-// SSR tidak tahu lebar viewport: kedua blok dirender, CSS menyembunyikan salah satunya (display: none, jadi keluar dari pohon aksesibilitas dan urutan Tab).
+// Berita Terkait: < 1024 px blok bawah "compact" = peringkat 1-3; >= 1024 px sidebar = 1-4 dan blok bawah "wide" = 5-7.
+// SSR tak tahu lebar viewport: kedua blok dirender, CSS menyembunyikan satu (display: none, keluar dari urutan Tab).
 const sidebarHeadingId = useId()
 const compactHeadingId = useId()
 const wideHeadingId = useId()
@@ -124,7 +124,7 @@ useStickyColumn(sidebarCol)
 </template>
 
 <style scoped>
-/* Jarak atas ke breadcrumb dan kepala artikel meniru desain mobile. Footer membawa margin-atas 32 sendiri, jadi margin-bawah -6
+/* Jarak atas ke breadcrumb dan kepala artikel meniru desain mobile. Footer ber-margin-atas 32, jadi margin-bawah -6
    menghasilkan jarak 26 ke Berita Terkait (footer bersama tidak diubah). */
 .detail {
   width: 100%;
@@ -207,7 +207,7 @@ useStickyColumn(sidebarCol)
 }
 
 @media (min-width: 1024px) {
-  /* Desktop: breadcrumb jarak 9 dari menu kategori, kolom artikel 18 di bawahnya; footer membawa margin-atas 163, jadi margin-bawah -25 */
+  /* Desktop: breadcrumb 9 dari menu kategori, artikel 18 di bawahnya; footer margin-atas 163, jadi margin-bawah -25 */
   .detail {
     margin-bottom: -25px;
     padding-top: 9px;

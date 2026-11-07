@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Article, CategoryPageResponse, SearchResponse } from '~/types/article'
 
-// Tombol "Lebih banyak" (kategori dan pencarian), tanpa frame Figma: tautan <a rel="next" href="...?halaman=N+1"> yang tanpa JavaScript tetap navigasi biasa (SSR/SEO); dengan JavaScript
-// klik tanpa modifier dicegat dan halaman berikutnya digabung tanpa duplikat (mergeArticles), URL tetap. Pengumuman lewat role="status" yang selalu ada; fokus ke kartu baru diatur halaman.
+// "Lebih banyak" (kategori, pencarian): <a rel="next" href="?halaman=N+1"> tanpa JS tetap navigasi biasa (SSR/SEO);
+// dengan JS klik dicegat, halaman digabung tanpa duplikat (mergeArticles); role="status" mengumumkan; fokus: halaman.
 const props = defineProps<{
   /** Slug kategori (halaman kategori). Kosongkan bila memakai `query`. */
   slug?: string
@@ -91,8 +91,8 @@ async function onClick(event: MouseEvent) {
   margin-top: var(--space-40); /* jarak ke daftar kartu terakhir */
 }
 
-/* Tombol terisi di tengah kolom. Teks putih di atas --color-brand = 5,0:1 (>= 4,5:1); tinggi >= 44 (target sentuh). Hover = garis bawah (tanpa warna baru);
-   fokus = cincin global 2 px + jarak 2 px = 4 px. */
+/* Tombol terisi di tengah kolom. Teks putih di atas --color-brand = 5,0:1; tinggi >= 44 (target sentuh).
+   Hover = garis bawah (tanpa warna baru); fokus = cincin global 2 px + jarak 2 px = 4 px. */
 .button {
   display: inline-flex;
   align-items: center;

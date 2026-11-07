@@ -1,7 +1,5 @@
-/**
- * Iklan dari ACF WordPress. Murni (tanpa auto-import Nuxt, impor berekstensi `.ts`) agar bisa diuji dengan `node:test`. Respons `wp/v2/iklan?_fields=id,date_gmt,title,acf` (tak tepercaya, bentuk apa pun) -> satu iklan tervalidasi per slot.
- * Layak bila SEMUA benar: `aktif`; `slot` salah satu dari 7 nama; gambar `https://` dari host WordPress; tautan `https://` valid tanpa userinfo; jadwal (hari ini WIB) terpenuhi. Yang tak layak dibuang tanpa galat; per slot dipakai `date_gmt` terbaru, lalu id terbesar. Tanpa HTML dari CMS.
- */
+// Iklan dari ACF WordPress (respons tak tepercaya) -> satu iklan tervalidasi per slot. Murni, diuji dengan `node:test`.
+// Layak: `aktif`, `slot` dikenal, gambar `https://` host WordPress, tautan `https://` valid, jadwal (WIB) terpenuhi.
 import type { AdItem, AdsBySlot } from '../../app/types/ad'
 import type { AdSlotName } from '../../app/utils/ad-slots.ts'
 import { AD_SLOTS } from '../../app/utils/ad-slots.ts'
@@ -20,7 +18,7 @@ const SLOT_NAMES: ReadonlySet<string> = new Set(Object.keys(AD_SLOTS))
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
 /** `date_gmt` WordPress: `2026-11-05T03:04:05` (UTC, tanpa zona) atau dengan `Z`. */
 const GMT_DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?$/
-/** Karakter kontrol, spasi, DEL, dan garis miring terbalik: URL yang memuatnya ditolak (peramban menormalkan/membuangnya diam-diam). */
+/** Karakter kontrol, spasi, DEL, dan `\`: URL yang memuatnya ditolak (peramban menormalkan/membuangnya diam-diam). */
 // eslint-disable-next-line no-control-regex
 const UNSAFE_URL_CHARS = /[\u0000- \u007F\\]/
 // eslint-disable-next-line no-control-regex
@@ -34,12 +32,12 @@ export function isAdSlotName(value: unknown): value is AdSlotName {
   return typeof value === 'string' && SLOT_NAMES.has(value)
 }
 
-/** Field True/False ACF lewat REST: `true`, `1`, atau `"1"` = aktif. Selain itu (`false`, `0`, `"0"`, kosong, tipe lain) = tidak aktif. */
+/** Field True/False ACF: `true`, `1`, atau `"1"` = aktif; selain itu tidak aktif. */
 export function acfFlag(value: unknown): boolean {
   return value === true || value === 1 || value === '1'
 }
 
-/** Date Picker ACF (`Y-m-d`): tanggal kalender valid `YYYY-MM-DD` -> string itu; kosong (`undefined`, `null`, `false`, `''`) -> `null` (tanpa batas); selain itu (format lain, tanggal mustahil seperti `2026-02-30`, bukan string) -> `undefined` (tak valid). */
+/** Date Picker ACF (`Y-m-d`): valid -> string itu; kosong -> `null` (tanpa batas); lainnya -> `undefined`. */
 export function parseAcfDate(value: unknown): string | null | undefined {
   if (value === undefined || value === null || value === false || value === '') return null
   if (typeof value !== 'string') return undefined
@@ -57,7 +55,7 @@ export function todayWib(now: Date): string {
   return new Date(now.getTime() + WIB_OFFSET_MS).toISOString().slice(0, 10)
 }
 
-/** Jadwal terpenuhi bila hari ini (WIB) ada di antara `mulai` dan `selesai`, inklusif; kosong = tanpa batas. Salah satu format tak valid = tidak terpenuhi (iklan dibuang). */
+/** Jadwal terpenuhi bila hari ini (WIB) di antara `mulai` dan `selesai` inklusif; kosong = tanpa batas. */
 export function isScheduleOpen(mulai: unknown, selesai: unknown, now: Date): boolean {
   const from = parseAcfDate(mulai)
   const to = parseAcfDate(selesai)
@@ -67,7 +65,7 @@ export function isScheduleOpen(mulai: unknown, selesai: unknown, now: Date): boo
   return (from === null || from <= today) && (to === null || today <= to)
 }
 
-/** Tautan iklan: hanya `https://host...` (tanpa userinfo, tanpa spasi/kontrol/garis miring terbalik, <= 2048 karakter) -> `URL.href` ternormalisasi, atau `null`. `http:`, `javascript:`, `data:`, relatif, dan `//host` ditolak. */
+/** Tautan iklan: hanya `https://host...` (tanpa userinfo/spasi/kontrol/`\`, <= 2048) -> `URL.href`, atau `null`. */
 export function safeAdLink(value: unknown): string | null {
   if (typeof value !== 'string' || value.length > MAX_URL_LENGTH || UNSAFE_URL_CHARS.test(value)) return null
   if (!/^https:\/\/[^/]/i.test(value)) return null
@@ -81,7 +79,7 @@ export function safeAdLink(value: unknown): string | null {
   return parsed.href
 }
 
-/** Gambar iklan: field `gambar` ACF (Image Array `{ url, ... }`, atau string URL) -> URL `https://` dari host WordPress (`imageHosts`, aturan `safeImageUrl`: tanpa port/userinfo), atau `null`. Jalur relatif ditolak; `imageHosts` kosong (base URL http/berport) = `null`. */
+/** Gambar iklan (`gambar` ACF: Image Array atau URL) -> URL `https://` host WordPress (`imageHosts`), atau `null`. */
 export function safeAdImage(gambar: unknown, imageHosts: readonly string[]): string | null {
   const url = typeof gambar === 'string' ? gambar : isRecord(gambar) ? gambar.url : undefined
   if (typeof url !== 'string' || url.length > MAX_URL_LENGTH || !/^https:\/\//i.test(url)) return null
@@ -92,7 +90,7 @@ function cleanText(value: string): string {
   return value.replace(CONTROL_CHARS, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_ALT_LENGTH)
 }
 
-/** Alt = `teks_alt` (teks polos apa adanya), lalu judul post (tag dibuang, entitas didekode), lalu `AD_FALLBACK_ALT`. */
+/** Alt = `teks_alt` apa adanya, lalu judul post (tag dibuang, entitas didekode), lalu `AD_FALLBACK_ALT`. */
 function altOf(teksAlt: unknown, title: unknown): string {
   const fromField = typeof teksAlt === 'string' ? cleanText(teksAlt) : ''
   if (fromField !== '') return fromField
@@ -132,7 +130,7 @@ function isNewer(a: NormalizedAd, b: NormalizedAd): boolean {
   return a.publishedMs > b.publishedMs || (a.publishedMs === b.publishedMs && a.ad.id > b.ad.id)
 }
 
-/** Daftar mentah `iklan` -> satu iklan terpilih per slot (yang terbaru). Bukan array atau tak ada yang layak = `{}`. Tidak melempar. */
+/** Daftar mentah `iklan` -> satu iklan terbaru per slot (date_gmt, lalu id terbesar). Bukan array = `{}`. */
 export function selectAds(raw: unknown, imageHosts: readonly string[], now: Date): AdsBySlot {
   if (!Array.isArray(raw)) return {}
   const best = new Map<AdSlotName, NormalizedAd>()
@@ -146,7 +144,7 @@ export function selectAds(raw: unknown, imageHosts: readonly string[], now: Date
   return ads
 }
 
-/** Tunggu `promise` paling lama `ms`; terlambat atau gagal = `fallback` (tidak pernah menolak). Agar WordPress yang lambat/mati untuk iklan (opsional) tidak menahan render halaman; pemuatan tetap berjalan di latar dan mengisi cache. */
+/** Tunggu `promise` paling lama `ms`; terlambat atau gagal = `fallback`. Iklan opsional tak menahan render. */
 export function withDeadline<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise<T>((resolve) => {
     const timer = setTimeout(() => resolve(fallback), ms)

@@ -1,7 +1,5 @@
-/**
- * Uji unit iklan dari ACF WordPress: nilai `aktif`, jadwal WIB inklusif, validasi tautan/gambar, normalisasi, iklan terbaru per slot, pemuat `loadWpAds` (GET saja, tanpa kredensial),
- * dan struktur sumber komponen/composable/API. Murni (tanpa jaringan sungguhan). Pelari: `node:test` (`npm test`).
- */
+// Uji unit iklan ACF WordPress: `aktif`, jadwal WIB, validasi tautan/gambar, iklan terbaru per slot, `loadWpAds`,
+// dan struktur sumber komponen/composable/API. Murni (tanpa jaringan). Pelari: `node:test` (`npm test`).
 import { afterEach, describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'

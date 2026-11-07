@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
 
-// Bagian "Trending" kolom kanan halaman kategori (BUKAN halaman Trending): artikel Terpopuler (`sidebar.popular`, data sama dengan tab Terpopuler Beranda; tanpa API baru).
-// Kosong = tidak dirender. Tanpa frame Figma: judul = HomeSectionTitle (h2, garis aksen), daftar = NewsCard layout="compact" seperti kolom samping Beranda.
+// "Trending" kolom kanan halaman kategori (BUKAN halaman Trending): Terpopuler (sidebar.popular), tanpa API baru.
+// Kosong = tidak dirender. Tanpa frame Figma: judul = HomeSectionTitle (h2), daftar = NewsCard layout="compact".
 defineProps<{
   articles: Article[]
   /** Waktu server (ISO) untuk waktu relatif. */
@@ -22,7 +22,7 @@ defineProps<{
 </template>
 
 <style scoped>
-/* Daftar seperti SidebarTabs: celah antar item 22, jarak judul ke daftar 16; < 1024 kartu kolom 354 boleh berdampingan di tablet */
+/* Daftar seperti SidebarTabs: celah item 22, jarak judul ke daftar 16; < 1024 kartu kolom 354 boleh berdampingan */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--container-mobile), 100%), 1fr));

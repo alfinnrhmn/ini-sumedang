@@ -1,7 +1,5 @@
-/**
- * Konfigurasi klien baca WordPress; hanya dipakai server (`server/utils/wp-client.ts`), tidak diimpor klien.
- * Satu tempat untuk TTL cache, batas waktu, dan batas ukuran.
- */
+// Konfigurasi klien baca WordPress; hanya dipakai server (`server/utils/wp-client.ts`), tidak diimpor klien.
+// Satu tempat untuk TTL cache, batas waktu, dan batas ukuran.
 
 /** TTL cache memori per proses untuk daftar artikel dan kategori WordPress. */
 export const WP_CACHE_TTL_MS = 60_000
@@ -12,10 +10,8 @@ export const WP_TIMEOUT_MS = 8_000
 /** Jumlah percobaan ulang satu permintaan yang gagal karena timeout, galat jaringan, atau 5xx. */
 export const WP_RETRIES = 1
 
-/**
- * Jeda minimum (ms) sebelum pemuatan ulang setelah gagal; selama jeda cache lama dipakai atau galat yang sama dikembalikan segera,
- * agar WordPress yang mati tidak membuat tiap permintaan menunggu timeout.
- */
+// Jeda minimum (ms) sebelum pemuatan ulang setelah gagal: cache lama dipakai atau galat sama dikembalikan segera,
+// agar WordPress yang mati tidak membuat tiap permintaan menunggu timeout.
 export const WP_FAILURE_BACKOFF_MS = 10_000
 
 /** Ukuran respons maksimum (byte); lebih besar dianggap gagal. */

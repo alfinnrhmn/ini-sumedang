@@ -1,7 +1,5 @@
-/**
- * Pembantu murni halaman kategori. Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji dengan `node:test`.
- * Logika penyanitasi HTML TIDAK ada di sini.
- */
+// Pembantu murni halaman kategori; tanpa auto-import Nuxt (impor berekstensi `.ts`) agar bisa diuji dengan `node:test`.
+// Logika penyanitasi HTML TIDAK ada di sini.
 import { CATEGORY_PAGE_PATTERN, CATEGORY_SLUG_MAX_LENGTH } from '../../app/config/category.ts'
 import { HOME_CATEGORY_SLUG } from '../../app/utils/routes.ts'
 
@@ -14,7 +12,7 @@ export interface Pagination {
   totalPages: number
 }
 
-/** Parameter `?halaman=`: tidak ada (undefined) = halaman 1; selain itu harus STRING TUNGGAL `^[1-9][0-9]{0,3}$`, lainnya (kosong, ganda, `0`, `01`, tanda, desimal, spasi, ...) = null (pemanggil memberi 404). */
+/** `?halaman=`: tak ada = 1; selain itu STRING TUNGGAL `^[1-9][0-9]{0,3}$`, lainnya (`0`, `01`, ganda, ...) = null. */
 export function parsePageParam(value: unknown): number | null {
   if (value === undefined) return 1
   if (typeof value !== 'string' || !CATEGORY_PAGE_PATTERN.test(value)) return null
@@ -31,7 +29,7 @@ export function totalPagesOf(total: number, perPage: number): number {
   return total <= 0 ? 0 : Math.ceil(total / perPage)
 }
 
-/** Apakah `page` boleh ditampilkan? Halaman 1 selalu boleh (total 0 = keadaan kosong netral); halaman >= 2 hanya bila tidak melewati halaman terakhir. */
+/** Apakah `page` boleh ditampilkan? Halaman 1 selalu (total 0 = kosong netral); >= 2 hanya bila tak lewat akhir. */
 export function isPageInRange(page: number, total: number, perPage: number): boolean {
   return page === 1 || (page > 1 && page <= totalPagesOf(total, perPage))
 }
@@ -47,7 +45,7 @@ export function sliceForPage<T>(items: T[], page: number, perPage: number): T[] 
   return items.slice(start, start + perPage)
 }
 
-/** Slug yang punya halaman kategori: bentuk wajar DAN bukan Berita (= Beranda; `/kategori/berita` dialihkan 308 ke `/`), jadi `/api/category/berita` diperlakukan seperti slug tak dikenal (404 pesan tetap). */
+/** Slug yang punya halaman kategori: bentuk wajar dan bukan Berita (= Beranda; `/kategori/berita` dialihkan 308). */
 export function isCategoryPageSlug(value: unknown): value is string {
   return isValidCategorySlug(value) && value !== HOME_CATEGORY_SLUG
 }

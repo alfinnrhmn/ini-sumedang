@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VisualTopic } from '~/types/article'
 
-/** Satu blok topik Ruang Visual: judul topik (h3, tidak menaut) -> kartu besar -> hingga 3 berita berthumbnail; komponen sendiri, bukan varian NewsCard. Tiap kartu = satu tautan (judul). */
+/** Blok topik Ruang Visual: judul h3 (tidak menaut), kartu besar, hingga 3 berita berthumbnail; kartu = satu tautan. */
 const props = defineProps<{ entry: VisualTopic }>()
 
 const leadHref = computed(() => articlePath(props.entry.lead))
@@ -70,8 +70,8 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   min-width: 0;
 }
 
-/* Judul topik: Figma Inter Bold 700 32/39 #1A1C21; tanpa token untuk gaya ini dan Inter 700 belum di-host (hanya 300-600), jadi bobot 600 dan warna --color-black-2 (#1D1D1D). Maks. 2 baris agar nama panjang tidak merusak blok.
-   Jarak 10 atas-bawah dipasang sebagai margin (bukan padding) supaya baris ke-3 yang terpotong klem tidak tampak di area padding. */
+/* Judul topik: Figma Inter Bold 700 32/39 #1A1C21; tanpa token, Inter 700 belum di-host: bobot 600, --color-black-2.
+   Maks. 2 baris. Jarak 10 sebagai margin (bukan padding) agar baris ke-3 yang terpotong klem tidak tampak. */
 .topic-title {
   margin: 10px 0;
   font: 600 32px/39px var(--font-sans);
@@ -176,7 +176,7 @@ const rows = computed(() => props.entry.items.map(article => ({ article, href: a
   overflow-wrap: anywhere;
 }
 
-/* Seluruh kartu satu tautan (pola NewsCard); cincin fokus 2 px + offset 2 = 4 px, di luar elemen (tanpa overflow hidden di induk) */
+/* Satu tautan per kartu (pola NewsCard); cincin fokus 2 px + offset 2 = 4 px (induk tanpa overflow hidden) */
 .link::after {
   content: '';
   position: absolute;

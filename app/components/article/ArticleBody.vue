@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Isi artikel: SATU-SATUNYA tempat v-html di proyek (gerbang: `git grep -n` pada atribut itu di app/ dan server/ harus tepat satu baris, di berkas ini).
-// `bodyHtml` selalu keluaran `sanitizeBodyHtml` dari server (HTML mentah CMS tidak pernah sampai ke sini); tanpa `class`/`style` bawaan, semua gaya lewat :deep() dari token.
+// SATU-SATUNYA v-html di proyek (gerbang: git grep atribut itu di app/ dan server/ = satu baris, di berkas ini).
+// bodyHtml selalu keluaran sanitizeBodyHtml dari server; tanpa class/style bawaan, semua gaya lewat :deep() dari token.
 defineProps<{ bodyHtml: string }>()
 </script>
 
@@ -57,7 +57,7 @@ defineProps<{ bodyHtml: string }>()
   margin-top: var(--space-8);
 }
 
-/* Kotak "Baca Juga": latar Figma #E4E4E4 -> --color-gray-5 (selisih 4/4/4); padding kiri 19 + garis kiri 6 = teks mulai x 25. */
+/* Kotak "Baca Juga": latar #E4E4E4 -> --color-gray-5 (selisih 4/4/4); padding 19 + garis kiri 6 = teks x 25. */
 .body :deep(blockquote) {
   display: flex;
   flex-direction: column;
@@ -144,7 +144,7 @@ defineProps<{ bodyHtml: string }>()
 }
 
 @media (min-width: 1024px) {
-  /* Desktop: Merriweather Regular 17/30. Regular 400 belum di-host (hanya SemiBold 600): peramban memakai berkas 600 terdekat.
+  /* Desktop: Merriweather Regular 17/30. Regular 400 belum di-host (hanya SemiBold 600): peramban memakai 600 terdekat.
      Ukuran 17 di luar skala. */
   .body {
     font: 400 17px/30px var(--font-serif);
@@ -157,7 +157,7 @@ defineProps<{ bodyHtml: string }>()
 
   .body :deep(blockquote) {
     max-width: 603px;
-    padding-right: 17px; /* Figma 19; dengan 19 teks contoh (560,7 px) lebih lebar dari isi (559 px) sehingga baris kedua muncul (tinggi 117 vs 90); 17 menjaga satu baris, kotak tetap 603 */
+    padding-right: 17px; /* Figma 19 (baris kedua muncul bila 19); 17 menjaga satu baris, kotak tetap 603 */
   }
 
   .body :deep(blockquote p:first-child > strong:only-child) {

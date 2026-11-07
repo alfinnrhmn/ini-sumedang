@@ -7,16 +7,16 @@ const props = defineProps<{
   now: string
   /** Gambar di atas lipatan: loading eager. */
   eager?: boolean
-  /** `compact`: kartu daftar kolom samping Beranda, horizontal pada semua lebar (thumbnail 104x80 di < 1024, 104x104 di >= 1024); bawaan mengikuti lebar layar. */
+  /** compact: kolom samping Beranda, horizontal (thumbnail 104x80 < 1024, 104x104 >= 1024); bawaan: ikut lebar. */
   layout?: 'compact'
-  /** Hanya bersama `layout="compact"`: thumbnail di kanan teks (daftar Berita Terkait Detail); tanpa prop ini thumbnail di kiri (kolom samping Beranda). */
+  /** Hanya dengan layout="compact": thumbnail di kanan teks (Berita Terkait Detail); tanpa ini di kiri (Beranda). */
   mediaEnd?: boolean
 }>()
 
 const href = computed(() => articlePath(props.article))
 const category = computed(() => props.article.categories[0]?.name ?? '')
-// Nama kategori yang ada di daftar kategori WordPress = tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang); di luar daftar (mis. uncategorized, anak Ruang Visual) tetap teks.
-// `:aria-current="undefined"`: penanda otomatis NuxtLink tidak dipakai di kartu (hanya menu, laci, footer). Di /kategori/<slug> label yang sama dengan halaman itu = teks biasa; Beranda (kategori Berita) tidak ikut: label tetap tautan.
+// Kategori di daftar WordPress = tautan terpisah ke /kategori/<slug> (di atas overlay kartu, bukan <a> bersarang);
+// di luar daftar tetap teks. :aria-current="undefined" mematikan penanda NuxtLink; label = halaman kategori itu: teks.
 const route = useRoute()
 const categories = useCategories()
 const categoryTo = computed(() => {
@@ -103,15 +103,15 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   color: var(--color-black);
 }
 
-/* Label kategori = tautan terpisah di atas overlay judul (z-index 1 > overlay auto), warna dan dekorasi diwarisi, hover bergaris bawah;
+/* Label kategori = tautan terpisah di atas overlay judul (z-index 1 > auto); warna diwarisi, hover bergaris bawah;
    hanya area teks label yang menaut (bukan seluruh baris). */
 .category-link {
   position: relative;
   z-index: 1;
 }
 
-/* Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat dari tepi atas label ke bawah. Sengaja tidak naik ke atas: label sering menempel di tepi atas kartu
-   dan kartu di atasnya hanya berjarak beberapa px, jadi ke atas area klik akan menimpa kartu lain. Rect label dan tampilan tidak berubah. */
+/* Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat dari tepi atas label ke bawah, tidak ke atas:
+   label menempel di tepi atas kartu, kartu di atasnya hanya berjarak beberapa px (akan menimpa). Tampilan tetap. */
 .category-link::after {
   content: '';
   position: absolute;
@@ -191,7 +191,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   white-space: nowrap;
 }
 
-/* layout="compact" mobile: item 358x82, thumbnail 104x80, gaya teks = varian horizontal di atas. Judul dibatasi 2 baris di semua lebar:
+/* compact mobile: item 358x82, thumbnail 104x80, gaya teks = varian horizontal. Judul dibatasi 2 baris di semua lebar:
    isi teks maks. 80,9 < 82, jadi tinggi item selalu 82 dan kedua tab setinggi sama (tanpa layout shift). */
 .card--compact {
   min-height: 82px;
@@ -206,7 +206,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   line-clamp: 2;
 }
 
-/* layout="compact" desktop: thumbnail 104x104, jarak label-judul-meta 6, judul Regular 400 (News/Caption), label Medium 500 (News/Metadata).
+/* compact desktop: thumbnail 104x104, jarak label-judul-meta 6, judul Regular 400, label Medium 500 (Caption/Metadata).
    Tidak dibuat (tanpa token/aset): penerbit Bold 700 dan ikon jam 16 px. */
 @media (min-width: 1024px) {
   .card--compact {

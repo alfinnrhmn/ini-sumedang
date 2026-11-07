@@ -1,7 +1,5 @@
-/**
- * Batas dan normalisasi pencarian `q`, dipakai bersama server (`/api/search`) dan klien (header, `/cari`).
- * Tanpa auto-import Nuxt agar bisa diuji dengan `node:test`.
- */
+// Batas dan normalisasi pencarian `q`, dipakai server (`/api/search`) dan klien (header, `/cari`).
+// Tanpa auto-import Nuxt agar bisa diuji dengan `node:test`.
 
 /** Panjang kata kunci setelah dinormalisasi: 2-100 karakter. */
 export const SEARCH_MIN_LENGTH = 2
@@ -28,20 +26,15 @@ function hasControlCharacter(text: string): boolean {
   return false
 }
 
-/**
- * `q` harus string tunggal tanpa karakter kontrol; spasi dipadatkan dan dipangkas, hasil 2-100 karakter, selain itu `null`.
- * Murni dan tidak melempar; karakter lain (kutip, `<`) tidak diubah.
- */
+// `q` harus string tunggal tanpa karakter kontrol; spasi dipadatkan dan dipangkas, hasil 2-100 karakter, atau `null`.
 export function normalizeSearchQuery(value: unknown): string | null {
   if (typeof value !== 'string' || hasControlCharacter(value)) return null
   const normalized = value.replace(/\s+/g, ' ').trim()
   return normalized.length >= SEARCH_MIN_LENGTH && normalized.length <= SEARCH_MAX_LENGTH ? normalized : null
 }
 
-/**
- * Nilai kolom cari header di `/cari`: `q` string biasa tetap diisikan (dipadatkan, dipotong 100 karakter) agar bisa diperbaiki;
- * berisi karakter kontrol, ganda, atau bukan string = kosong. Hanya dirender sebagai nilai input.
- */
+// Nilai kolom cari di `/cari`: `q` string biasa tetap diisikan (dipadatkan, dipotong 100) agar bisa diperbaiki;
+// karakter kontrol, ganda, atau bukan string = kosong. Hanya dirender sebagai nilai input.
 export function searchInputValue(value: unknown): string {
   if (typeof value !== 'string' || hasControlCharacter(value)) return ''
   return value.replace(/\s+/g, ' ').trim().slice(0, SEARCH_MAX_LENGTH)

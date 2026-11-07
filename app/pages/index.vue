@@ -17,18 +17,18 @@ const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar
   key: 'articles-sidebar'
 })
 
-// Ruang Visual: 4 topik (kategori anak `ruang-visual`); `topics` kosong = section tidak dirender. Urutan: Rekomendasi -> section kategori ke-1 -> Ruang Visual -> section ke-2, ke-3, ke-4.
-// Section kategori dipilih di server (/api/articles/home-sections); tanpa section kategori, Ruang Visual dan widget sosial mobile tetap dirender.
+// Ruang Visual: 4 topik (kategori anak `ruang-visual`); `topics` kosong = tidak dirender.
+// Urutan: Rekomendasi, section 1, Ruang Visual, section 2-4; tanpa section, Ruang Visual + sosial mobile tetap tampil.
 const { data: visual } = await useFetch<VisualTopicsResponse>('/api/articles/visual-topics', {
   key: 'articles-visual-topics'
 })
 
-// Section kategori: satu permintaan; server memilih section dan artikelnya (HOME_SECTION_MAX section x HOME_SECTION_ARTICLE_COUNT kartu).
+// Section kategori: 1 permintaan; server memilih section dan artikel (HOME_SECTION_MAX x HOME_SECTION_ARTICLE_COUNT).
 const { data: sectionData } = await useFetch<HomeSectionsResponse>('/api/articles/home-sections', {
   key: 'articles-home-sections'
 })
 
-// Kolom kanan menempel hanya >= 1024 px: kolom iklan Rekomendasi (kontainer = grid Rekomendasi) dan iklan section kategori pertama (kontainer = section itu).
+// Kolom kanan menempel >= 1024 px: iklan Rekomendasi (kontainer = grid Rekomendasi), iklan section 1 (= section itu).
 // Tab Terbaru | Terpopuler tidak ditempel: kontainernya (.top) setinggi hero, tanpa ruang gulir.
 const sideAds = ref<HTMLElement | null>(null)
 const sectionAd = ref<HTMLElement | null>(null)
@@ -38,10 +38,10 @@ function setSectionAd(el: unknown) {
 useStickyColumn(sideAds)
 useStickyColumn(sectionAd)
 
-// Section tanpa artikel tidak ada di daftar (server hanya memilih kategori tak kosong); gagal dimuat = tanpa section (Ruang Visual tetap dirender).
+// Section tanpa artikel tak ada di daftar (server hanya memilih kategori tak kosong); gagal dimuat = tanpa section.
 const sections = computed(() => sectionData.value?.sections ?? [])
 const sectionsNow = computed(() => sectionData.value?.now ?? '')
-// Widget sosial mobile: setelah section ke-3, atau setelah section terakhir bila kurang dari 3 (tanpa section: setelah Ruang Visual).
+// Widget sosial mobile: setelah section ke-3, atau section terakhir bila < 3 (tanpa section: setelah Ruang Visual).
 const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
 </script>
 
@@ -59,7 +59,8 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
         <HomeSidebarTabs :latest="sidebar.latest" :popular="sidebar.popular" :now="sidebar.now" />
       </aside>
     </div>
-    <!-- Rekomendasi (tanpa "Lainnya"): kolom kanan desktop = widget sosial + 2 iklan, iklan lebar setelah baris ketiga, iklan kecil setelah kartu ketiga (mobile) -->
+    <!-- Rekomendasi (tanpa "Lainnya"): kolom kanan desktop = widget sosial + 2 iklan;
+         iklan lebar setelah baris ketiga, iklan kecil setelah kartu ketiga (mobile) -->
     <section class="recommended">
       <HomeSectionTitle title="Rekomendasi" />
       <ul v-if="data && data.articles.length" class="list">
@@ -111,7 +112,7 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
         <AdSlot variant="mobile-m" />
         <AdSlot variant="mobile-s" />
       </div>
-      <!-- Mobile/tablet: widget sosial setelah section ke-3 (jarak 30); desktop memakai salinan di kolom kanan Rekomendasi -->
+      <!-- Mobile/tablet: widget sosial setelah section ke-3 (jarak 30); desktop memakai salinan di kolom kanan -->
       <div v-if="sectionIndex === socialIndex" class="mobile-social">
         <HomeSocialWidget />
       </div>
@@ -128,7 +129,7 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
         </div>
       </template>
     </template>
-    <!-- Tanpa section kategori (WordPress tanpa kategori berartikel): Ruang Visual dan widget sosial mobile tetap dirender, urutan sama -->
+    <!-- Tanpa section kategori: Ruang Visual dan widget sosial mobile tetap dirender, urutan sama -->
     <template v-if="!sections.length">
       <template v-if="visual && visual.topics.length">
         <section class="category-section">
@@ -185,8 +186,8 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
   margin-top: 33px;
 }
 
-/* Slot iklan di dalam daftar kartu: mobile (< 768, satu kolom) setelah kartu ketiga; tablet dan desktop (>= 768) iklan lebar setelah kartu keenam.
-   Salah satu disembunyikan (display: none) sesuai lebar. */
+/* Slot iklan di daftar: mobile (< 768) setelah kartu ketiga; tablet/desktop (>= 768) iklan lebar setelah kartu keenam;
+   yang lain disembunyikan (display: none) sesuai lebar. */
 .ad-item {
   grid-column: 1 / -1;
 }
@@ -198,8 +199,8 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
   display: none;
 }
 
-/* Pembungkus yang hanya berisi slot tanpa iklan (mode WordPress; AdSlot tidak dirender, hanya komentar Vue) disembunyikan agar tidak meninggalkan celah (margin/gap).
-   Mode fixture selalu berisi penampung. `.side-ads` berisi widget sosial, tidak pernah kosong. */
+/* Pembungkus yang hanya berisi slot tanpa iklan (mode WordPress; AdSlot tak dirender, hanya komentar Vue) disembunyikan
+   agar tak meninggalkan celah (margin/gap). Mode fixture selalu berisi penampung; `.side-ads` tidak pernah kosong. */
 .ad-item:empty,
 .mobile-ads:empty,
 .section-ad:empty,
@@ -273,7 +274,7 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
     margin-left: auto;
   }
 
-  /* Tab kolom samping mulai 17 di atas hero; tab 50 + celah 16 + daftar 482 = 548, jadi daftar berakhir di dasar hero (tinggi baris atas 531),
+  /* Tab samping mulai 17 di atas hero; tab 50 + celah 16 + daftar 482 = 548, jadi daftar berakhir di dasar hero (531),
      Rekomendasi tepat di bawah keduanya. */
   .hero-slot + .sidebar,
   .sidebar {
@@ -285,7 +286,7 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
     margin-top: 73px;
   }
 
-  /* Rekomendasi: judul selebar kontainer, daftar di kolom kiri 739, iklan 237 + 368 di kolom kanan 357 (923 = 160 + 739 + 24) */
+  /* Rekomendasi: judul selebar kontainer, daftar di kolom kiri 739, iklan 237 + 368 di kolom kanan 357 (x 923) */
   .recommended {
     display: grid;
     grid-template-columns: calc(100% * 739 / 1120) calc(100% * 357 / 1120);
@@ -304,7 +305,7 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
     grid-row: 2;
     align-self: start;
     margin-top: 28px; /* sejajar kartu pertama (garis ke kartu 28) */
-    /* Menempel di dalam area grid baris 2 (setinggi daftar Rekomendasi); top dihitung useStickyColumn (var(--space-24) tanpa JavaScript) */
+    /* Menempel di area grid baris 2 (setinggi daftar); `top` dari useStickyColumn (var(--space-24) tanpa JavaScript) */
     position: sticky;
     top: var(--space-24);
   }
@@ -318,14 +319,15 @@ const socialIndex = computed(() => Math.min(2, sections.value.length - 1))
     margin-top: 28px; /* garis bawah y=820 ke kartu y=848 */
   }
 
-  /* Ruang Visual 2x2: 358 + 23 + 358 = 739; jarak baris 32. Garis section ke blok topik 12-13: dipakai 13 (judul topik bermargin 10, teks mulai 23). */
+  /* Ruang Visual 2x2: 358 + 23 + 358 = 739; jarak baris 32.
+     Garis section ke blok topik 12-13: dipakai 13 (judul topik bermargin 10, teks mulai 23). */
   .topics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 23px;
     margin-top: 13px;
   }
 
-  /* Lebar 739 sudah ditetapkan pada .category-section; daftar di dalamnya mengisi penuh agar tidak dipersempit dua kali */
+  /* Lebar 739 sudah di .category-section; daftar di dalamnya mengisi penuh agar tidak dipersempit dua kali */
   .category-section .list,
   .recommended .list {
     width: 100%;

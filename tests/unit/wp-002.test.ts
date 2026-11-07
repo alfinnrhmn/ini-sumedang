@@ -1,7 +1,5 @@
-/**
- * Uji unit kategori, label, dan tag mengikuti WordPress. Murni (tanpa Nuxt): pemilihan daftar kategori WordPress, pemilihan section Beranda
- * (preferensi + isi dari daftar), pemilihan tag tampil, validasi slug section, dan penjaga sumber.
- */
+// Uji unit kategori, label, dan tag mengikuti WordPress. Murni (tanpa Nuxt): pemilihan kategori dan section Beranda,
+// pemilihan tag tampil, validasi slug section, dan penjaga sumber.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync, statSync } from 'node:fs'

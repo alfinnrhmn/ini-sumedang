@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Bagikan artikel: Facebook, X, WhatsApp (tautan bagikan resmi, tanpa SDK) dan Salin tautan (Clipboard API); Instagram tidak dirender (tanpa URL bagikan web).
-// WhatsApp tidak ada di Figma: ubin dan ikon diturunkan dari tombol yang ada. Nama layer Figma tidak cocok dengan ikon (mis. "Tombol Salin tautan" berisi Facebook): ikon yang dipakai.
+// Bagikan: Facebook, X, WhatsApp (tautan resmi, tanpa SDK) dan Salin tautan (Clipboard API); Instagram tidak dirender.
+// WhatsApp tidak ada di Figma (ubin dan ikon dari tombol lain); nama layer Figma tak cocok ikon: ikon yang dipakai.
 const props = defineProps<{
   /** URL kanonis artikel (origin permintaan + /berita/<slug>). */
   url: string
@@ -11,7 +11,7 @@ const facebookHref = computed(() => facebookShareUrl(props.url))
 const xHref = computed(() => xShareUrl(props.url, props.title))
 const whatsappHref = computed(() => whatsappShareUrl(props.url, props.title))
 
-// Umpan balik salin: satu elemen status (aria-live) yang selalu ada di DOM, teks diisi saat tombol ditekan lalu dikosongkan.
+// Umpan balik salin: satu elemen aria-live yang selalu ada di DOM, teks diisi saat tombol ditekan lalu dikosongkan.
 const message = ref('')
 let timer: ReturnType<typeof setTimeout> | undefined
 
@@ -100,7 +100,7 @@ const labelId = useId()
 }
 
 .label {
-  flex: 0 1 120px; /* dengan 4 ubin, baris 340 px > kontainer 272 pada 320; label boleh menyusut (2 baris, baris tetap 55) */
+  flex: 0 1 120px; /* 4 ubin: baris 340 px > kontainer 272 pada 320; label menyusut (2 baris, tinggi tetap 55) */
   min-width: 0;
   font: 600 14px/21px var(--font-sans);
   color: var(--color-article-title);
@@ -152,7 +152,7 @@ const labelId = useId()
   height: 22px;
 }
 
-/* Umpan balik: gelembung kecil di bawah baris (tidak menggeser tata letak); kosong = tidak terlihat tetapi tetap ada untuk pembaca layar */
+/* Umpan balik: gelembung di bawah baris, tanpa geser tata letak; kosong = tak terlihat tetapi tetap ada */
 .status {
   position: absolute;
   left: 0;

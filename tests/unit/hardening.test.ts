@@ -1,7 +1,5 @@
-/**
- * Uji unit hardening: basis URL tetap (`siteOrigin`), validasi URL gambar hero (`safeImageUrl`), dan turunan header CSP `frame-src` dari `EMBED_ALLOWED_HOSTS` (`embedFrameSrcPolicy`).
- * Pelari: `node:test` (`npm test`).
- */
+// Uji unit hardening: `siteOrigin`, URL gambar hero (`safeImageUrl`), dan CSP `frame-src` dari `EMBED_ALLOWED_HOSTS`.
+// Pelari: `node:test` (`npm test`).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { SITE_URL, siteOrigin, validSiteUrl } from '../../app/config/site.ts'

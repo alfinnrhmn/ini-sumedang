@@ -1,7 +1,5 @@
-/**
- * Urutan PREFERENSI section kategori Beranda, bukan daftar tetap: `pickHomeSections` (server) memilih dari kategori WordPress yang punya artikel terbit.
- * Slug yang cocok diisi dulu menurut urutan ini (judul konfigurasi); sisa tempat diisi kategori lain yang tak kosong (judul = nama WordPress).
- */
+// Urutan PREFERENSI section kategori Beranda, bukan daftar tetap: `pickHomeSections` (server) memilih dari kategori
+// WordPress yang punya artikel terbit; sisa tempat diisi kategori lain yang tak kosong (judul = nama WordPress).
 export interface HomeSectionPreference {
   slug: string
   title: string
@@ -25,11 +23,11 @@ export const SECTION_LIMIT_MAX = 12
 /** Kolom samping Beranda: jumlah item per tab. */
 export const SIDEBAR_COUNT = 4
 
-/** Terpopuler = pilihan editor: artikel terbit bertag `POPULAR_TAG_SLUG` dalam `POPULAR_WINDOW_DAYS` hari terakhir (umur tepat 14 hari masuk, lebih tua tidak). */
+/** Terpopuler = pilihan editor: artikel bertag `POPULAR_TAG_SLUG` dalam `POPULAR_WINDOW_DAYS` hari terakhir. */
 export const POPULAR_WINDOW_DAYS = 14
 export const POPULAR_TAG_SLUG = 'terpopuler'
 
-/** Tag yang tampil di UI: semua tag artikel kecuali tag fungsional `POPULAR_TAG_SLUG`, urutan terjaga (tag pertama = label kedua kepala artikel, semuanya = baris tag Detail). */
+/** Tag yang tampil di UI: semua tag kecuali tag fungsional `POPULAR_TAG_SLUG`, urutan terjaga. */
 export function visibleTags<T extends { slug: string }>(tags: readonly T[]): T[] {
   return tags.filter(tag => tag.slug !== POPULAR_TAG_SLUG)
 }
@@ -43,7 +41,7 @@ export const HERO_SLIDE_MS = 400
 /** Interval putar otomatis hero (ms); animasi geser memakai `HERO_SLIDE_MS` yang sama dengan perpindahan manual. */
 export const HERO_AUTOPLAY_MS = 5000
 
-/** Keadaan putar otomatis: `manual` = tidak berputar (kurang dari 2 slide, reduced-motion, atau belum di klien), `paused` = dijeda, `running` = berputar. */
+/** Putar otomatis hero: `manual` = tidak berputar (< 2 slide, reduced-motion, belum di klien), `paused`, `running`. */
 export type HeroAutoplayStatus = 'manual' | 'paused' | 'running'
 
 export interface HeroAutoplayInput {
@@ -66,7 +64,7 @@ export function heroAutoplayStatus(input: HeroAutoplayInput): HeroAutoplayStatus
   return input.hovering || input.focused || input.hidden ? 'paused' : 'running'
 }
 
-/** `aria-live` area slide: `off` selama berputar otomatis (tanpa pengumuman tiap 5 detik), `polite` saat dijeda atau manual. */
+/** `aria-live` slide: `off` saat berputar otomatis (tanpa pengumuman tiap 5 detik), `polite` saat dijeda/manual. */
 export function heroLiveMode(status: HeroAutoplayStatus): 'off' | 'polite' {
   return status === 'running' ? 'off' : 'polite'
 }

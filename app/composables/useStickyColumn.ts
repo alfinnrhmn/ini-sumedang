@@ -1,16 +1,16 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 import type { Ref } from 'vue'
 
-// Menempel = CSS `position: sticky` (hanya >= 1024 px); di sini hanya `top` dihitung: kolom lebih tinggi dari layar menempel dengan DASARNYA, dan `top`
-// digeser sementara agar elemen fokus keyboard terlihat. Syarat: tanpa leluhur ber-overflow selain visible di antara kolom dan kontainernya.
+// Menempel = CSS `position: sticky` (>= 1024 px); di sini hanya `top` dihitung: kolom lebih tinggi dari layar menempel
+// dengan DASARNYA, `top` digeser sementara agar fokus keyboard terlihat. Tanpa leluhur ber-overflow non-visible.
 
 /** Jarak kolom ke tepi atas (dan bawah) layar saat menempel; sama dengan --space-24. */
 export const STICKY_OFFSET = 24
 
-/** Sticky hanya pada desktop; di bawahnya kolom bertumpuk dan bergulir normal. Sama dengan ambang `min-width: 1024px` di CSS halaman. */
+/** Sticky hanya pada desktop; di bawahnya kolom bertumpuk. Sama dengan ambang `min-width: 1024px` di CSS halaman. */
 export const STICKY_MIN_WIDTH = 1024
 
-/** Murni: `top` sticky = min(offset, tinggiLayar - tinggiKolom - offset); kolom lebih tinggi dari layar mendapat `top` negatif (menempel dengan dasarnya). */
+/** Murni: `top` = min(offset, tinggiLayar - tinggiKolom - offset); kolom lebih tinggi dari layar: `top` negatif. */
 export function stickyTop(viewportHeight: number, columnHeight: number, offset: number = STICKY_OFFSET): number {
   return Math.min(offset, viewportHeight - columnHeight - offset)
 }
@@ -18,7 +18,8 @@ export function stickyTop(viewportHeight: number, columnHeight: number, offset: 
 /** Gulir halaman (px) setelah fokus yang dianggap gulir pengguna: `top` kembali ke rumus `stickyTop`. */
 export const STICKY_SCROLL_RESET = 8
 
-/** Murni: `top` sementara agar elemen fokus terlihat penuh, atau `null` bila sudah terlihat. Dibatasi ke [stickyTop, offset]; elemen terlalu tinggi memprioritaskan tepi atasnya. */
+/** Murni: `top` sementara agar elemen fokus terlihat penuh, atau `null` bila sudah; dibatasi [stickyTop, offset].
+ * Elemen terlalu tinggi memprioritaskan tepi atasnya. */
 export function stickyTopForFocus(
   viewportHeight: number,
   columnHeight: number,
@@ -28,14 +29,14 @@ export function stickyTopForFocus(
   offset: number = STICKY_OFFSET
 ): number | null {
   if (targetTop >= offset && targetBottom <= viewportHeight - offset) return null
-  // Rentang `top` kolom yang membuat elemen terlihat penuh (relatif terhadap kolom, jadi tak bergantung pada status menempel).
+  // Rentang `top` kolom agar elemen terlihat penuh (relatif ke kolom, tak bergantung status menempel).
   const lowest = offset - (targetTop - columnTop)
   const highest = viewportHeight - offset - (targetBottom - columnTop)
   const wanted = lowest > highest ? lowest : Math.min(Math.max(columnTop, lowest), highest)
   return Math.min(Math.max(wanted, stickyTop(viewportHeight, columnHeight, offset)), offset)
 }
 
-/** Pasang `style.top` inline pada kolom kanan (ResizeObserver + resize) hanya saat lebar >= STICKY_MIN_WIDTH; dibersihkan saat unmount. */
+/** Pasang `style.top` inline pada kolom kanan (ResizeObserver + resize) hanya saat lebar >= STICKY_MIN_WIDTH. */
 export function useStickyColumn(target: Ref<HTMLElement | null | undefined>) {
   let cleanup: (() => void) | undefined
 
@@ -73,7 +74,7 @@ export function useStickyColumn(target: Ref<HTMLElement | null | undefined>) {
       cancelAnimationFrame(frame)
       baseScrollY = null
       reveal(focused)
-      // Setelah browser selesai menggulir untuk fokus (gulir itu bukan gulir pengguna): periksa ulang lalu catat posisi gulir.
+      // Setelah browser selesai menggulir untuk fokus (bukan gulir pengguna): periksa ulang, catat posisi gulir.
       frame = requestAnimationFrame(() => {
         frame = requestAnimationFrame(() => {
           if (document.activeElement === focused) reveal(focused)

@@ -1,7 +1,5 @@
-/**
- * Widget sosial "Ikuti IniSumedang": jumlah pengikut tiap akun IniSumedang (bukan fitur follow). Tanpa auto-import Nuxt agar bisa diuji dengan `node:test`.
- * `value` dan `unit` hanya PENAMPUNG (angka contoh desain): ganti angka nyata sebelum tayang atau sembunyikan widget. `url` kosong = teks biasa, hanya `https://` menjadi tautan.
- */
+// Widget sosial "Ikuti IniSumedang": jumlah pengikut tiap akun (bukan fitur follow). Tanpa auto-import Nuxt.
+// `value` dan `unit` hanya PENAMPUNG: ganti angka nyata sebelum tayang atau sembunyikan widget. `url` kosong = teks.
 export interface SocialIconRect {
   x: number
   y: number
@@ -49,10 +47,8 @@ export const SOCIAL_STATS: SocialStat[] = [
   }
 ]
 
-/**
- * URL akun yang aman dijadikan tautan, atau `null` (kotak tetap teks biasa). Hanya skema `https:` yang diterima
- * (tolak `http:`, `javascript:`, `data:`, URL relatif/skema-relatif, dan URL berisi kredensial); hasilnya `href` ter-normalisasi.
- */
+// URL akun yang aman dijadikan tautan, atau `null` (kotak tetap teks biasa). Hanya `https:` diterima (tolak `http:`,
+// `javascript:`, `data:`, URL relatif/skema-relatif, dan URL berisi kredensial); hasil `href` ternormalisasi.
 export function socialHref(url: string | undefined | null): string | null {
   if (typeof url !== 'string') return null
   const trimmed = url.trim()

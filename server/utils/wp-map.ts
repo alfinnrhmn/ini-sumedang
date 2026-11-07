@@ -1,7 +1,5 @@
-/**
- * Pemetaan data artikel. Murni (tanpa auto-import Nuxt, impor berekstensi `.ts`) agar bisa diuji dengan `node:test`. `normalizeWpPost`/`normalizeWpTerms`: respons REST WordPress (tak tepercaya) -> `WpPost`/`WpTerm`
- * (data tak berbentuk benar dibuang, bukan dilempar); `mapPost`: `WpPost` -> `Article` (dipakai fixture dan WordPress; satu-satunya tempat aturan tampilan data).
- */
+// Pemetaan data artikel, murni agar bisa diuji. `normalizeWpPost`/`normalizeWpTerms`: REST WordPress -> model;
+// `mapPost`: `WpPost` -> `Article` (satu-satunya tempat aturan tampilan). Data tak benar dibuang, bukan dilempar.
 import type { Article, ArticleCategory } from '../../app/types/article'
 import { VISUAL_PARENT_SLUG, WP_DEFAULT_CATEGORY_SLUG } from '../../app/config/category.ts'
 import type { WpPost, WpTerm } from '../fixtures/posts.ts'
@@ -27,7 +25,7 @@ export function decodeEntities(text: string): string {
   })
 }
 
-/** Teks polos dari HTML ringkasan/keterangan: tag dibuang, entitas didekode. Hasilnya hanya dirender sebagai teks (di-escape). */
+/** Teks polos dari HTML ringkasan/keterangan: tag dibuang, entitas didekode; hanya dirender sebagai teks. */
 export function excerptText(html: string): string {
   return decodeEntities(stripTags(html))
 }
@@ -37,10 +35,7 @@ export function publishedAtOf(post: Pick<WpPost, 'date_gmt'>): string {
   return post.date_gmt.endsWith('Z') ? post.date_gmt : `${post.date_gmt}Z`
 }
 
-/**
- * `WpPost` -> `Article`. `imageHosts` = host https tambahan untuk gambar hero (host media WordPress dari base URL; kosong untuk fixture).
- * URL gambar tak aman (skema berbahaya, host di luar daftar) = artikel tanpa gambar, bukan galat.
- */
+/** `WpPost` -> `Article`. `imageHosts` = host https tambahan untuk gambar hero; URL tak aman = tanpa gambar. */
 export function mapPost(post: WpPost, imageHosts: readonly string[] = []): Article {
   const media = post._embedded['wp:featuredmedia']?.[0]
   const heroUrl = media ? safeImageUrl(media.source_url, [...IMAGE_ALLOWED_HOSTS, ...imageHosts]) : null
@@ -66,7 +61,7 @@ export function mapPost(post: WpPost, imageHosts: readonly string[] = []): Artic
   }
 }
 
-/** Host gambar yang diizinkan dari base URL WordPress: hanya https tanpa port (aturan `safeImageUrl`); selain itu kosong. */
+/** Host gambar dari base URL WordPress: hanya https tanpa port (aturan `safeImageUrl`); selain itu kosong. */
 export function wpImageHosts(baseUrl: string): readonly string[] {
   try {
     const url = new URL(baseUrl)
@@ -101,7 +96,7 @@ function embeddedTerms(embedded: Record<string, unknown>): WpTerm[][] {
       ? [{ id, slug: term.slug, name }]
       : []
   })
-  // Grup 0 = kategori, grup 1 = tag (bentuk `WpPost`); dipilih lewat `taxonomy`, bukan urutan, agar taksonomi lain tidak menggeser.
+  // Grup 0 = kategori, grup 1 = tag; dipilih lewat `taxonomy`, bukan urutan, agar taksonomi lain tidak menggeser.
   return [pick('category'), pick('post_tag')]
 }
 
@@ -124,10 +119,8 @@ function embeddedMedia(embedded: Record<string, unknown>, title: string): NonNul
   }]
 }
 
-/**
- * Satu item `posts?_embed` WordPress -> `WpPost`, atau `null` bila bukan post yang layak tampil (bentuk salah, id/slug/tanggal/judul tak valid). Judul dan nama kategori/tag tanpa tag HTML; `content`/`excerpt` selalu terisi (agar tidak jatuh ke isi bawaan fixture);
- * kredit foto = `caption`; nama pengguna WordPress TIDAK dibawa (penulis tetap `IniSumedang`).
- */
+// Satu item `posts?_embed` -> `WpPost`, atau `null` bila tak layak tampil (bentuk salah, id/slug/tanggal/judul).
+// `content`/`excerpt` selalu terisi (bukan isi fixture); kredit foto = `caption`; nama pengguna WP TIDAK dibawa.
 export function normalizeWpPost(raw: unknown): WpPost | null {
   if (!isRecord(raw)) return null
   const id = positiveInt(raw.id)
@@ -153,7 +146,7 @@ export function normalizeWpPost(raw: unknown): WpPost | null {
   }
 }
 
-/** Daftar post WordPress (hasil gabungan halaman) -> `WpPost[]`; item tak layak dibuang. Bukan array = daftar kosong. */
+/** Daftar post WordPress (gabungan halaman) -> `WpPost[]`; item tak layak dibuang. Bukan array = daftar kosong. */
 export function normalizeWpPosts(raw: unknown): WpPost[] {
   return Array.isArray(raw) ? raw.flatMap((item) => {
     const post = normalizeWpPost(item)
@@ -161,7 +154,7 @@ export function normalizeWpPosts(raw: unknown): WpPost[] {
   }) : []
 }
 
-/** `categories?_fields=id,slug,name,parent,count` -> `WpTerm[]` (`parent` hanya bila > 0, seperti fixture). Item tak valid dibuang. */
+/** `categories?_fields=id,slug,name,parent,count` -> `WpTerm[]` (`parent` hanya bila > 0). Item tak valid dibuang. */
 export function normalizeWpTerms(raw: unknown): WpTerm[] {
   if (!Array.isArray(raw)) return []
   return raw.flatMap((item): WpTerm[] => {
@@ -174,10 +167,8 @@ export function normalizeWpTerms(raw: unknown): WpTerm[] {
   })
 }
 
-/**
- * Daftar kategori situs dari kategori WordPress: SEMUA kategori kecuali `uncategorized`, `ruang-visual`, dan semua keturunan `ruang-visual` (anak langsung = topik Ruang Visual), urutan id naik. Kategori kosong tetap masuk; nama didekode.
- * Kategori yang slug-nya tidak punya halaman (`isValidCategorySlug`: mis. non-ASCII atau lebih dari 60 karakter) dilewati, supaya menu tidak menaut ke 404.
- */
+// Daftar kategori situs: semua kategori kecuali `uncategorized`, `ruang-visual`, dan turunannya; urutan id naik.
+// Slug tanpa halaman (`isValidCategorySlug`) dilewati agar menu tidak menaut ke 404. Nama didekode.
 export function pickWordPressCategories(terms: readonly WpTerm[]): ArticleCategory[] {
   const hidden = new Set<number>(terms.filter(term => term.slug === VISUAL_PARENT_SLUG).map(term => term.id))
   // Keturunan ruang-visual: ulangi sampai tidak ada anak baru (aman terhadap siklus data, tiap id masuk satu kali).

@@ -1,7 +1,5 @@
-/**
- * Peringkat Berita Terkait. Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
- * Aturan: (1) berbagi tag, urut jumlah tag sama lalu terbaru; (2) lengkapi kategori sama; (3) lengkapi terbaru. Tanpa artikel yang sedang dibaca dan tanpa duplikat; pemanggil hanya memberi artikel `publish`.
- */
+// Peringkat Berita Terkait. Murni (tanpa auto-import Nuxt) agar bisa diuji dengan `node:test`.
+// Aturan: (1) tag sama, (2) kategori sama, (3) terbaru; tanpa artikel yang dibaca dan duplikat; hanya `publish`.
 export interface RelatedCandidate {
   id: number
   /** ISO 8601 UTC */
@@ -50,10 +48,7 @@ export function splitRelated<T>(ranked: T[], sidebarCount: number, bottomCount: 
   }
 }
 
-/**
- * Tiga irisan dari satu daftar berperingkat: >= 1024 px `sidebar` (peringkat 1..sidebarCount) dan `bottom` (berikutnya) tanpa duplikat; < 1024 px (tanpa sidebar) `bottomMobile` = `bottomMobileCount` teratas.
- * Hanya satu pasangan yang terlihat per viewport (CSS).
- */
+/** Tiga irisan satu daftar berperingkat: `sidebar` dan `bottom` (>= 1024), `bottomMobile` (< 1024, tanpa sidebar). */
 export function relatedBlocks<T>(ranked: T[], sidebarCount: number, bottomCount: number, bottomMobileCount: number): { sidebar: T[], bottom: T[], bottomMobile: T[] } {
   return { ...splitRelated(ranked, sidebarCount, bottomCount), bottomMobile: ranked.slice(0, bottomMobileCount) }
 }
