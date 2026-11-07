@@ -2,8 +2,8 @@
 import { FOOTER_COMPANY, FOOTER_LEGAL, FOOTER_SECTIONS, FOOTER_TAGLINE, FOOTER_YEAR } from '~/config/footer'
 import type { FooterSection } from '~/config/footer'
 
-// Footer. Desktop >= 1024: tiga kolom daftar terbuka; di bawah 1024: tiga baris akordeon. Keduanya dirender di HTML server, yang tidak dipakai disembunyikan CSS (display: none).
-// Kolom Kategori mendaftar SEMUA kategori WordPress (useCategories), bukan dari FOOTER_SECTIONS; tanpa kategori kolomnya tidak dirender.
+// Footer. Desktop >= 1024: tiga kolom terbuka; di bawah 1024: tiga baris akordeon. Keduanya dirender di HTML server,
+// yang tak dipakai di-display:none. Kolom Kategori = SEMUA kategori WordPress (useCategories), bukan FOOTER_SECTIONS.
 const uid = useId()
 const open = ref<Record<string, boolean>>({})
 
@@ -141,7 +141,7 @@ ul {
   object-fit: cover;
 }
 
-/* Tautan footer (kategori, Beranda): hover dan kategori aktif = garis bawah (pola hover kartu/breadcrumb, tanpa token baru).
+/* Tautan footer (kategori, Beranda): hover dan kategori aktif = garis bawah (pola kartu/breadcrumb, tanpa token baru).
    Aktif hanya untuk tautan kategori: penanda otomatis "Beranda" di Beranda tidak diberi gaya. */
 @media (hover: hover) {
   .footer a:hover {
@@ -153,8 +153,8 @@ ul {
   text-decoration: underline;
 }
 
-/* Area klik tautan footer 24 px (FooterLabel). Daftar kategori desktop menumpuk 9 tautan berjarak 1 baris (18,67 px < 24): area klik dibatasi setinggi satu baris (1lh)
-   supaya tidak saling menimpa; 24 px penuh butuh jarak antar item lebih besar (mengubah tampilan). */
+/* Area klik tautan footer 24 px (FooterLabel). Daftar kategori desktop rapat (jarak 1 baris = 18,67 px < 24): area klik
+   dibatasi setinggi satu baris (1lh) agar tidak saling menimpa; 24 px penuh butuh jarak lebih besar (ubah tampilan). */
 .col-kategori .list a::after {
   height: 1lh;
 }
@@ -314,10 +314,10 @@ ul {
   .columns {
     display: grid;
     grid-template-columns: 230px 265px 1fr; /* kolom di x 0, 230, 495 */
-    align-items: start; /* kolom Navigasi, Kategori, Tentang sejajar atas; hanya Kategori (9 item, satu kolom) yang lebih tinggi */
+    align-items: start; /* kolom Navigasi, Kategori, Tentang sejajar atas; hanya Kategori (9 item) lebih tinggi */
     min-height: 152px; /* garis legal di y 226; kolom Kategori satu kolom lebih tinggi, jadi footer melebihi 270 */
     padding-top: var(--space-24); /* judul kolom y 98 setelah garis y 74 */
-    padding-bottom: 25px; /* jarak item terakhir kolom terpanjang ke garis legal (kolom berakhir ±201, garis y 226); 25 di luar skala */
+    padding-bottom: 25px; /* item terakhir kolom terpanjang ke garis legal (±201 ke y 226); 25 di luar skala */
   }
 
   .col-title {

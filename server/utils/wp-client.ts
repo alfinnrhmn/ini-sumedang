@@ -1,7 +1,5 @@
-/**
- * Klien baca WordPress REST: HANYA `GET`, tanpa kredensial, tanpa menulis ke WordPress; dipakai server saja. Murni dari auto-import Nuxt (impor berekstensi `.ts`; base URL dari pemanggil) agar bisa diuji dengan `node:test`.
- * Daftar dimuat berhalaman (maks. `WP_MAX_PAGES`), di-cache di memori `WP_CACHE_TTL_MS`, single-flight; gagal: cache lama bila ada, jika tidak `WpUnavailableError`. Galat tidak pernah memuat URL, path, env, atau isi respons (hanya kode alasan singkat).
- */
+// Klien baca WordPress REST: HANYA `GET`, tanpa kredensial, tanpa menulis; server saja. Murni agar bisa diuji.
+// Berhalaman (maks. `WP_MAX_PAGES`), cache `WP_CACHE_TTL_MS`, single-flight. Galat tanpa URL/path/env/isi respons.
 import { WP_CACHE_TTL_MS, WP_FAILURE_BACKOFF_MS, WP_MAX_PAGES, WP_MAX_RESPONSE_BYTES, WP_PER_PAGE, WP_RETRIES, WP_TIMEOUT_MS } from '../../app/config/wp.ts'
 import type { WpPost, WpTerm } from '../fixtures/posts.ts'
 import { normalizeWpPosts, normalizeWpTerms } from './wp-map.ts'
@@ -9,10 +7,7 @@ import { normalizeWpPosts, normalizeWpTerms } from './wp-map.ts'
 /** Pesan tetap yang boleh sampai ke klien (tanpa stack, path, URL, env). */
 export const WP_UNAVAILABLE_MESSAGE = 'Sumber data tidak tersedia.'
 
-/**
- * WordPress tidak bisa dipakai (timeout, jaringan, 5xx, JSON rusak, terlalu besar). `reason` = kode singkat untuk log, bukan untuk klien.
- * `detail` (opsional) = kode galat jaringan Node/undici (mis. `ECONNREFUSED`) hanya untuk diagnosis: log server dan, di mode dev saja, badan 502.
- */
+/** WordPress tidak bisa dipakai. `reason` = kode singkat untuk log; `detail` = kode galat jaringan (log, 502 dev). */
 export class WpUnavailableError extends Error {
   readonly reason: string
   readonly retryable: boolean
@@ -29,7 +24,7 @@ export class WpUnavailableError extends Error {
 // Kode galat Node/undici/OpenSSL: huruf besar, angka, garis bawah (ECONNREFUSED, UNABLE_TO_VERIFY_LEAF_SIGNATURE, ...).
 const ERROR_CODE = /^[A-Z][A-Z0-9_]{2,40}$/
 
-/** Kode galat jaringan dari galat `fetch` (`error.cause.code`, lalu `error.code`) HANYA bila berbentuk kode (`ERROR_CODE`), selain itu `'unknown'`. Tidak pernah memuat pesan galat, URL, host, path, atau isi respons. Tidak melempar. */
+/** Kode galat jaringan (`error.cause.code`, lalu `error.code`) HANYA bila berbentuk kode, else `'unknown'`. */
 export function networkErrorDetail(error: unknown): string {
   const codeOf = (value: unknown): unknown => (typeof value === 'object' && value !== null ? (value as { code?: unknown }).code : undefined)
   const cause = typeof error === 'object' && error !== null ? (error as { cause?: unknown }).cause : undefined
@@ -44,7 +39,7 @@ const HTTPS_ORIGIN = /^https:\/\/(?:[A-Za-z0-9-]+\.)*[A-Za-z0-9-]+(?::(\d{1,5}))
 // Pengembangan lokal: http hanya untuk localhost / 127.0.0.1.
 const LOCAL_HTTP_ORIGIN = /^http:\/\/(?:localhost|127\.0\.0\.1)(?::(\d{1,5}))?\/?$/i
 
-/** Base URL WordPress yang valid: origin (huruf kecil, tanpa garis miring akhir) atau `null` bila kosong/tidak valid. Hanya `https://host[:port]` dan `http://localhost|127.0.0.1[:port]`; tanpa path, query, hash, userinfo, spasi. Tidak melempar. */
+/** Base URL WordPress valid: origin huruf kecil tanpa `/` akhir, atau `null`. Hanya https atau http localhost. */
 export function validWpBaseUrl(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -67,7 +62,7 @@ export function parseTotalPages(header: string | null): number {
   return Number.isInteger(value) && value >= 1 ? value : 1
 }
 
-/** Gabungkan semua halaman: halaman 1 dulu (memberi `totalPages`), sisanya sampai `maxPages` (batas keras), urutan dipertahankan. Satu halaman gagal = seluruhnya gagal (tidak ada hasil separuh). */
+/** Gabungkan semua halaman: halaman 1 dulu (memberi `totalPages`), sisanya sampai `maxPages`; satu gagal = gagal. */
 export async function collectPages(fetchPage: (page: number) => Promise<WpPage>, maxPages: number): Promise<unknown[]> {
   const first = await fetchPage(1)
   const total = Math.max(1, Math.min(Number.isInteger(first.totalPages) ? first.totalPages : 1, maxPages))
@@ -75,7 +70,7 @@ export async function collectPages(fetchPage: (page: number) => Promise<WpPage>,
   return [first, ...rest].flatMap(page => page.items)
 }
 
-/** Jalankan `run`; gagal dengan `WpUnavailableError` yang `retryable` diulang sampai `retries` kali. Galat lain tidak diulang. */
+/** Jalankan `run`; `WpUnavailableError` yang `retryable` diulang sampai `retries` kali. Galat lain tidak diulang. */
 export async function withRetry<T>(run: () => Promise<T>, retries: number): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
@@ -93,10 +88,8 @@ export interface CachedLoaderOptions {
   clock?: () => number
 }
 
-/**
- * Pemuat ber-cache: nilai segar (< `ttlMs`) dipakai langsung; pemuatan bersamaan digabung (single-flight). Gagal: nilai lama (basi) dipakai bila ada, bila tidak galat dilempar;
- * pemuatan ulang menunggu `backoffMs` (selama itu tidak menghubungi WordPress lagi).
- */
+// Pemuat ber-cache: nilai segar (< `ttlMs`) dipakai langsung; pemuatan bersamaan digabung (single-flight).
+// Gagal: nilai basi dipakai bila ada, jika tidak galat dilempar; pemuatan ulang menunggu `backoffMs`.
 export function createCachedLoader<T>(load: () => Promise<T>, options: CachedLoaderOptions): () => Promise<T> {
   const clock = options.clock ?? Date.now
   let value: T | undefined
@@ -191,7 +184,7 @@ async function requestPage(url: string): Promise<WpPage> {
   }
 }
 
-/** Semua halaman satu sumber (`path` sudah memuat query, tanpa `page`). Gagal: log satu baris (hanya kode alasan) lalu lempar. */
+/** Semua halaman satu sumber (`path` memuat query, tanpa `page`). Gagal: log satu baris (kode alasan) lalu lempar. */
 async function fetchAll(baseUrl: string, path: string): Promise<unknown[]> {
   try {
     return await collectPages(page => withRetry(() => requestPage(`${baseUrl}/wp-json/wp/v2/${path}&page=${page}`), WP_RETRIES), WP_MAX_PAGES)
@@ -213,7 +206,7 @@ function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
   return loader()
 }
 
-/** Semua post berstatus `publish` (permintaan `status=publish` + `_embed`), sudah dinormalisasi ke `WpPost`. Ber-cache. */
+/** Semua post `publish` (`status=publish` + `_embed`), dinormalisasi ke `WpPost`. Ber-cache. */
 export function loadWpPosts(baseUrl: string): Promise<WpPost[]> {
   return cached(`${baseUrl}|posts`, async () =>
     normalizeWpPosts(await fetchAll(baseUrl, `posts?_embed=1&status=publish&per_page=${WP_PER_PAGE}`)))
@@ -225,10 +218,8 @@ export function loadWpCategories(baseUrl: string): Promise<WpTerm[]> {
     normalizeWpTerms(await fetchAll(baseUrl, `categories?per_page=${WP_PER_PAGE}&_fields=id,slug,name,parent,count`)))
 }
 
-/**
- * Iklan mentah (`iklan?status=publish&per_page=100&_fields=id,date_gmt,title,acf`), belum dinormalisasi: kelayakan jadwal (hari ini WIB) dinilai per permintaan oleh `selectAds` (`wp-ads.ts`), bukan dibekukan di cache.
- * Ber-cache. Post type `iklan` belum ada = 404 = `WpUnavailableError` (pemanggil menganggapnya "tanpa iklan").
- */
+// Iklan mentah, belum dinormalisasi: jadwal (hari ini WIB) dinilai per permintaan oleh `selectAds`, bukan di cache.
+// Ber-cache. Post type `iklan` belum ada = 404 = `WpUnavailableError` (pemanggil menganggapnya "tanpa iklan").
 export function loadWpAds(baseUrl: string): Promise<unknown[]> {
   return cached(`${baseUrl}|ads`, () => fetchAll(baseUrl, `iklan?status=publish&per_page=${WP_PER_PAGE}&_fields=id,date_gmt,title,acf&acf_format=standard`))
 }

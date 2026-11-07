@@ -1,7 +1,5 @@
-/**
- * Uji unit evaluasi visual: kategori Berita = Beranda, slot iklan, footer satu kolom, konstanta animasi hero, dan penjaga sumber ("Lainnya" hanya di empat section kategori,
- * penampung iklan tanpa tautan/skrip, pengalihan 308). Pelari: `node:test` (`npm test`).
- */
+// Uji unit evaluasi visual: kategori Berita = Beranda, slot iklan, footer satu kolom, animasi hero, dan penjaga sumber
+// ("Lainnya" di empat section kategori, penampung iklan tanpa tautan/skrip, pengalihan 308). `node:test`.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'

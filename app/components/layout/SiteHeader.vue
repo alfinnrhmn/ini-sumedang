@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { ArticleDetailResponse } from '~/types/article'
 
-// Header situs: hamburger (membuka laci semua kategori WordPress) + logo, kolom pencarian, dan menu kategori (>= 1024); < 1024 ikon cari membuka baris input yang menggantikan isi bilah (tinggi tetap 51), tombol tutup/Esc menutup dan mengembalikan fokus ke ikon cari.
-// Tombol tema tidak dirender (dark mode ditunda) tetapi slotnya (30 + celah 8) tetap dicadangkan agar kolom/ikon cari di posisi Figma. Kategori dari useCategories; tanpa kategori menu dan laci tidak dirender.
+// Header: hamburger (laci kategori) + logo, kolom cari, menu kategori (>= 1024). < 1024: ikon cari membuka baris input
+// (tinggi 51); tutup/Esc mengembalikan fokus ke ikon cari. Slot tombol tema (30 + 8) dicadangkan walau tak dirender.
 const { data } = await useCategoriesFetch()
 const categories = computed(() => data.value?.categories ?? [])
 
-// Kategori pertama artikel di Detail disorot di menu dan laci (tanpa aria-current), dibaca dari payload kunci `article-<slug>` milik halaman Detail; di server header ikut mengambil kunci yang sama (`dedupe: 'defer'` di kedua pemanggil = satu permintaan)
-// supaya sorotan sudah ada di HTML SSR, bukan muncul setelah hidrasi. Kegagalan memuat diabaikan (tanpa sorotan); halaman Detail sendiri yang menampilkan galat.
+// Kategori pertama artikel Detail disorot di menu dan laci (tanpa aria-current), dibaca dari payload article-<slug>;
+// di server header memakai kunci sama (dedupe: 'defer' di kedua pemanggil) supaya ada di HTML SSR; galat diabaikan.
 const route = useRoute()
 const detailSlug = computed(() => (route.name === 'berita-slug' ? String(route.params.slug) : ''))
 const detailKey = (slug: string) => `article-${slug}`
@@ -31,8 +31,8 @@ async function closeDrawer() {
   toggleButton.value?.focus()
 }
 
-// Mengikuti tautan kategori di laci menutup laci TANPA mengembalikan fokus ke hamburger (halaman tujuan memindahkan fokus ke <h1>-nya). Navigasi ke rute lain ditangani watcher di bawah;
-// tautan menuju halaman yang SEDANG dibuka tidak mengubah rute, jadi laci ditutup dan fokus dipindah ke <h1> di sini.
+// Tautan kategori di laci menutup laci TANPA fokus ke hamburger (halaman tujuan memindahkan fokus ke <h1>).
+// Rute lain: watcher di bawah; tautan ke halaman SEDANG dibuka tak mengubah rute, jadi tutup + fokus ke <h1> di sini.
 watch(() => route.fullPath, () => {
   if (open.value) open.value = false
   if (searchOpen.value) searchOpen.value = false
@@ -57,7 +57,8 @@ async function closeSearch() {
   searchToggle.value?.focus()
 }
 
-// Setelah kata kunci dikirim, baris ditutup TANPA mengembalikan fokus ke ikon cari (halaman /cari memindahkan fokus ke <h1>-nya); bila tujuan sama dengan halaman yang sedang dibuka (rute tidak berubah), fokus dipindah ke <h1> di sini.
+// Setelah kata kunci dikirim, baris ditutup TANPA fokus ke ikon cari (halaman /cari memindahkan fokus ke <h1>);
+// bila tujuan sama dengan halaman yang dibuka (rute tidak berubah), fokus dipindah ke <h1> di sini.
 const router = useRouter()
 async function onSearchNavigate(to: string) {
   searchOpen.value = false
@@ -143,7 +144,7 @@ async function onSearchNavigate(to: string) {
 </template>
 
 <style scoped>
-/* Mobile: bilah y 25 (padding atas 25), blok hamburger + logo y 27 (tinggi 24, rata bawah bilah 26 -> 2 px dari atas bilah),
+/* Mobile: bilah y 25 (padding atas 25), blok hamburger + logo y 27 (tinggi 24, rata bawah bilah 26 = 2 px dari atas),
    margin samping 24. Tinggi total 51. */
 .bar {
   display: flex;
@@ -170,8 +171,8 @@ async function onSearchNavigate(to: string) {
   display: block;
 }
 
-/* Ikon cari mobile: 30 x 26 (padding 8 x 5 + border 1: ikon 14 x 14 pada x 8, y 6), latar #F8F8F8, border rgba(8,8,8,0.05), radius 6. Rata kanan dengan margin kanan 38 (slot tombol tema, 68 bersama celah);
-   rata bawah bilah (ikon 26 setinggi y 25-51, isi bilah y 27, jadi naik 2). Area ketuk diperluas ke 44 x 44. */
+/* Ikon cari mobile: 30 x 26 (padding 8 x 5 + border 1: ikon 14 x 14 pada x 8, y 6), latar #F8F8F8, border 5%, radius 6.
+   Margin kanan 38 (slot tombol tema, 68 bersama celah); rata bawah bilah (y 25-51, isi y 27). Area ketuk 44 x 44. */
 .search-toggle {
   position: relative;
   display: flex;
@@ -196,7 +197,7 @@ async function onSearchNavigate(to: string) {
   inset: -9px -7px;
 }
 
-/* Tanpa JavaScript (< 1024) ikon cari tidak bisa membuka baris: ikon disembunyikan dan form (SearchForm) tampil sebagai baris kedua bilah. */
+/* Tanpa JS (< 1024) ikon cari disembunyikan dan form (SearchForm) tampil sebagai baris kedua bilah. */
 @media (max-width: 1023.98px) and (scripting: none) {
   .bar {
     flex-wrap: wrap;
@@ -214,7 +215,8 @@ async function onSearchNavigate(to: string) {
   }
 }
 
-/* Baris pencarian terbuka (< 1024): hamburger, logo, dan ikon cari disembunyikan; form (40 tinggi) rata bawah bilah 51 => padding atas 11 */
+/* Baris pencarian terbuka (< 1024): hamburger, logo, ikon cari disembunyikan;
+   form (tinggi 40) rata bawah bilah 51 => padding atas 11 */
 @media (max-width: 1023.98px) {
   .bar--search {
     padding-top: 11px;
@@ -265,7 +267,8 @@ async function onSearchNavigate(to: string) {
     padding: 10px;
   }
 
-  /* Kolom cari pada x 639 (160 + 282 + 197): margin kiri 191 + celah flex 6 = 197 dari logo. Pusat vertikal bilah (y 20-74 dari 94). */
+  /* Kolom cari x 639 (160 + 282 + 197): margin kiri 191 + celah flex 6 = 197 dari logo.
+     Pusat vertikal bilah (y 20-74 dari 94). */
   .bar-search {
     margin-left: 191px;
   }

@@ -1,7 +1,5 @@
-/**
- * Slot iklan (`AdSlot`): nama, ukuran (px), dan node Figma; murni agar bisa diuji dengan `node:test`. Nama slot = nilai field `slot` (Select) iklan di ACF WordPress, divalidasi server.
- * `width` = lebar maksimum (di kolom lebih sempit slot menyusut; `null` = selebar wadah); `height` selalu tetap agar tanpa layout shift.
- */
+// Slot iklan (`AdSlot`): nama, ukuran (px), node Figma; murni agar bisa diuji. Nama slot = field `slot` iklan di ACF.
+// `width` = lebar maksimum (`null` = selebar wadah); `height` selalu tetap agar tanpa layout shift.
 export interface AdSlotSpec {
   /** Lebar maksimum (px) pada desktop; `null` = selebar wadah. */
   width: number | null

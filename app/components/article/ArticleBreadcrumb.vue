@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ArticleCategory } from '~/types/article'
 
-// Breadcrumb Detail: Beranda > kategori > judul. "Beranda" = tautan ke "/"; kategori yang ada di daftar kategori WordPress = tautan ke /kategori/<slug>, selain itu teks biasa.
+// Breadcrumb Detail: Beranda > kategori > judul. Kategori WordPress = tautan /kategori/<slug>, selain itu teks biasa.
 // Judul = halaman saat ini (aria-current="page"), bukan tautan; satu baris, dipotong "..." bila panjang.
 const props = defineProps<{
   category: ArticleCategory | null
@@ -77,7 +77,7 @@ const categoryTo = computed(() => (props.category ? categoryLink(props.category.
   height: 8px;
 }
 
-/* Area klik tautan >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+/* Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
 a.crumb {
   position: relative;
 }

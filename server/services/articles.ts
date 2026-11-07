@@ -17,7 +17,7 @@ import { WP_UNAVAILABLE_MESSAGE, WpUnavailableError, loadWpCategories, loadWpPos
 import { decodeEntities, excerptText, mapPost, pickWordPressCategories, publishedAtOf, wpImageHosts } from '../utils/wp-map'
 
 const RECOMMENDED_COUNT = 8
-// Ruang Visual: jumlah topik dan jumlah item berthumbnail per topik (1 kartu besar + 3 item = 4 artikel). Induk: `VISUAL_PARENT_SLUG` (config).
+// Ruang Visual: jumlah topik dan item berthumbnail per topik (1 kartu besar + 3 item). Induk: `VISUAL_PARENT_SLUG`.
 const VISUAL_TOPIC_COUNT = 4
 const VISUAL_ITEM_COUNT = 3
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -34,24 +34,18 @@ function isEdgeSet(): boolean {
   return env?.FIXTURE_SET === 'edge'
 }
 
-/**
- * Base URL WordPress dari env `NUXT_WP_BASE_URL` (`runtimeConfig.wpBaseUrl`, privat); kosong/tidak valid = `null` = sumber fixture (uji, QA, dev tanpa WordPress).
- * Dibaca per panggilan: nilai konfigurasi tidak berubah selama proses berjalan.
- */
+/** Base URL WordPress dari `NUXT_WP_BASE_URL` (privat); kosong/tidak valid = `null` = fixture. Dibaca per panggilan. */
 function wpBase(): string | null {
   return validWpBaseUrl(useRuntimeConfig().wpBaseUrl)
 }
 
-/** Host gambar tambahan = host WordPress dari base URL (satu-satunya host https di luar `IMAGE_ALLOWED_HOSTS`); fixture: kosong. */
+/** Host gambar tambahan = host WordPress dari base URL (satu-satunya host https di luar `IMAGE_ALLOWED_HOSTS`). */
 function imageHosts(): readonly string[] {
   const base = wpBase()
   return base ? wpImageHosts(base) : []
 }
 
-/**
- * Pemuatan dari WordPress gagal = 502 dengan pesan tetap, tanpa stack, path, URL, atau env. Hanya di mode dev `data` memuat `reason` dan `detail` (kode galat) untuk diagnosis;
- * build produksi tidak pernah menambah `data`.
- */
+/** Gagal memuat dari WordPress = 502 pesan tetap tanpa stack/path/URL/env; `reason`/`detail` hanya di mode dev. */
 async function fromWordPress<T>(load: () => Promise<T>): Promise<T> {
   try {
     return await load()
@@ -68,7 +62,7 @@ async function fromWordPress<T>(load: () => Promise<T>): Promise<T> {
   }
 }
 
-/** Semua post terbit (hanya status `publish`), terbaru dulu, tanpa duplikat id. Sumber: WordPress bila base URL valid, jika tidak fixture. */
+/** Semua post `publish`, terbaru dulu, tanpa duplikat id. Sumber: WordPress bila base URL valid, jika tidak fixture. */
 async function getPublishedPosts(now: Date): Promise<WpPost[]> {
   const seen = new Set<number>()
   const base = wpBase()
@@ -94,7 +88,7 @@ export async function getRecommendedArticles(now: Date = new Date()): Promise<Ar
   return (await getPublishedArticles(now)).slice(0, RECOMMENDED_COUNT)
 }
 
-/** `limit` artikel terbit terbaru untuk slide hero Beranda. Hanya status `publish`; sama dengan 4 kartu Rekomendasi pertama. */
+/** `limit` artikel terbit terbaru untuk slide hero Beranda; sama dengan 4 kartu Rekomendasi pertama. */
 export async function getHeroArticles(limit: number = HERO_SLIDE_COUNT, now: Date = new Date()): Promise<Article[]> {
   return (await getPublishedArticles(now)).slice(0, limit)
 }
@@ -111,10 +105,8 @@ export async function getLatestArticles(limit: number = SIDEBAR_COUNT, now: Date
   return (await getPublishedArticles(now)).slice(0, limit)
 }
 
-/**
- * `limit` artikel terbit bertag `POPULAR_TAG_SLUG` dalam `POPULAR_WINDOW_DAYS` hari terakhir (umur tepat sama dengan jendela masuk), terbaru dulu (kolom samping, tab Terpopuler).
- * Tidak ada hasil: array kosong (pemanggil menyembunyikan tab; jangan diisi "terbaru"). Hanya status `publish`.
- */
+// `limit` artikel `publish` bertag `POPULAR_TAG_SLUG` dalam `POPULAR_WINDOW_DAYS` hari terakhir (tab Terpopuler).
+// Kosong = array kosong (pemanggil menyembunyikan tab; jangan diisi "terbaru").
 export async function getPopularArticles(limit: number = SIDEBAR_COUNT, now: Date = new Date()): Promise<Article[]> {
   const earliest = now.getTime() - POPULAR_WINDOW_DAYS * DAY_MS
   const hosts = imageHosts()
@@ -124,10 +116,7 @@ export async function getPopularArticles(limit: number = SIDEBAR_COUNT, now: Dat
     .map(post => mapPost(post, hosts))
 }
 
-/**
- * Ruang Visual: `VISUAL_TOPIC_COUNT` kategori anak `ruang-visual` non-kosong yang paling baru dibuat (id terbesar dulu, bukan tanggal artikel; draft/private tidak dihitung).
- * Tiap topik: kartu besar = artikel terbaru, `items` = sampai 3 artikel berikutnya. Induk tak ada: array kosong.
- */
+/** `VISUAL_TOPIC_COUNT` kategori anak `ruang-visual` non-kosong terbaru dibuat (id terbesar); kartu besar + 3 item. */
 export async function getVisualTopics(now: Date = new Date()): Promise<VisualTopic[]> {
   const base = wpBase()
   const categories = base ? await fromWordPress(() => loadWpCategories(base)) : (isEdgeSet() ? buildEdgeVisualCategories() : buildFigmaVisualCategories())
@@ -150,20 +139,14 @@ export async function getVisualTopics(now: Date = new Date()): Promise<VisualTop
   return topics
 }
 
-/**
- * Daftar kategori situs (nama terdekode): kategori WordPress kecuali `uncategorized`, `ruang-visual`, dan keturunannya, urutan id naik (`pickWordPressCategories`).
- * Tidak bergantung pada artikel; mode fixture (base URL kosong): 9 kategori contoh sesuai urutan menu.
- */
+/** Kategori situs (nama terdekode): semua kategori WordPress kecuali `uncategorized`, `ruang-visual`, turunannya. */
 export async function getCategories(): Promise<ArticleCategory[]> {
   const base = wpBase()
   if (base) return pickWordPressCategories(await fromWordPress(() => loadWpCategories(base)))
   return buildMenuCategories().map(term => ({ id: term.id, slug: term.slug, name: decodeEntities(term.name) }))
 }
 
-/**
- * Section kategori Beranda: sampai `HOME_SECTION_MAX` kategori dari `getCategories()` yang punya >= 1 artikel terbit (`pickHomeSections`: preferensi `HOME_SECTIONS` dulu),
- * masing-masing `HOME_SECTION_ARTICLE_COUNT` artikel terbaru. Tanpa kategori atau tanpa artikel: array kosong.
- */
+/** Section kategori Beranda: sampai `HOME_SECTION_MAX` kategori berartikel (`pickHomeSections`), tiap N artikel. */
 export async function getHomeSections(now: Date = new Date()): Promise<HomeSection[]> {
   const [categories, published] = await Promise.all([getCategories(), getPublishedArticles(now)])
   const nonEmpty = new Set(published.flatMap(article => article.categories.map(category => category.slug)))
@@ -174,10 +157,8 @@ export async function getHomeSections(now: Date = new Date()): Promise<HomeSecti
   }))
 }
 
-/**
- * Halaman kategori: hanya kategori dari `getCategories()` (anak Ruang Visual, `uncategorized`, dan slug lain = null), status `publish`, terbaru dulu. `page` melewati halaman terakhir = null;
- * halaman 1 kategori kosong tetap dikembalikan (artikel kosong, `totalPages` 0). Tanpa `body`/HTML mentah.
- */
+// Halaman kategori: hanya kategori dari `getCategories()`, status `publish`, terbaru dulu. `page` lewat batas = null;
+// halaman 1 kategori kosong tetap dikembalikan (artikel kosong, `totalPages` 0). Tanpa HTML mentah.
 export async function getCategoryPage(slug: string, page: number, perPage: number, now: Date = new Date()): Promise<Omit<CategoryPageResponse, 'now'> | null> {
   const category = (await getCategories()).find(item => item.slug === slug)
   if (!category) return null
@@ -191,10 +172,8 @@ function excerptTextOf(post: WpPost): string {
   return excerptText(post.excerpt?.rendered ?? buildDefaultExcerpt(post.id, post.title.rendered))
 }
 
-/**
- * Pencarian (hanya `publish`): `query` dinormalisasi (`normalizeSearchQuery`), tidak valid = tanpa hasil; semua kata harus muncul di judul atau ringkasan, urutan = kata di judul terbanyak lalu terbaru.
- * `page` melewati halaman terakhir = null; halaman 1 tanpa hasil tetap dikembalikan. `query` pada hasil = kata kunci ternormalisasi. Tanpa `body`/HTML mentah.
- */
+// Pencarian `publish`: semua kata `query` (dinormalisasi; tak valid = tanpa hasil) ada di judul/ringkasan.
+// Urut kata di judul lalu terbaru. `page` lewat batas = null; halaman 1 tanpa hasil tetap dikembalikan. Tanpa HTML.
 export async function searchArticles(query: string, page: number, perPage: number, now: Date = new Date()): Promise<Omit<SearchResponse, 'now'> | null> {
   const candidates = (await getPublishedPosts(now)).map(post => ({
     post,
@@ -213,13 +192,10 @@ function mapTags(post: WpPost): ArticleTag[] {
   return (post._embedded['wp:term'][1] ?? []).map(tag => ({ id: tag.id, slug: tag.slug, name: decodeEntities(tag.name) }))
 }
 
-/**
- * Detail artikel: `Article` + isi. `bodyHtml` = HTML CMS yang SUDAH disanitasi (`sanitizeBodyHtml`); HTML mentah (`content.rendered`) tidak pernah keluar dari fungsi ini.
- * Ringkasan dan kredit foto dikeluarkan sebagai teks polos.
- */
+/** Detail artikel: `bodyHtml` = HTML CMS yang SUDAH disanitasi (`sanitizeBodyHtml`); HTML mentah tak pernah keluar. */
 function mapDetail(post: WpPost): ArticleDetail {
   const hosts = imageHosts()
-  // Isi tanpa teks, gambar, atau embed (hanya spasi/tag kosong) dianggap kosong: '' agar halaman menampilkan pesan netral.
+  // Isi tanpa teks, gambar, atau embed dianggap kosong: '' agar halaman menampilkan pesan netral.
   const sanitized = sanitizeBodyHtml(post.content?.rendered ?? buildDefaultBody(post.id, post.title.rendered), hosts)
   const bodyHtml = hasVisibleContent(sanitized) ? sanitized : ''
   return {
@@ -243,10 +219,8 @@ function toCandidate(post: WpPost): RelatedCandidate {
   return { id: post.id, publishedAt: publishedAtOf(post), categoryIds: categories.map(term => term.id), tagIds: tags.map(term => term.id) }
 }
 
-/**
- * Berita Terkait: satu daftar berperingkat (tag sama, kategori sama, terbaru) dari artikel terbit selain `articleId`; sidebar = `RELATED_SIDEBAR_COUNT` teratas, blok bawah = `RELATED_BOTTOM_COUNT` berikutnya (>= 1024 px),
- * `bottomMobile` = `RELATED_BOTTOM_MOBILE_COUNT` teratas (< 1024 px, tanpa sidebar; CSS memilih satu). Artikel tak ada atau tak terbit: semua kosong.
- */
+// Berita Terkait: satu daftar berperingkat selain `articleId`; sidebar + blok bawah (>= 1024), `bottomMobile` (< 1024).
+// Hanya satu pasangan tampil per viewport (CSS). Artikel tak ada atau tak terbit: semua kosong.
 export async function getRelatedArticles(articleId: number, now: Date = new Date()): Promise<{ sidebar: Article[], bottom: Article[], bottomMobile: Article[] }> {
   const posts = await getPublishedPosts(now)
   const current = posts.find(post => post.id === articleId)
@@ -262,10 +236,8 @@ export async function getRelatedArticles(articleId: number, now: Date = new Date
 /** Penyanitasi per daftar host gambar tambahan (host WordPress): dibuat sekali, dipakai ulang. */
 const sanitizers = new Map<string, (html: unknown) => string>()
 
-/**
- * Satu-satunya jalur HTML CMS: `body` dari CMS/fixture WAJIB lewat fungsi ini sebelum keluar sebagai tipe domain atau dirender. Allowlist: server/utils/sanitize-config.ts.
- * `extraImageHosts` = host media WordPress yang ditambahkan ke host gambar (`IMAGE_ALLOWED_HOSTS` statis tetap kosong). Tidak pernah melempar; masukan tak valid atau terlalu besar: ''.
- */
+// Satu-satunya jalur HTML CMS: `body` WAJIB lewat fungsi ini sebelum dirender. Allowlist: sanitize-config.ts.
+// `extraImageHosts` = host media WordPress tambahan. Tidak pernah melempar; masukan tak valid atau terlalu besar: ''.
 export function sanitizeBodyHtml(html: unknown, extraImageHosts: readonly string[] = []): string {
   if (extraImageHosts.length === 0) return sanitizeArticleHtml(html)
   const key = extraImageHosts.join(',')

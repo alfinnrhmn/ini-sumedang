@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { FooterLink } from '~/config/footer'
 
-// `to` terisi = tautan internal (NuxtLink); `null` = teks biasa tanpa <a>/href dan tidak dapat difokus. Tautan kategori (punya `slug`): `aria-current="page"` hanya pada kategori yang sedang dibuka
-// (berbasis slug rute, termasuk `?halaman=N`); tautan lain (Beranda) memakai penanda otomatis NuxtLink.
+// to terisi = tautan internal (NuxtLink); null = teks tanpa <a>/href. Kategori (punya slug): aria-current="page"
+// hanya pada kategori yang dibuka (slug rute, termasuk ?halaman=N); tautan lain (Beranda) memakai penanda NuxtLink.
 const props = defineProps<{ link: FooterLink }>()
 
 const route = useRoute()
-// `data-category` = penanda gaya aktif footer (kategori Berita menaut ke `/`, jadi gaya tidak bisa bergantung pada href).
+// data-category = penanda gaya aktif footer (kategori Berita menaut ke /, jadi gaya tak bisa bergantung pada href).
 const categoryAttrs = computed(() =>
   props.link.slug
     ? { 'aria-current': isCategoryRoute(route, props.link.slug) ? ('page' as const) : undefined, 'data-category': '' }
@@ -22,7 +22,7 @@ const categoryAttrs = computed(() =>
 </template>
 
 <style scoped>
-/* Area klik tautan footer >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
+/* Area klik >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada tautan; tampilan tidak berubah. */
 a {
   position: relative;
 }

@@ -1,7 +1,5 @@
-/**
- * Penyanitasi HTML isi artikel CMS: HANYA di server (Nitro), jangan diimpor dari `app/`; allowlist di `sanitize-config.ts`. Satu-satunya jalur HTML CMS ke keluaran (pemanggil merender hasilnya, bukan masukan mentah).
- * Masukan bukan string, kosong, lebih dari `SANITIZE_MAX_INPUT_LENGTH`, memuat lebih dari `SANITIZE_MAX_TAG_OPENINGS` karakter '<' (parser kuadratik pada tag tak tertutup), atau galat pustaka -> '' (tidak pernah melempar, tanpa log isi).
- */
+// Penyanitasi HTML artikel CMS: HANYA di server, jangan diimpor dari `app/`. Satu-satunya jalur HTML CMS ke keluaran.
+// Masukan bukan string/kosong/melebihi batas ukuran atau jumlah '<' (parser kuadratik), atau galat pustaka -> ''.
 import sanitizeHtml from 'sanitize-html'
 import type { Frame, IOptions, Transformed } from 'sanitize-html'
 import {
@@ -34,7 +32,7 @@ const SCHEME = /^[a-zA-Z][a-zA-Z0-9+.-]*:/
 const DIGITS = /^\d{1,5}$/
 const HOSTNAME = /^[a-z0-9.-]+$/i
 
-/** Normalisasi seperti peramban: tab/baris-baru dibuang, spasi/kontrol di tepi dipangkas; kontrol lain di dalam, atau garis miring terbalik di awal (dibaca peramban sebagai `//`), ditolak (null). */
+/** Normalisasi seperti peramban: tab/baris-baru dibuang, tepi dipangkas; kontrol di dalam atau `\` di awal = null. */
 function cleanUrl(value: string): string | null {
   const cleaned = trimControl(value.replace(/[\t\n\r]/g, ''))
   for (let index = 0; index < cleaned.length; index++) {
@@ -73,7 +71,7 @@ function safeImageSrc(raw: string, hosts: ReadonlySet<string>): string | null {
   return HOSTNAME.test(authority) && hosts.has(authority) ? value : null
 }
 
-/** Embed: `src` harus https, host persis di allowlist (tanpa userinfo, port, karakter ter-encode, titik akhir), path persis `EMBED_PATH_PATTERN`; hasil DIBANGUN ULANG dari bagian tervalidasi (query disaring), bukan disalin. */
+/** Embed: `src` https, host persis di allowlist (tanpa userinfo/port), path `EMBED_PATH_PATTERN`; DIBANGUN ULANG. */
 function safeEmbedSrc(raw: string, hosts: ReadonlySet<string>): string | null {
   const value = cleanUrl(raw)
   if (value === null || !/^https:\/\//i.test(value) || value.includes('\\')) return null

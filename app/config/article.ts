@@ -1,7 +1,5 @@
-/**
- * Berita Terkait berperingkat dihitung sekali per artikel: sidebar desktop = `RELATED_SIDEBAR_COUNT` teratas, blok bawah = `RELATED_BOTTOM_COUNT` berikutnya (tanpa duplikat).
- * Di bawah 1024 px sidebar tidak ada: blok bawah memakai `RELATED_BOTTOM_MOBILE_COUNT` teratas dan blok bawah desktop disembunyikan CSS (SSR tidak tahu lebar viewport).
- */
+// Berita Terkait dihitung sekali per artikel: sidebar desktop = `RELATED_SIDEBAR_COUNT` teratas, blok bawah = sisanya.
+// < 1024 px tanpa sidebar: blok bawah = `RELATED_BOTTOM_MOBILE_COUNT` teratas; blok desktop disembunyikan CSS (SSR).
 export const RELATED_SIDEBAR_COUNT = 4
 export const RELATED_BOTTOM_COUNT = 3
 export const RELATED_BOTTOM_MOBILE_COUNT = 3

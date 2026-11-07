@@ -21,7 +21,7 @@
   --color-footer-link: #172033; /* tautan footer */
   --color-footer-divider: #E5E7EB; /* garis footer desktop */
   --color-footer-divider-mobile: #D5D5D5; /* garis atas footer mobile */
-  --color-article-title: #1A212E; /* judul, isi, dan label Detail Berita; bukan --color-footer-link (selisih kanal 3/1/5, 5 > 4); kontras 16,14:1 vs putih */
+  --color-article-title: #1A212E; /* label Detail Berita; bukan --color-footer-link (selisih 3/1/5 > 4); 16,14:1 */
   --color-surface: #F8F8F8; /* latar pencarian/tombol */
   --color-border-subtle: rgba(8, 8, 8, 0.05); /* border kontrol */
   --color-border: rgba(8, 8, 8, 0.1); /* border kontrol, garis */
@@ -30,7 +30,8 @@
   --color-focus: var(--color-black-1); /* [usulan] cincin fokus, 20,03:1 vs putih, 4,00:1 vs biru merek */
 
   /* ---- Tipografi: famili ---- */
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* [usulan] fallback */
+  /* [usulan] fallback */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-hero: "Merriweather Sans", var(--font-sans); /* judul hero desktop; fallback Inter lalu sans sistem */
   --font-serif: "Merriweather", Georgia, "Times New Roman", serif; /* [usulan] fallback */
 
@@ -53,7 +54,8 @@
   --type-card-mobile-category: 400 11.111px/15.555px var(--font-sans); /* label kategori kartu mobile */
   --type-card-mobile-timestamp: 300 11.111px/15.555px var(--font-sans); /* timestamp kartu mobile (Light) */
   --type-footer-heading-mobile: 600 16px/25.6px var(--font-sans); /* judul kolom footer mobile */
-  --type-hero-headline-desktop: 400 32px/38.4px var(--font-hero); /* Merriweather Sans Regular 32, line-height 1,2; + --tracking-hero-headline. Hero mobile memakai --type-heading-mobile (Merriweather SemiBold), bukan Merriweather Sans */
+  /* Merriweather Sans Regular 32, line-height 1,2 (+ --tracking-hero-headline); hero mobile: --type-heading-mobile. */
+  --type-hero-headline-desktop: 400 32px/38.4px var(--font-hero);
 
   /* ---- Tipografi: letter-spacing ---- */
   --tracking-text-l: -0.72px; /* Text/L "-4" = -4% x 18px [turunan] */
@@ -85,8 +87,8 @@
   --container-mobile: 354px; /* frame 402, margin 24 per sisi */
 }
 
-/* Font self-host: woff2 = subset Latin turunan Fontsource 5.3.0 (paket inter dan merriweather), bukan distribusi resmi pencipta (lisensi: public/fonts/LICENSE-*.txt).
-   Nama keluarga harus sama dengan --font-sans / --font-serif. */
+/* Font self-host: woff2 = subset Latin turunan Fontsource 5.3.0 (inter, merriweather), bukan distribusi resmi pencipta
+   (lisensi: public/fonts/LICENSE-*.txt). Nama keluarga harus sama dengan --font-sans / --font-serif. */
 @font-face {
   font-family: "Inter";
   font-style: normal;
@@ -127,7 +129,7 @@
   src: url("/fonts/merriweather-latin-600-normal.woff2") format("woff2");
 }
 
-/* Merriweather Sans Regular 400 (judul hero desktop): woff2 = subset Latin turunan Fontsource 5.3.0 (@fontsource/merriweather-sans),
+/* Merriweather Sans Regular 400 (judul hero desktop): woff2 = subset Latin turunan Fontsource 5.3.0,
    bukan distribusi resmi pencipta. Lisensi: public/fonts/LICENSE-MerriweatherSans.txt. */
 @font-face {
   font-family: "Merriweather Sans";

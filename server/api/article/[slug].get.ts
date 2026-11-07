@@ -2,7 +2,7 @@ import type { ArticleDetailResponse } from '../../../app/types/article'
 import { getArticleBySlug, getRelatedArticles } from '../../services/articles'
 import { isValidArticleSlug } from '../../utils/article-detail'
 
-// Path tunggal `/api/article/<slug>` sengaja terpisah dari `/api/articles/*` (daftar). Slug tak valid, tak ada, draft, atau private = 404 dengan pesan tetap
+// Terpisah dari `/api/articles/*` (daftar). Slug tak valid, tak ada, draft, atau private = 404 dengan pesan tetap
 // (tanpa mengulang masukan); query diabaikan. `bodyHtml` sudah disanitasi di layanan, HTML mentah tidak pernah keluar.
 function notFound() {
   return createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Artikel tidak ditemukan.' })

@@ -2,8 +2,8 @@
 import type { ArticleDetail } from '~/types/article'
 import { visibleTags } from '~/config/home'
 
-// Kepala artikel: label kategori • tag, judul (h1), ringkasan, identitas + waktu baca. Label kedua = tag tampil pertama (tag fungsional `terpopuler` tidak ikut);
-// tanpa tag hanya kategori, tanpa keduanya label tidak dirender. Tanggal terbit ditampilkan di baris waktu baca.
+// Kepala artikel: label kategori • tag, judul (h1), ringkasan, identitas + waktu baca. Label kedua = tag tampil pertama
+// (bukan terpopuler); tanpa tag hanya kategori, tanpa keduanya label tidak dirender. Tanggal di baris waktu baca.
 const props = defineProps<{ article: ArticleDetail }>()
 
 const category = computed(() => props.article.categories[0]?.name ?? '')

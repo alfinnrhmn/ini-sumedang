@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Judul blok Berita Terkait: di sidebar desktop (baris 40, padding 10, garis dasar 3 px, aksen biru 96) dan di blok bawah (teks langsung di atas garis 3 px, aksen biru 130).
-// Garis dasar #D9D9D9 Figma -> --color-gray-5 (sama dengan judul section Beranda). Tanpa tautan "Lainnya" (tidak ada tujuan).
+// Judul Berita Terkait: sidebar desktop (baris 40, padding 10, garis dasar 3 px, aksen 96) dan blok bawah (aksen 130).
+// Garis dasar #D9D9D9 -> --color-gray-5 (seperti judul section Beranda). Tanpa tautan "Lainnya" (tidak ada tujuan).
 defineProps<{
   title: string
   variant: 'sidebar' | 'bottom'

@@ -3,11 +3,11 @@ import type { Article, SearchResponse, SidebarResponse } from '~/types/article'
 import { CATEGORY_PAGE_PATTERN } from '~/config/category'
 import { normalizeSearchQuery, SEARCH_EMPTY_MESSAGE, SEARCH_INVALID_MESSAGE } from '~/config/search'
 
-// `q` divalidasi dengan fungsi yang sama dengan server (normalizeSearchQuery): kosong/tidak valid = halaman tetap 200 dengan pesan netral (tanpa permintaan API, masukan tidak dipantulkan); `halaman` tak valid/di luar batas = 404.
-// Kata kunci hanya tampil sebagai teks (interpolasi Vue, tanpa HTML mentah) dan TIDAK dimasukkan ke <title>/meta; halaman noindex.
+// `q` divalidasi seperti server (normalizeSearchQuery): kosong/tak valid = 200 + pesan netral, tanpa API.
+// `halaman` tak valid = 404. Kata kunci hanya teks (interpolasi Vue), TIDAK masuk <title>/meta; noindex.
 
 const route = useRoute()
-// Parameter `q` dan `halaman` diteruskan apa adanya (string; array untuk ganda; null untuk tanpa nilai): validasi memutuskan.
+// `q` dan `halaman` diteruskan apa adanya (string; array untuk ganda; null tanpa nilai): validasi memutuskan.
 const query = computed(() => normalizeSearchQuery(route.query.q))
 const pageParam = computed(() => route.query.halaman)
 const pageNumber = computed(() => {
@@ -26,7 +26,7 @@ function pageError(statusCode: number) {
   })
 }
 
-// Halaman 2 dst. tanpa kata kunci valid tidak punya isi (seperti di luar batas): 404; halaman 1 tanpa kata kunci = pesan netral.
+// Halaman 2 dst. tanpa kata kunci valid tak punya isi (seperti di luar batas): 404; halaman 1 = pesan netral.
 function checkRoute() {
   if (pageNumber.value === null || (query.value === null && pageNumber.value > 1)) throw pageError(404)
 }
@@ -41,10 +41,10 @@ const { data, error } = await useAsyncData<SearchResponse | null>(
 
 if (error.value) throw pageError(error.value.statusCode ?? 500)
 
-// Trending: hanya `popular`; data dibagikan dengan Beranda/kategori lewat kunci yang sama, kegagalan memuatnya tidak menggagalkan halaman.
+// Trending: hanya `popular`, kunci sama dengan Beranda/kategori; gagal memuat tidak menggagalkan halaman.
 const { data: sidebar } = await useFetch<SidebarResponse>('/api/articles/sidebar', { key: 'articles-sidebar' })
 
-// Gagal memuat pada navigasi berikutnya (mis. halaman sudah tidak ada) atau rute tak valid: tampilkan halaman error yang sama.
+// Gagal memuat pada navigasi berikutnya (mis. halaman sudah tak ada) atau rute tak valid: tampilkan halaman error.
 watch(error, (value) => {
   if (value) showError(pageError(value.statusCode ?? 500))
 })
@@ -57,16 +57,16 @@ watch(() => [route.query.q, route.query.halaman], () => {
   }
 })
 
-// Tampilan: kata kunci tidak valid = pesan netral (dari rute, seketika); selain itu mengikuti data (judul, jumlah, kartu, tombol selalu sinkron;
-// data lama tetap tampil selama permintaan berikutnya berjalan).
+// Tampilan: kata kunci tak valid = pesan netral (dari rute, seketika); selain itu mengikuti data (judul, jumlah, kartu,
+// tombol selalu sinkron; data lama tetap tampil selama permintaan berikutnya berjalan).
 const invalid = computed(() => query.value === null)
 const shownQuery = computed(() => data.value?.query ?? '')
 const articles = computed(() => data.value?.articles ?? [])
 const pagination = computed(() => data.value?.pagination)
 const now = computed(() => data.value?.now ?? '')
 
-// "Lebih banyak": `shown` = artikel halaman awal + yang ditambahkan di klien; `loadedPage` = halaman terakhir yang sudah dimuat.
-// Keduanya dibuang (kembali ke data rute) saat kata kunci atau ?halaman berubah lewat navigasi. Waktu relatif memakai `now` halaman awal.
+// "Lebih banyak": `shown` = artikel halaman awal + tambahan klien; `loadedPage` = halaman terakhir dimuat;
+// keduanya dibuang saat kata kunci atau ?halaman berubah. Waktu relatif memakai `now` halaman awal.
 const shown = ref<Article[]>([...articles.value])
 const loadedPage = ref(data.value?.pagination.page ?? 1)
 watch(data, (value) => {
@@ -79,7 +79,7 @@ async function onLoaded(payload: { articles: Article[], page: number, added: num
   shown.value = payload.articles
   loadedPage.value = payload.page
   if (payload.added < 1) return
-  // Fokus ke tautan judul kartu baru pertama (tombol bisa hilang di halaman terakhir); tanpa menggulir agar tampilan tidak melompat.
+  // Fokus ke tautan judul kartu baru pertama (tombol bisa hilang di halaman akhir); tanpa menggulir agar tak melompat.
   await nextTick()
   listEl.value?.children[firstNew]?.querySelector<HTMLElement>('a[href^="/berita/"]')?.focus({ preventScroll: true })
 }
@@ -94,8 +94,8 @@ useSeoMeta({
   robots: 'noindex'
 })
 
-// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju yang disengaja (bukan muat awal SSR/hidrasi, bukan Back/Forward); pola sama dengan halaman kategori (app/utils/focus.ts).
-// Instansi sama (hanya ?q / ?halaman berubah): saat data baru tiba atau, untuk kata kunci tak valid (tanpa data), saat rute berubah; Back/Forward memulihkan gulir yang diingat.
+// Fokus ke <h1> dan gulir ke atas HANYA untuk navigasi maju disengaja (bukan muat awal/hidrasi, bukan Back/Forward).
+// Instansi sama (?q/?halaman berubah): saat data baru tiba, atau saat rute berubah bila kata kunci tak valid.
 const listHeadingId = useId()
 const nuxtApp = useNuxtApp()
 const router = useRouter()
@@ -124,7 +124,7 @@ watch(data, (value, previous) => {
   if (!value || value === previous) return
   afterRouteChange()
 }, { flush: 'post' })
-// Tanpa data (kata kunci tidak valid) tidak ada perubahan `data` yang bisa diamati: rute yang berubah menjadi/antar kata kunci tak valid ditangani di sini.
+// Kata kunci tak valid tak punya `data` teramati: perubahan rute ke/antar kata kunci tak valid ditangani di sini.
 watch(() => route.fullPath, () => {
   if (invalid.value) afterRouteChange()
 }, { flush: 'post' })
@@ -134,7 +134,7 @@ watch(() => route.fullPath, () => {
   <main class="search-page">
     <ArticleBreadcrumb :category="null" title="Pencarian" />
     <div class="columns">
-      <!-- Judul + jumlah hasil di baris 1 kolom kiri supaya kolom kanan mulai di baris 2, sejajar tepi atas daftar kartu (pola halaman kategori) -->
+      <!-- Judul + jumlah hasil di baris 1 kolom kiri agar kolom kanan mulai di baris 2, sejajar atas daftar kartu -->
       <div class="head">
         <HomeSectionTitle title="Hasil pencarian" tag="h1" />
         <p v-if="!invalid && pagination" class="summary">
@@ -169,7 +169,7 @@ watch(() => route.fullPath, () => {
           />
         </template>
       </div>
-      <!-- Kolom kanan (357): widget sosial, Trending (kosong = tidak dirender), lalu papan iklan; urutan sama di mobile -->
+      <!-- Kolom kanan (357): widget sosial, Trending (kosong = tak dirender), lalu iklan; urutan sama di mobile -->
       <div ref="secondary" class="secondary">
         <HomeSocialWidget />
         <HomeTrendingList v-if="sidebar" :articles="sidebar.popular" :now="sidebar.now" />
@@ -187,7 +187,7 @@ watch(() => route.fullPath, () => {
 </template>
 
 <style scoped>
-/* Sama dengan halaman kategori (tanpa frame): kontainer, jarak atas, dan jarak judul-ke-daftar meminjam Detail (breadcrumb) dan Beranda. */
+/* Seperti halaman kategori (tanpa frame): kontainer, jarak atas, jarak judul-ke-daftar meminjam Detail dan Beranda. */
 .search-page {
   width: 100%;
   max-width: calc(var(--container-desktop) + 2 * var(--space-24));
@@ -199,7 +199,7 @@ watch(() => route.fullPath, () => {
   margin-top: var(--space-8);
 }
 
-/* Jumlah hasil di bawah garis judul; kata kunci panjang tanpa spasi (maks. 100 karakter) dibungkus agar tidak pernah melewati lebar layar */
+/* Jumlah hasil di bawah garis judul; kata kunci panjang tanpa spasi (maks. 100) dibungkus agar tak melewati layar */
 .summary {
   margin-top: var(--space-8);
   color: var(--color-gray-2); /* 8,6 : 1 di atas putih */
@@ -233,7 +233,8 @@ watch(() => route.fullPath, () => {
   white-space: nowrap;
 }
 
-/* Mobile satu kolom kartu horizontal (354x104), tablet 2 kolom hanya bila kartu tidak lebih sempit dari kartu mobile; garis ke kartu pertama 30 */
+/* Mobile satu kolom kartu horizontal (354x104), tablet 2 kolom hanya bila kartu tidak lebih sempit dari kartu mobile;
+   garis ke kartu pertama 30 */
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--container-mobile), 100%), 1fr));
@@ -253,8 +254,8 @@ watch(() => route.fullPath, () => {
     padding-top: 9px;
   }
 
-  /* Grid sama dengan halaman kategori: judul (kolom 1, baris 1), daftar + "Lebih banyak" (kolom 1, baris 2), kolom kanan (kolom 2, baris 2) dengan
-     jarak atas --list-gap (28) sehingga atas widget = atas gambar kartu pertama. Sticky terbatas pada baris 2. */
+  /* Grid seperti halaman kategori: judul (kolom 1, baris 1), daftar + "Lebih banyak" (kolom 1, baris 2), kolom kanan
+     (kolom 2, baris 2) dengan jarak atas --list-gap (28) agar atas widget = atas gambar kartu 1. Sticky: baris 2. */
   .columns {
     --list-gap: 28px;
 

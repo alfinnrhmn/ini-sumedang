@@ -1,7 +1,5 @@
-/**
- * Pembantu murni Detail Berita. Tanpa auto-import Nuxt (impor eksplisit berekstensi `.ts`) agar bisa diuji dengan `node:test`.
- * Logika penyanitasi HTML TIDAK ada di sini (lihat `sanitize-article-html.ts`).
- */
+// Pembantu murni Detail Berita; tanpa auto-import Nuxt (impor berekstensi `.ts`) agar bisa diuji dengan `node:test`.
+// Logika penyanitasi HTML TIDAK ada di sini (lihat `sanitize-article-html.ts`).
 import { ARTICLE_SLUG_MAX_LENGTH, READING_WORDS_PER_MINUTE } from '../../app/config/article.ts'
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -11,12 +9,12 @@ export function isValidArticleSlug(value: unknown): value is string {
   return typeof value === 'string' && value.length <= ARTICLE_SLUG_MAX_LENGTH && SLUG_PATTERN.test(value)
 }
 
-/** Buang tag HTML dari teks sumber tepercaya CMS (excerpt, keterangan foto) untuk dirender sebagai teks. Bukan penyanitasi. */
+/** Buang tag HTML dari teks sumber tepercaya CMS (excerpt, keterangan foto) untuk dirender sebagai teks. */
 export function stripTags(html: string): string {
   return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
 
-/** Apakah HTML yang sudah disanitasi punya isi terlihat (teks selain spasi/`&nbsp;`/karakter lebar nol, gambar, atau embed)? Hanya spasi/tag kosong (`<p> </p>`, `<br>`, `<hr>`) = false. Bukan penyanitasi. */
+/** Apakah HTML tersanitasi punya isi terlihat (teks bukan spasi/`&nbsp;`, gambar, atau embed)? Bukan penyanitasi. */
 export function hasVisibleContent(sanitizedHtml: string): boolean {
   if (/<(img|iframe)\b/i.test(sanitizedHtml)) return true
   const text = sanitizedHtml

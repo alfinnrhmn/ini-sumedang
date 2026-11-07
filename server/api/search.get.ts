@@ -4,8 +4,8 @@ import { searchArticles } from '../services/articles'
 import { parsePageParam } from '../utils/category-page'
 import { normalizeSearchQuery } from '../utils/search-query'
 
-// `GET /api/search?q=&halaman=N`: `q` = string tunggal 2-100 karakter ternormalisasi (`normalizeSearchQuery`); `halaman` tak valid/melewati batas = 404, `q` tak valid = 400. Pesan galat TETAP (tak memuat masukan).
-// Header nosniff mencegah `query` pada JSON ditafsirkan sebagai HTML. Hanya membaca lewat layanan (WordPress gagal = 502 pesan tetap); tidak ada tulisan atau cookie.
+// `q` 2-100 karakter ternormalisasi (`normalizeSearchQuery`); `halaman` tak valid = 404, `q` tak valid = 400.
+// Pesan galat tetap. Header nosniff mencegah JSON dibaca sebagai HTML. Hanya baca (WordPress gagal = 502).
 export default defineEventHandler(async (event): Promise<SearchResponse> => {
   setResponseHeader(event, 'X-Content-Type-Options', 'nosniff')
   const { q, halaman } = getQuery(event)

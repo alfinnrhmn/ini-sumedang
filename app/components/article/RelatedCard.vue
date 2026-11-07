@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Article } from '~/types/article'
 
-// Kartu blok Berita Terkait di bawah artikel. Satu tautan per kartu (judul; overlay ::after menutup kartu); gambar dan avatar bukan tautan.
+// Kartu Berita Terkait di bawah artikel: satu tautan per kartu (judul; overlay ::after); gambar/avatar bukan tautan.
 // Waktu hanya di mobile (desktop hanya penerbit).
 const props = defineProps<{
   article: Article
@@ -124,7 +124,7 @@ const time = computed(() => formatRelativeTime(props.article.publishedAt, props.
   text-overflow: ellipsis;
 }
 
-/* Waktu: #727272 Figma tak punya token dalam 4 level; dipakai --color-footer-muted (selisih 12/2/19, kontras 4,97:1; --color-gray-3 gagal AA 3,84:1) */
+/* Waktu: #727272 tanpa token dalam 4 level; dipakai --color-footer-muted (selisih 12/2/19, 4,97:1; gray-3 gagal AA) */
 .time {
   flex: none;
   margin-left: var(--space-8); /* 8 + 8 = celah 16 penerbit-waktu */

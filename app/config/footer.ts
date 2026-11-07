@@ -1,7 +1,5 @@
-/**
- * Konfigurasi footer, satu daftar untuk desktop dan mobile. `to: null` = teks biasa (bukan <a>, tanpa href, tidak dapat difokus); terisi = tautan internal.
- * Label kategori dari daftar resmi, bukan teks desain (ada salah ketik di desain); `to` kategori = `categoryPath(slug)`.
- */
+// Footer satu daftar untuk desktop dan mobile. `to: null` = teks biasa (bukan <a>); terisi = tautan internal.
+// Label kategori dari daftar resmi, bukan teks desain (ada salah ketik di desain); `to` = `categoryPath(slug)`.
 import { categoryPath } from '../utils/routes.ts'
 
 export interface FooterLink {
@@ -25,7 +23,7 @@ export interface FooterSection {
 export interface FooterSocial {
   name: string
   icon: string
-  /** Opsional. Hanya `https://`; bila terisi ikon menjadi tautan (rel="noopener noreferrer"). Kosong = ikon dekoratif. */
+  /** Opsional. Hanya `https://`; terisi = ikon menjadi tautan (rel="noopener noreferrer"), kosong = ikon dekoratif. */
   url?: string
 }
 

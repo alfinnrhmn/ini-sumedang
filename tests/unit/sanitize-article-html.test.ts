@@ -1,7 +1,5 @@
-/**
- * Uji unit penyanitasi HTML artikel. Pelari: `node:test` bawaan Node (tanpa Vitest). Jalankan: `npm test`.
- * Memuat berkas `.ts` langsung (Node 22.23+), maka impor memakai ekstensi `.ts`.
- */
+// Uji unit penyanitasi HTML artikel. Pelari: `node:test` (tanpa Vitest), `npm test`.
+// Memuat berkas `.ts` langsung (Node 22.23+), maka impor memakai ekstensi `.ts`.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -477,8 +475,8 @@ describe('SN7/SN8 direktif HTML mentah Vue hanya di ArticleBody.vue dan penyanit
     assert.equal(occurrences, 1)
   })
 
-  // Pindai sumber (komentar dibuang lebih dulu agar dokumentasi tidak memicu false positive) untuk semua sink HTML mentah, bukan hanya atribut `v-html=`: variasi spasi/huruf, binding `:innerHTML`/`v-bind:innerHTML`, `domProps`, API DOM.
-  // Batas: pengikatan dinamis (`v-bind="obj"` dengan kunci dari variabel) tidak terdeteksi statis; ditutup oleh review.
+  // Pindai sumber (komentar dibuang dulu) untuk semua sink HTML mentah: `v-html=`, `:innerHTML`, `domProps`, API DOM.
+  // Batas: `v-bind="obj"` dengan kunci dari variabel tidak terdeteksi statis; ditutup oleh review.
   const stripComments = (text: string): string => text
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\/\*[\s\S]*?\*\//g, '')

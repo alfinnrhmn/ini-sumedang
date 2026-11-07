@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { normalizeSearchQuery, searchInputValue } from '~/config/search'
 
-// Kolom cari header: <form role="search" method="get" action="/cari"> yang berfungsi tanpa JavaScript; dengan JavaScript dialihkan lewat router ke /cari?q=<kata kunci ternormalisasi>. Nilai awal = `q` bila /cari terbuka. Tanpa saran otomatis.
-// Di bawah 1024 form tersembunyi sampai tombol ikon header (prop `open`) membukanya (tanpa frame Figma, diturunkan dari token); fokus ke input, tombol tutup/Esc memancarkan `close`. Ikon cari = tombol kirim di kiri input, urutan DOM/Tab: input lalu tombol.
+// Kolom cari: <form role="search" method="get" action="/cari"> jalan tanpa JS; dengan JS via router ke /cari?q=<kata>.
+// Nilai awal = q. < 1024 tersembunyi sampai prop open; fokus ke input, tutup/Esc memancarkan close; Tab: input, tombol.
 const props = defineProps<{
   /** id form; dipakai aria-controls pada tombol cari di header */
   id: string
@@ -29,8 +29,8 @@ watch(() => props.open, async (isOpen) => {
   input.value?.focus()
 })
 
-// Pengiriman dengan JavaScript: kata kunci valid menjadi /cari?q=<ternormalisasi>; kosong atau tidak valid tetap dikirim (halaman menampilkan
-// pesan netral) dengan nilai dipadatkan, tanpa karakter kontrol. Tujuan dikirim ke pemanggil agar baris pencarian mobile ditutup.
+// Kirim dengan JS: kata valid jadi /cari?q=<ternormalisasi>; kosong/tidak valid tetap dikirim dengan nilai dipadatkan
+// tanpa karakter kontrol (halaman beri pesan netral). Tujuan dikirim ke pemanggil agar baris pencarian mobile ditutup.
 async function onSubmit(event: SubmitEvent) {
   event.preventDefault()
   const to = searchPath(normalizeSearchQuery(value.value) ?? searchInputValue(value.value))
@@ -38,7 +38,7 @@ async function onSubmit(event: SubmitEvent) {
   emit('navigate', to)
 }
 
-// Esc menutup baris pencarian (hanya saat terbuka di bawah 1024); tanpa itu Esc tetap perilaku bawaan input. Teks yang sudah diketik tidak dihapus.
+// Esc menutup baris pencarian (hanya saat terbuka di bawah 1024), selain itu bawaan input; teks yang diketik tetap.
 function onKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape' || !props.open) return
   event.preventDefault()
@@ -94,7 +94,8 @@ function onKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
-/* < 1024: tersembunyi sampai dibuka. Terbuka = baris setinggi 40 (bilah mobile 51: padding atas 11 diatur SiteHeader), kolom input melebar + tombol tutup 40. */
+/* < 1024: tersembunyi sampai dibuka. Terbuka = baris setinggi 40 (bilah mobile 51: padding atas 11 diatur SiteHeader),
+   kolom input melebar + tombol tutup 40. */
 .search {
   display: none;
 }
@@ -155,7 +156,7 @@ function onKeydown(event: KeyboardEvent) {
   outline-offset: 2px;
 }
 
-/* Tombol kirim = ikon 20 x 20 pada x 15 (padding kiri 14 + border 1), disetel di atas padding kiri input. Area ketuk 46 x tinggi kolom. */
+/* Tombol kirim = ikon 20 x 20 pada x 15 (padding kiri 14 + border 1) di atas padding input. Area ketuk 46 x tinggi. */
 .submit {
   position: absolute;
   top: 0;
@@ -200,7 +201,7 @@ function onKeydown(event: KeyboardEvent) {
   white-space: nowrap;
 }
 
-/* Tanpa JavaScript (< 1024) form selalu tampil (SiteHeader menaruhnya sebagai baris kedua bilah) dan tombol tutup tidak berguna */
+/* Tanpa JS (< 1024) form selalu tampil (SiteHeader menaruhnya sebagai baris kedua bilah); tombol tutup tidak berguna */
 @media (max-width: 1023.98px) and (scripting: none) {
   .search {
     display: flex;

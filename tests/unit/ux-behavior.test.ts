@@ -1,7 +1,5 @@
-/**
- * Uji unit perilaku UX: `stickyTop` (kolom kanan menempel), `mergeArticles` ("Lebih banyak" tanpa duplikat), putar otomatis hero (`heroAutoplayStatus`, `heroLiveMode`, `nextHeroSlide`, `HERO_AUTOPLAY_MS`),
- * dan penjaga sumber (kolom kanan kategori, "Lebih banyak", ukuran "Lainnya", sticky hanya >= 1024). Perilaku di browser diuji terpisah. Pelari: `node:test` (`npm test`).
- */
+// Uji unit perilaku UX: `stickyTop`, `mergeArticles`, putar otomatis hero (`heroAutoplayStatus`, `heroLiveMode`,
+// `nextHeroSlide`) dan penjaga sumber (kolom kanan kategori, "Lebih banyak", sticky hanya >= 1024). `node:test`.
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -112,7 +110,7 @@ describe('UX1b stickyTopForFocus (fokus keyboard selalu terlihat)', () => {
   })
 
   it('kolom belum menempel (posisi alami lebih rendah dari top): geser dihitung dari posisi sebenarnya', () => {
-    // kolom alami di y 300, elemen di bawah layar y 880..920: perlu 256 (300 - 44), dibatasi ke offset karena tak pernah > 24 dari atas layar
+    // kolom alami di y 300, elemen di bawah layar y 880..920: perlu 256 (300 - 44), dibatasi ke offset (maks 24)
     assert.equal(stickyTopForFocus(vh, colH, 300, 880, 920), STICKY_OFFSET)
     // kolom alami di y -20, elemen di bawah layar: top = -20 - 44
     assert.equal(stickyTopForFocus(vh, colH, -20, 880, 920), -64)

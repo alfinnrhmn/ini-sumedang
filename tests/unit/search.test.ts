@@ -1,7 +1,5 @@
-/**
- * Uji unit pencarian: normalisasi `q`, pemecahan kata dan penilaian (`searchTerms`, `searchScore`, `compareSearchHits`), inti `searchArticles` (`searchPage`), bentuk URL (`searchPath`),
- * dan penjaga sumber (form tanpa JavaScript, `noindex`, kata kunci tidak dipantulkan, data hanya lewat API, satu `v-html`). `searchArticles` sendiri tidak bisa diimpor `node:test` (impor tanpa ekstensi di layanan/fixture), jadi diuji lewat `searchPage`. Pelari: `node:test` (`npm test`).
- */
+// Uji unit pencarian: normalisasi `q`, `searchTerms`/`searchScore`/`compareSearchHits`, `searchPage`, `searchPath`,
+// dan penjaga sumber. `searchArticles` diuji lewat `searchPage` (layanan memakai impor tanpa ekstensi).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
@@ -177,7 +175,7 @@ describe('SR5 searchPage (inti searchArticles)', () => {
   it('urutan: kata di judul di atas, lalu terbaru', () => {
     const result = searchPage(NOW_ITEMS, 'sumedang', 1, 10)
     assert.ok(result)
-    // Tiga artikel punya kata di judul (terbaru dulu: 10, 30, 60 menit lalu), lalu yang hanya di ringkasan (meski paling baru, 5 menit lalu)
+    // Tiga artikel punya kata di judul (terbaru dulu), lalu yang hanya di ringkasan (meski paling baru).
     assert.deepEqual(titles(result.items), [
       'Pemkab Sumedang Dorong Transformasi Digital',
       'Layanan Digital Sumedang Meluas',

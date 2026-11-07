@@ -1,7 +1,5 @@
-/**
- * Uji unit pembantu murni halaman kategori: validasi `?halaman=` dan slug, hitung paginasi, bentuk URL kategori, penanda kategori aktif, konsistensi daftar kategori resmi dengan footer.
- * Pelari: `node:test` (`npm test`).
- */
+// Uji unit pembantu halaman kategori: `?halaman=` dan slug, paginasi, URL kategori, kategori aktif, footer.
+// Pelari: `node:test` (`npm test`).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { buildPagination, isCategoryPageSlug, isPageInRange, isValidCategorySlug, parsePageParam, sliceForPage, totalPagesOf } from '../../server/utils/category-page.ts'
@@ -9,7 +7,7 @@ import { categoryLink, categoryPagePath, categoryPath, isCategoryRoute } from '.
 import { CATEGORY_PER_PAGE } from '../../app/config/category.ts'
 import { FOOTER_SECTIONS } from '../../app/config/footer.ts'
 
-// Daftar kategori contoh mode fixture (9 kategori, urutan menu) = `buildMenuCategories()`; hanya acuan uji, bukan konstanta aplikasi.
+// Daftar kategori contoh mode fixture (9 kategori, urutan menu) = `buildMenuCategories()`; hanya acuan uji.
 const MENU_SLUGS = ['berita', 'nasional', 'pemerintahan', 'politik', 'hukum', 'sepak-bola', 'otomotif', 'jelajah', 'bisnis-teknologi']
 const MENU_CATEGORIES = MENU_SLUGS.map((slug, index) => ({ id: index + 1, slug, name: slug }))
 

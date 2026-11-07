@@ -3,8 +3,8 @@ import { CATEGORY_PER_PAGE } from '../../../app/config/category'
 import { getCategoryPage } from '../../services/articles'
 import { isCategoryPageSlug, parsePageParam } from '../../utils/category-page'
 
-// Path tunggal `/api/category/<slug>` sengaja terpisah dari `/api/articles/*` dan `/api/article/*`. `?halaman=N` valid = string tunggal `^[1-9][0-9]{0,3}$` (tanpa parameter = 1).
-// Slug tak valid/tak dikenal (termasuk `berita`, yang = Beranda), halaman tak valid, atau melewati batas = 404 pesan tetap; halaman 1 kategori kosong = 200 dengan `articles` kosong.
+// Terpisah dari `/api/articles/*` dan `/api/article/*`. `?halaman=N` = string tunggal `^[1-9][0-9]{0,3}$` (default 1).
+// Slug tak valid/tak dikenal (termasuk `berita`), halaman tak valid/melewati batas = 404; halaman 1 kosong = 200.
 function notFound() {
   return createError({ statusCode: 404, statusMessage: 'Not Found', message: 'Halaman tidak ditemukan.' })
 }

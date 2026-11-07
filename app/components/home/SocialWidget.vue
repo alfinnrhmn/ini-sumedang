@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { SOCIAL_STATS, socialHref, socialLabel } from '~/config/social'
 
-// Widget "Ikuti IniSumedang": jumlah pengikut tiap akun; BUKAN fitur follow (tanpa tombol ikuti, form, SDK, atau skrip pihak ketiga). Angka = penampung dari app/config/social.ts.
-// Kotak = teks biasa; bila `url` https terisi menjadi <a rel="noopener noreferrer" target="_blank">. Judul = h2 agar urutan heading tidak melompat. Ikon `loading="lazy"`, dekoratif (satu permintaan per ikon).
+// Widget "Ikuti IniSumedang": jumlah pengikut tiap akun; BUKAN fitur follow (tanpa tombol, form, SDK, skrip luar).
+// Angka = penampung (config/social.ts). Kotak = teks, atau <a rel="noopener noreferrer" target="_blank"> bila https.
 const headingId = useId()
 const items = SOCIAL_STATS.map(item => ({
   ...item,
@@ -149,7 +149,7 @@ const items = SOCIAL_STATS.map(item => ({
   max-width: none;
 }
 
-/* Kolom teks: lebar Figma (50-58); nilai Inter SemiBold 16/22,4 (= News/Card/Headline/Mobile) di blok 23, satuan Inter Medium 11,111/15,555 (= News/Metadata) di blok 16 */
+/* Kolom teks: lebar Figma (50-58); nilai = News/Card/Headline/Mobile di blok 23, satuan = News/Metadata di blok 16 */
 .text {
   display: flex;
   flex: none;
@@ -160,7 +160,7 @@ const items = SOCIAL_STATS.map(item => ({
   white-space: nowrap;
 }
 
-/* Nilai #1F2937 -> --color-footer-link #172033 (selisih 8/9/4 > 4: deviasi dari Figma); satuan #667085 = --color-footer-muted */
+/* Nilai #1F2937 -> --color-footer-link (selisih 8/9/4 > 4: deviasi Figma); satuan #667085 = --color-footer-muted */
 .value {
   display: block;
   height: 23px;

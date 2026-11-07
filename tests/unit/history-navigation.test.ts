@@ -1,7 +1,5 @@
-/**
- * Uji unit pembeda navigasi riwayat (Back/Forward) dari navigasi maju dan ingatan gulir antar halaman paginasi; juga penjaga sumber agar `:hover` menu/laci hanya di `@media (hover: hover)`
- * dan pelacak dipakai di halaman kategori. Pelari: `node:test` (`npm test`).
- */
+// Uji unit navigasi riwayat (Back/Forward) dan ingatan gulir paginasi; penjaga sumber: `:hover` hanya di
+// `@media (hover: hover)` dan pelacak dipakai di halaman kategori. Pelari: `node:test` (`npm test`).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'

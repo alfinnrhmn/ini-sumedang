@@ -1,7 +1,5 @@
-/**
- * Penjaga sumber untuk kontrak tampilan yang bisa dibaca dari sumber; perilaku di browser (area klik, sorotan, tab stop) diuji manual/QA.
- * Pelari: `node:test` (`npm test`).
- */
+// Penjaga sumber untuk kontrak tampilan yang bisa dibaca dari sumber; perilaku browser diuji manual/QA.
+// Pelari: `node:test` (`npm test`).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'

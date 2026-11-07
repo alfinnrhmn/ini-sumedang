@@ -9,8 +9,8 @@ const props = defineProps<{
   now: string
 }>()
 
-// Carousel tanpa tombol prev/next dan geser sentuh: titik = tombol dengan roving tabindex; panah kiri/kanan (berputar), Home, End memindahkan fokus dan slide. Pindah slide = geser ke kiri (HERO_SLIDE_MS ease) tanpa pergeseran tata letak
-// (slide bertumpuk absolut di kotak tetap); slide lama tetap dirender `inert` + `aria-hidden` sampai animasi selesai lalu `hidden`; `prefers-reduced-motion: reduce` = instan.
+// Carousel tanpa prev/next dan geser sentuh: titik = tombol roving tabindex; panah (berputar), Home, End pindah slide.
+// Slide bertumpuk di kotak tetap; slide lama inert + aria-hidden sampai animasi selesai; reduced-motion = instan.
 const selected = ref(0)
 const active = computed(() => Math.min(selected.value, props.articles.length - 1))
 const leaving = ref<number | null>(null)
@@ -43,8 +43,8 @@ function onSlideAnimationEnd(event: AnimationEvent) {
   if (event.target === event.currentTarget) settle()
 }
 
-// Putar otomatis tiap HERO_AUTOPLAY_MS, hanya di klien setelah mount (SSR/hidrasi tidak berubah). Dijeda saat pointer di atas hero, fokus keyboard (`:focus-visible`; titik yang baru diklik tidak menjeda) di dalam hero, atau tab tersembunyi; reduced-motion = tanpa putar.
-// Satu timer setTimeout dipasang ulang tiap status/slide berubah, dibersihkan saat unmount; pilihan titik/panah memulai ulang dari 0 (`restartAutoplay`). Logika keputusan ada di app/config/home.ts agar bisa diuji murni.
+// Putar otomatis (HERO_AUTOPLAY_MS) hanya di klien; dijeda saat pointer di hero, fokus keyboard, atau tab tersembunyi.
+// reduced-motion = tanpa putar. setTimeout dipasang ulang tiap perubahan, dibersihkan saat unmount (config/home.ts).
 const root = ref<HTMLElement | null>(null)
 const mounted = ref(false)
 const reducedMotion = ref(false)
@@ -88,7 +88,7 @@ function onFocusIn(event: FocusEvent) {
     focused.value = (event.target as HTMLElement).matches(':focus-visible')
   }
   catch {
-    focused.value = true // peramban tanpa :focus-visible: anggap fokus keyboard (lebih aman: menjeda)
+    focused.value = true // tanpa :focus-visible: anggap fokus keyboard (lebih aman: menjeda)
   }
 }
 
@@ -137,7 +137,8 @@ function onKeydown(event: KeyboardEvent) {
   dotEls[next]?.focus()
 }
 
-// Chip = kategori pertama artikel (nama sudah didekode di server), tanpa kategori tidak dirender; kategori dari daftar WordPress = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul), selain itu teks.
+// Chip = kategori pertama artikel (nama sudah didekode di server), tanpa kategori tidak dirender; kategori WordPress
+// = tautan ke /kategori/<slug> (tab stop sendiri, di atas overlay judul), selain itu teks.
 const categories = useCategories()
 const slides = computed(() =>
   props.articles.map(article => ({
@@ -259,7 +260,7 @@ const slides = computed(() =>
   display: none;
 }
 
-/* Animasi geser-kiri: slide baru masuk dari kanan, slide lama keluar ke kiri, bersamaan (bersebelahan, tanpa tumpang tindih). */
+/* Geser-kiri: slide baru masuk dari kanan, slide lama keluar ke kiri, bersamaan (tanpa tumpang tindih). */
 .slide--enter {
   animation: hero-slide-in var(--hero-slide-ms) ease both;
 }
@@ -295,8 +296,8 @@ const slides = computed(() =>
   }
 }
 
-/* Foto memenuhi kotak (object-fit: cover). Lapisan gelap ditambahkan (Figma tanpa overlay) agar teks putih dan chip (putih 20%) terbaca di foto CMS yang lebih terang.
-   Kontras teks >= 4,9:1 (WCAG, 8 foto fixture, 1440 dan 402); tanpa lapisan ini chip turun ke 1,2:1; stop 20% = 65% menjaga chip mobile di atas AA 4,5:1. */
+/* Foto memenuhi kotak (cover). Lapisan gelap ditambahkan (Figma tanpa overlay) agar teks putih dan chip terbaca.
+   Kontras teks >= 4,9:1 (8 foto fixture); tanpa lapisan chip 1,2:1; stop 20% = 65% menjaga chip mobile di atas AA. */
 .photo {
   position: absolute;
   inset: 0;
@@ -324,8 +325,8 @@ const slides = computed(() =>
   z-index: 1;
 }
 
-/* Judul = satu-satunya tautan slide (satu titik tab). Tautan memakai overlay ::after seluruh slide sebagai area klik, jadi judul tidak boleh menjadi blok penampung
-   (position: static; z-index berlaku karena judul adalah item grid). Foto bukan tautan. */
+/* Judul = satu-satunya tautan slide (satu tab stop); overlay ::after seluruh slide = area klik, jadi judul bukan blok
+   penampung (position: static; z-index berlaku karena judul item grid). Foto bukan tautan. */
 .slide > .title {
   position: static;
   z-index: 1;
@@ -337,7 +338,7 @@ const slides = computed(() =>
   inset: 0;
 }
 
-/* Cincin fokus 4 px total (2 + jarak 2) di luar hero (slide ber-overflow hidden akan memotongnya, jadi digambar pada .hero) */
+/* Cincin fokus 4 px total (2 + jarak 2) di luar hero; digambar pada .hero karena slide overflow hidden memotongnya */
 .link:focus-visible {
   outline: none;
 }
@@ -354,7 +355,7 @@ const slides = computed(() =>
   }
 }
 
-/* Chip: tinggi 18, radius 4, latar putih 20%. Figma: lebar tetap 117 dengan px 15, teks terpusat melewati padding (jarak tepi sebenarnya ~9,7);
+/* Chip: tinggi 18, radius 4, latar putih 20%. Figma: lebar 117 dengan px 15, teks terpusat melewati padding (~9,7);
    dipakai padding 10 dengan lebar mengikuti teks (selisih lebar 0,56 untuk label contoh). */
 .chip {
   grid-area: chip;
@@ -372,13 +373,13 @@ const slides = computed(() =>
   text-overflow: ellipsis;
 }
 
-/* Chip tautan di atas overlay judul (z-index 2 > judul 1); hover bergaris bawah; fokus putih seperti titik (--color-focus tak terlihat di foto gelap) */
+/* Chip tautan di atas overlay judul (z-index 2 > 1); hover bergaris bawah; fokus putih (hitam tak terlihat di foto) */
 .slide > .chip {
   z-index: 2;
 }
 
-/* Area klik chip tautan (mobile 18 px) >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada chip; overflow chip tautan dibuat visible agar ::after tidak terpotong
-   (nama kategori resmi pendek, jadi tidak ada teks yang meluber). Tampilan chip tidak berubah. */
+/* Area klik chip tautan (mobile 18 px) >= 24 x 24 px (WCAG 2.5.8) lewat ::after tak terlihat berpusat pada chip;
+   overflow chip tautan visible agar ::after tidak terpotong (nama kategori pendek). Tampilan chip tidak berubah. */
 a.chip {
   overflow: visible;
 }
@@ -544,11 +545,11 @@ a.chip::after {
     line-clamp: 4;
   }
 
-  /* Blok penerbit + waktu desktop sengaja lebih kecil dari Figma (avatar 50, nama 23,04, waktu 18) agar ringkas: avatar 32, nama 16, waktu 13,333,
-     celah dan jarak ~0,64x. Mobile/tablet tidak berubah. */
+  /* Penerbit + waktu desktop sengaja lebih kecil dari Figma (avatar 50, nama 23,04, waktu 18) agar ringkas: avatar 32,
+     nama 16, waktu 13,333, celah dan jarak ~0,64x. Mobile/tablet tidak berubah. */
   .meta {
     max-width: 270px;
-    margin-top: -16px; /* jarak judul ke penulis tetap 16 (row-gap 32 - 16): garis dasar judul sudah memberi ruang tambahan */
+    margin-top: -16px; /* judul ke penulis tetap 16 (row-gap 32 - 16): garis dasar judul memberi ruang */
     margin-bottom: -12px; /* jarak penulis ke titik 32 -> 20 (32 x 0,64), tanpa mengubah row-gap chip-judul */
     gap: 4px; /* waktu rapat di bawah penerbit */
   }

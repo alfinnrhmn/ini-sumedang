@@ -1,7 +1,5 @@
-/**
- * Uji unit widget sosial "Ikuti IniSumedang": logika murni (`socialHref` hanya https, `socialLabel` satu unit), data konfigurasi (enam platform, penampung) dan penjaga sumber komponen/penempatan
- * (tanpa tombol ikuti/form/skrip, ikon dekoratif, warna dari token, widget di kolom kanan Beranda/Detail/kategori dan tidak di Detail mobile). Pelari: `node:test` (`npm test`).
- */
+// Uji unit widget sosial "Ikuti IniSumedang": `socialHref` (hanya https), `socialLabel`, data konfigurasi, dan
+// penjaga sumber (tanpa tombol ikuti/form/skrip; kolom kanan Beranda/Detail/kategori, tidak di Detail mobile).
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, existsSync } from 'node:fs'
@@ -106,7 +104,7 @@ describe('SOC-001 penempatan (penjaga sumber)', () => {
     assert.match(page, /<div ref="sideAds" class="side-ads">\s*<HomeSocialWidget \/>\s*<AdSlot variant="sidebar-m" \/>/)
     assert.match(page, /const socialIndex = computed\(\(\) => Math\.min\(2, sections\.value\.length - 1\)\)/)
     assert.match(page, /<div v-if="sectionIndex === socialIndex" class="mobile-social">\s*<HomeSocialWidget \/>/)
-    // Salinan desktop (kolom Rekomendasi), salinan mobile di antara section, dan salinan mobile cadangan bila tanpa section kategori
+    // Salinan desktop (kolom Rekomendasi), salinan mobile di antara section, dan cadangan bila tanpa section kategori
     assert.equal((page.match(/<HomeSocialWidget/g) ?? []).length, 3)
   })
 
